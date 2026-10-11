@@ -60,15 +60,39 @@ class RAGService:
         user_id = getattr(user, "id", None) if user else None
         user_email = getattr(user, "email", None) if user else None
 
-        # 1. Query Resolution & Follow-Up Check
+        # 1. Conversational & Sentimental Inquiries (Routed to Dedicated Key)
+        if sap_classifier.is_conversational_or_greeting(query):
+            logger.info(f"Routing conversational query '{query}' to dedicated conversational LLM tier.")
+            conversational_reply = llm_service.generate_conversational_reply(query, chat_history=chat_history)
+            follow_ups = followup_service.generate_starter_followups()
+            return {
+                "answer": conversational_reply,
+                "source_type": "conversational",
+                "grounding_score": 1.0,
+                "is_in_rag_pipeline": False,
+                "kb_score": 0.0,
+                "web_score": 0.0,
+                "winning_score": 0.0,
+                "selected_source": "conversational_assistant",
+                "verification_status": "verified",
+                "internal_evidence_confidence": 0.0,
+                "selected_evidence_quality": 0.0,
+                "external_search_used": False,
+                "citations": [],
+                "web_sources": [],
+                "follow_up_questions": follow_ups,
+                "selection_summary": "Handled via dedicated conversational assistant introducing SAP BRIM."
+            }
+
+        # 2. Query Resolution & Follow-Up Check
         resolution = query_rewriter.resolve_query(query, chat_history=chat_history)
         is_follow_up = resolution.get("is_follow_up", False)
         resolved_query = resolution.get("resolved_query", query).strip()
         cleaned_query = resolved_query
 
-        # 2. Strict SAP Domain Classifier Enforcement
+        # 3. Strict SAP Domain Classifier Enforcement
         # If it's a verified follow-up to an existing SAP topic, evaluate resolved_query;
-        # otherwise evaluate the raw query. Sentimental and non-SAP queries are rejected automatically.
+        # otherwise evaluate the raw query. Unrelated non-SAP queries are rejected automatically.
         target_check_query = cleaned_query if is_follow_up else query.strip()
         is_sap, refusal_msg = sap_classifier.classify(target_check_query)
 
@@ -129,11 +153,40 @@ class RAGService:
 
         selected_passages = evidence_selection.get("selected_passages") or top_kb_chunks or web_results or []
         selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
-        if selected_source_type in ("insufficient", "none"):
-            selected_source_type = "knowledge_base" if top_kb_chunks else ("web" if web_results else "knowledge_base")
         selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
 
-        # 6. Generate Candidate Answer (Always answer the query)
+        # Honest Abstention Gate when both internal and external sources are insufficient
+        if selected_source_type in ("insufficient", "none") or (internal_conf < 0.50 and not web_results and selected_quality < 0.50):
+            abstention_answer = (
+                f"I couldn't find sufficient authoritative evidence in the available SAP knowledge base "
+                f"or official SAP documentation to answer your inquiry about '{query}'. "
+                f"The requested technical details are not available or cannot be verified in official documentation. "
+                f"Please verify the question context or consult relevant SAP Service Marketplace notes."
+            )
+            return {
+                "answer": abstention_answer,
+                "source_type": "abstention",
+                "grounding_score": 0.0,
+                "is_in_rag_pipeline": False,
+                "kb_score": round(internal_conf, 4),
+                "web_score": 0.0,
+                "winning_score": 0.0,
+                "selected_source": "abstention",
+                "verification_status": "abstention",
+                "internal_evidence_confidence": internal_conf,
+                "selected_evidence_quality": 0.0,
+                "external_search_used": should_trigger_tavily,
+                "citations": [],
+                "web_sources": [],
+                "follow_up_questions": [
+                    "What specific SAP module or business process does this involve?",
+                    "Can you provide the relevant SAP transaction code or table name?",
+                    "How can I check this in standard SAP customizing (SPRO)?"
+                ],
+                "selection_summary": "Insufficient authoritative evidence available to substantiate technical claims."
+            }
+
+        # 6. Generate Candidate Answer
         candidate_answer = llm_service.generate_answer(
             cleaned_query, selected_passages, source_type=selected_source_type
         )
@@ -148,8 +201,10 @@ class RAGService:
         verification_status = verification.get("verification_status", "verified")
 
         # 8. Controlled Answer Repair if needed
+        regeneration_count = 0
         if not verification.get("passes_grounding_gate") and settings.MAX_GROUNDING_REPAIR_ATTEMPTS > 0:
             logger.info("Attempting answer repair...")
+            regeneration_count += 1
             repaired_answer = llm_service.repair_answer(
                 query=cleaned_query,
                 candidate_answer=candidate_answer,
@@ -175,20 +230,32 @@ class RAGService:
         citations = []
         web_sources = []
         for p in selected_passages:
-            if p.get("source_type") == "knowledge_base":
+            src_type = p.get("source_type") or ("web" if p.get("url") else "knowledge_base")
+            if src_type == "knowledge_base":
+                doc_name = p.get("document_name") or p.get("title") or "SAP BRIM Documentation"
+                page_no = p.get("page_number", 1) or 1
+                section_title = p.get("section", "") or f"Page {page_no}"
+                score_val = round(float(p.get("relevance_score", p.get("rerank_score", p.get("score", 0.7)))), 4)
+                raw_snip = p.get("snippet") or p.get("chunk_text") or ""
+                clean_snip = raw_snip.replace("\ufffd", "-").strip()
                 citations.append({
-                    "document": p.get("document_name", "SAP Manual"),
-                    "page": p.get("page_number", 1),
-                    "section": p.get("section", ""),
-                    "score": round(float(p.get("relevance_score", 0.7)), 4),
-                    "snippet": p.get("snippet", "")
+                    "document": doc_name,
+                    "page": page_no,
+                    "section": section_title,
+                    "score": score_val,
+                    "snippet": clean_snip
                 })
-            elif p.get("source_type") == "web":
+            elif src_type == "web":
+                title_val = p.get("title") or p.get("document_name") or "SAP Official Documentation"
+                url_val = p.get("url", "")
+                domain_val = p.get("domain", "help.sap.com")
+                raw_snip = p.get("snippet") or p.get("chunk_text") or ""
+                clean_snip = raw_snip.replace("\ufffd", "-").strip()
                 web_sources.append({
-                    "title": p.get("title", "SAP Documentation"),
-                    "url": p.get("url", ""),
-                    "domain": p.get("domain", "help.sap.com"),
-                    "snippet": p.get("snippet", "")
+                    "title": title_val,
+                    "url": url_val,
+                    "domain": domain_val,
+                    "snippet": clean_snip
                 })
 
         return {
@@ -207,7 +274,11 @@ class RAGService:
             "citations": citations,
             "web_sources": web_sources,
             "follow_up_questions": follow_ups,
-            "selection_summary": evidence_selection.get("selection_summary", "")
+            "selection_summary": evidence_selection.get("selection_summary", ""),
+            "model_used": getattr(llm_service, "last_model_used", "openai/gpt-oss-120b"),
+            "provider_used": getattr(llm_service, "last_provider_used", "groq"),
+            "failed_over": getattr(llm_service, "failed_over", False),
+            "regeneration_count": regeneration_count
         }
 
     def stream_query(
@@ -229,6 +300,44 @@ class RAGService:
         user_role = getattr(user, "role", "consultant") if user else "consultant"
         user_id = getattr(user, "id", None) if user else None
         user_email = getattr(user, "email", None) if user else None
+
+        # STAGE 0: Conversational & Sentimental Inquiries (Dedicated Key)
+        if sap_classifier.is_conversational_or_greeting(query):
+            logger.info(f"Stream routing conversational query '{query}' to dedicated conversational LLM tier.")
+            yield {
+                "type": "status",
+                "stage": "thinking",
+                "message": "Connecting to SAP BRIM Assistant..."
+            }
+            token_buffer = ""
+            for token in llm_service.stream_conversational_reply(query, chat_history=chat_history):
+                token_buffer += token
+                yield {
+                    "type": "token",
+                    "content": token
+                }
+
+            follow_ups = followup_service.generate_starter_followups()
+            yield {
+                "type": "done",
+                "answer": token_buffer,
+                "source_type": "conversational",
+                "grounding_score": 1.0,
+                "is_in_rag_pipeline": False,
+                "kb_score": 0.0,
+                "web_score": 0.0,
+                "winning_score": 0.0,
+                "selected_source": "conversational_assistant",
+                "verification_status": "verified",
+                "internal_evidence_confidence": 0.0,
+                "selected_evidence_quality": 0.0,
+                "external_search_used": False,
+                "citations": [],
+                "web_sources": [],
+                "follow_up_questions": follow_ups,
+                "selection_summary": "Handled via dedicated conversational assistant introducing SAP BRIM."
+            }
+            return
 
         # STAGE 1: Context Resolution & Follow-Up Check
         yield {
@@ -331,9 +440,49 @@ class RAGService:
 
         selected_passages = evidence_selection.get("selected_passages") or top_kb_chunks or web_results or []
         selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
-        if selected_source_type in ("insufficient", "none"):
-            selected_source_type = "knowledge_base" if top_kb_chunks else ("web" if web_results else "knowledge_base")
         selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
+
+        # Honest Abstention Gate for streaming
+        if selected_source_type in ("insufficient", "none") or (internal_conf < 0.50 and not web_results and selected_quality < 0.50):
+            abstention_answer = (
+                f"I couldn't find sufficient authoritative evidence in the available SAP knowledge base "
+                f"or official SAP documentation to answer your inquiry about '{query}'. "
+                f"The requested technical details are not available or cannot be verified in official documentation. "
+                f"Please verify the question context or consult relevant SAP Service Marketplace notes."
+            )
+            yield {
+                "type": "token",
+                "content": abstention_answer
+            }
+            yield {
+                "type": "status",
+                "stage": "verifying_claims",
+                "message": "Verifying claims..."
+            }
+            yield {
+                "type": "done",
+                "answer": abstention_answer,
+                "source_type": "abstention",
+                "grounding_score": 0.0,
+                "is_in_rag_pipeline": False,
+                "kb_score": round(internal_conf, 4),
+                "web_score": 0.0,
+                "winning_score": 0.0,
+                "selected_source": "abstention",
+                "verification_status": "abstention",
+                "internal_evidence_confidence": internal_conf,
+                "selected_evidence_quality": 0.0,
+                "external_search_used": should_trigger_tavily,
+                "citations": [],
+                "web_sources": [],
+                "follow_up_questions": [
+                    "What specific SAP module or business process does this involve?",
+                    "Can you provide the relevant SAP transaction code or table name?",
+                    "How can I check this in standard SAP customizing (SPRO)?"
+                ],
+                "selection_summary": "Insufficient authoritative evidence available to substantiate technical claims."
+            }
+            return
 
         # STAGE 5: Direct Live Answer Streaming (Instant TTFT)
         yield {
@@ -364,7 +513,12 @@ class RAGService:
                 "content": final_answer
             }
 
-        # STAGE 6: Instant Claim-Level Grounding Verification (algorithmic, <5ms)
+        # STAGE 6: Instant Claim-Level Grounding Verification
+        yield {
+            "type": "status",
+            "stage": "verifying_claims",
+            "message": "Verifying technical claims against evidence..."
+        }
         verification = grounding_service.verify_answer(
             cleaned_query, final_answer, selected_passages, source_type=selected_source_type
         )
@@ -380,20 +534,32 @@ class RAGService:
         citations = []
         web_sources = []
         for p in selected_passages:
-            if p.get("source_type") == "knowledge_base":
+            src_type = p.get("source_type") or ("web" if p.get("url") else "knowledge_base")
+            if src_type == "knowledge_base":
+                doc_name = p.get("document_name") or p.get("title") or "SAP BRIM Documentation"
+                page_no = p.get("page_number", 1) or 1
+                section_title = p.get("section", "") or f"Page {page_no}"
+                score_val = round(float(p.get("relevance_score", p.get("rerank_score", p.get("score", 0.7)))), 4)
+                raw_snip = p.get("snippet") or p.get("chunk_text") or ""
+                clean_snip = raw_snip.replace("\ufffd", "-").strip()
                 citations.append({
-                    "document": p.get("document_name", "SAP Manual"),
-                    "page": p.get("page_number", 1),
-                    "section": p.get("section", ""),
-                    "score": round(float(p.get("relevance_score", 0.7)), 4),
-                    "snippet": p.get("snippet", "")
+                    "document": doc_name,
+                    "page": page_no,
+                    "section": section_title,
+                    "score": score_val,
+                    "snippet": clean_snip
                 })
-            elif p.get("source_type") == "web":
+            elif src_type == "web":
+                title_val = p.get("title") or p.get("document_name") or "SAP Official Documentation"
+                url_val = p.get("url", "")
+                domain_val = p.get("domain", "help.sap.com")
+                raw_snip = p.get("snippet") or p.get("chunk_text") or ""
+                clean_snip = raw_snip.replace("\ufffd", "-").strip()
                 web_sources.append({
-                    "title": p.get("title", "SAP Documentation"),
-                    "url": p.get("url", ""),
-                    "domain": p.get("domain", "help.sap.com"),
-                    "snippet": p.get("snippet", "")
+                    "title": title_val,
+                    "url": url_val,
+                    "domain": domain_val,
+                    "snippet": clean_snip
                 })
 
         # STAGE 10: Completion 'done' event with all required fields

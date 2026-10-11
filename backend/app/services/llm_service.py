@@ -9,17 +9,50 @@ from backend.app.services.answer_planner import answer_planner
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_PROMPT = """You are cClyptus.AI Assistant, an advanced enterprise AI assistant and expert consultant specializing in SAP, SAP BRIM (Billing and Revenue Innovation Management), software engineering, and enterprise architecture.
+SYSTEM_PROMPT = """You are cClyptus.AI Assistant, an elite SAP Solution Architect and Principal Enterprise AI Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management), SAP S/4HANA, and enterprise billing architecture.
 
-Your mission is to provide helpful, comprehensive, technically rigorous, and accurate answers to any inquiry the user presents.
+Your objective is to provide production-grade, technically accurate, evidence-grounded guidance for senior SAP consultants and enterprise architects.
 
-Core Principles:
-- Answer every question thoroughly, clearly, and constructively.
-- When retrieved documentation or evidence is provided, prioritize it and integrate all relevant technical details, transaction codes, database tables, and customizing steps.
-- When general or broader questions are asked, use your deep technical knowledge base and intelligence to provide complete, insightful, and practical guidance.
-- Never refuse to answer, and never state that you cannot generate text, cannot help, or lack information.
-- Format responses beautifully with clean Markdown headings, structured bullet points, and tables where applicable.
-- Maintain a professional, senior consultant tone."""
+CORE ARCHITECTURAL AND GROUNDING PRINCIPLES:
+1. Strict Evidence Grounding:
+   - Base all technical statements, procedures, and architectural claims strictly on the provided retrieved evidence and verified SAP documentation.
+   - When evidence is provided, cite and prioritize documented transaction codes, database tables, BAPIs, and customizing (SPRO) activities.
+
+2. Prevention of Technical Hallucinations:
+   - NEVER fabricate SAP transaction codes, database tables, field names, BAPIs/APIs, customizing paths, or processing statuses.
+   - If an object or process is not documented in the provided knowledge base, explicitly declare that it cannot be verified in current documentation rather than inventing one.
+   - Never assert unverified integration guarantees (e.g. automatic exactly-once processing, automatic partner settlements, or automatic IFRS 15 schedules) unless explicitly supported by evidence.
+
+3. Clear Technical Classification:
+   - Clearly distinguish between:
+     [A] Documented Standard SAP Functionality
+     [B] Standard Customizing / Configuration (SPRO)
+     [C] Recommended Architectural Design Pattern
+     [D] Custom Development Required (BAdI, Enhancement Spot, BAPI)
+     [E] Technical Inference / Unverified Requirement
+
+4. Professional Structure:
+   - Structure complex responses clearly: Executive Summary, Component Alignment (SOM, CC, CI, FI-CA), Configuration / Master Data, Data Flow, Error & Recovery, and Evidence Boundaries.
+   - Maintain an authoritative, senior consultant tone with clean Markdown formatting."""
+
+
+CONVERSATIONAL_SYSTEM_PROMPT = """You are cClyptus.AI Assistant, an elite and friendly SAP Solution Architect and Principal Enterprise Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management).
+
+The user is having a casual, greeting, or conversational interaction (such as saying hello, asking "what are you doing?", "who are you?", "how are you?", or asking how to use you).
+
+YOUR OBJECTIVES:
+1. Greet or answer the user's specific conversational question warmly, naturally, and personably:
+   - If they ask "what are you doing?", answer that you are actively analyzing enterprise architectures and standing by to assist them with everything in SAP and SAP BRIM.
+   - If they say "hi" or "hello", greet them warmly with high energy.
+   - If they ask who you are or how to use you, introduce yourself as the dedicated SAP BRIM AI Assistant.
+2. Clearly explain that they can use you to get details about SAP BRIM (Billing and Revenue Innovation Management) and all related modules:
+   - Subscription Order Management (SOM): Master data, provider orders, provider contracts.
+   - Convergent Charging (CC): Real-time online rating, offline batch rating, charge plans, pricing macros.
+   - Convergent Invoicing (CI): Billable item classes (BITs), billing aggregation, and invoicing documents.
+   - Contract Accounts Receivable and Payable (FI-CA): Contract accounts, open items, automatic clearing, payment runs, and dunning.
+   - Architecture & S/4HANA integration, customizing paths (SPRO), transaction codes, database tables, and SLG1 troubleshooting.
+3. Explicitly invite the user to ask any follow-up questions about SAP BRIM processes, transaction codes, or architecture.
+4. Maintain an inviting, expert consultant persona. Keep the response crisp, well-structured with clean markdown (2-3 concise paragraphs), without generic robotic disclaimers."""
 
 
 class LLMService:
@@ -27,28 +60,22 @@ class LLMService:
     # Fallback model cascades for all supported providers
     # Valid Groq models (https://console.groq.com/docs/models)
     GROQ_MODELS = [
-        "openai/gpt-oss-20b",
-        "qwen/qwen3.8-27b",
         "openai/gpt-oss-120b",
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-20b",
         "allam-2-7b",
     ]
 
     # Valid Gemini models
     GEMINI_MODELS = [
-        "gemini-3.8-flash",
-        "gemini-3.5-flash-lite",
         "gemini-2.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
+        "gemini-3.8-flash",
     ]
 
     # Valid OpenRouter free models
     OPENROUTER_MODELS = [
-        "google/gemma-4-31b-it:free",
-        "google/gemma-4-26b-a4b-it:free",
-        "nvidia/nemotron-3.5-lightning:free",
         "liquid/lfm-2.5-2.6b:free",
+        "nvidia/nemotron-3.5-lightning:free",
         "apodex/apodex-1.1-mini:free",
     ]
 
@@ -76,6 +103,10 @@ class LLMService:
         # Legacy compatibility attribute
         self.api_key = self.groq_api_key or self.gemini_api_key or self.openrouter_api_key
         self.provider = "tiered"
+        self.last_model_used = self.GROQ_MODELS[0]
+        self.last_provider_used = "groq"
+        self.failed_over = False
+
 
     # =========================================================
     # TEXT CLEANING
@@ -484,33 +515,34 @@ class LLMService:
     ) -> str:
 
         evidence_context = ""
+        budgeted_evidence = (evidence or [])[:4]
 
-        if source_type == "knowledge_base":
-
+        if source_type in ("knowledge_base", "combined"):
             evidence_context = "\n\n".join(
                 [
                     (
                         f"[Document: {c.get('document_name')}, "
                         f"Page: {c.get('page_number')}, "
                         f"Section: {c.get('section')}]\n"
-                        f"{c.get('chunk_text')}"
+                        f"{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
                     )
-                    for c in evidence
+                    for c in budgeted_evidence
                 ]
             )
-
         elif source_type == "web":
-
             evidence_context = "\n\n".join(
                 [
                     (
                         f"[Source: {w.get('title')} "
                         f"- {w.get('domain')}]\n"
-                        f"{w.get('snippet')}"
+                        f"{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
                     )
-                    for w in evidence
+                    for w in budgeted_evidence
                 ]
             )
+
+        if len(evidence_context) > 4500:
+            evidence_context = evidence_context[:4500] + "..."
 
         plan = answer_planner.plan_answer(query)
         structure_guidance = plan.get("instructions", "")
@@ -564,6 +596,68 @@ Instructions:
             metadata=evidence
         )
 
+    def generate_with_primary_model(
+        self,
+        query: str,
+        evidence: List[Dict[str, Any]],
+        source_type: str = "knowledge_base"
+    ) -> Optional[str]:
+        """
+        Attempts direct retry on primary model (Groq openai/gpt-oss-120b)
+        with exponential backoff (e.g. 2s, 4s) when failover occurs.
+        """
+        import time
+        if not self.groq_api_key:
+            return None
+        try:
+            from groq import Groq
+            client = Groq(api_key=self.groq_api_key, timeout=8.0, max_retries=0)
+        except Exception as e:
+            logger.warning(f"Failed to initialize Groq client for primary retry: {e}")
+            return None
+
+        evidence_context = ""
+        budgeted_evidence = (evidence or [])[:4]
+        if source_type in ("knowledge_base", "combined"):
+            evidence_context = "\n\n".join([
+                f"[Document: {c.get('document_name')}, Page: {c.get('page_number')}, Section: {c.get('section')}]\n{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
+                for c in budgeted_evidence
+            ])
+        elif source_type == "web":
+            evidence_context = "\n\n".join([
+                f"[Source: {w.get('title')} - {w.get('domain')}]\n{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
+                for w in budgeted_evidence
+            ])
+
+        plan = answer_planner.plan_answer(query)
+        user_prompt = f"USER QUERY:\n{query}\n\nQUESTION ARCHETYPE:\n{plan.get('title', 'Technical Inquiry')}\n\nSOURCE TYPE:\n{source_type.upper()}\n\nRETRIEVED EVIDENCE:\n{evidence_context}\n\nTASK:\nAnswer the user's question thoroughly, completely, and helpfully."
+
+        primary_model = self.GROQ_MODELS[0]
+        try:
+            time.sleep(2.0)
+            response = client.chat.completions.create(
+                model=primary_model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                temperature=0.1,
+                max_tokens=4096,
+                timeout=8.0
+            )
+            if response.choices and response.choices[0].message and response.choices[0].message.content:
+                content = response.choices[0].message.content.strip()
+                if content:
+                    self.last_model_used = primary_model
+                    self.last_provider_used = "groq"
+                    self.failed_over = False
+                    logger.info(f"Re-run on primary model succeeded: {primary_model}")
+                    return content
+        except Exception as e:
+            logger.info(f"Primary model retry bypassed under current TPM quota: {e}. Retaining valid failover response.")
+        return None
+
+
     # =========================================================
     # MULTI-PROVIDER TIERED INFERENCE HELPERS
     # (Tier 1: Groq -> Tier 2: Gemini -> Tier 3: OpenRouter)
@@ -575,7 +669,7 @@ Instructions:
             return None
         try:
             from groq import Groq
-            client = Groq(api_key=self.groq_api_key)
+            client = Groq(api_key=self.groq_api_key, timeout=8.0, max_retries=0)
         except Exception as e:
             logger.warning(f"[Tier 1: Groq] Client initialization failed: {e}")
             return None
@@ -590,11 +684,15 @@ Instructions:
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.1,
-                    max_tokens=4096
+                    max_tokens=4096,
+                    timeout=8.0
                 )
                 if response.choices and response.choices[0].message and response.choices[0].message.content:
                     content = response.choices[0].message.content.strip()
                     if content:
+                        self.last_model_used = model
+                        self.last_provider_used = "groq"
+                        self.failed_over = (model != self.GROQ_MODELS[0])
                         logger.info(f"[Tier 1: Groq] Successfully generated with model: {model}")
                         return content
                     else:
@@ -617,7 +715,7 @@ Instructions:
 
     def _call_gemini(self, prompt: str, system_prompt: str) -> Optional[str]:
         """Tier 2: Invoke Google Gemini across all its candidate models."""
-        if not self.gemini_api_key or not self.gemini_api_key.startswith("AIza"):
+        if not self.gemini_api_key:
             return None
         try:
             import google.generativeai as genai
@@ -644,6 +742,9 @@ Instructions:
                 if response and response.text:
                     content = response.text.strip()
                     if content:
+                        self.last_model_used = model_name
+                        self.last_provider_used = "gemini"
+                        self.failed_over = True
                         logger.info(f"[Tier 2: Gemini] Successfully generated with model: {model_name}")
                         return content
             except Exception as err:
@@ -689,6 +790,9 @@ Instructions:
                 if response.choices and response.choices[0].message and response.choices[0].message.content:
                     content = response.choices[0].message.content.strip()
                     if content:
+                        self.last_model_used = model
+                        self.last_provider_used = "openrouter"
+                        self.failed_over = True
                         logger.info(f"[Tier 3: OpenRouter] Successfully generated with model: {model}")
                         return content
             except Exception as err:
@@ -786,6 +890,109 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
         return ""
 
     # =========================================================
+    # CONVERSATIONAL & SENTIMENTAL ROUTING (Dedicated Key)
+    # =========================================================
+
+    def generate_conversational_reply(
+        self,
+        query: str,
+        chat_history: Optional[List[Dict[str, Any]]] = None
+    ) -> str:
+        """
+        Generates conversational and sentimental replies (e.g. 'what are you doing?', 'hi').
+        Routes explicitly to the dedicated Conversational LLM key (Tier 2: Gemini),
+        with fallback to OpenRouter or Groq.
+        """
+        user_prompt = f"User: {query}\n\nRespond warmly and conversationally, explaining what you are doing, that you are the dedicated SAP BRIM AI Assistant, and how the user can use you to explore all aspects of SAP BRIM (SOM, CC, CI, FI-CA). Invite them to ask follow-up questions."
+
+        # Dedicated Conversational Tier: Gemini API Key
+        logger.info("[Conversational Routing] Invoking Dedicated Key (Gemini) for conversational inquiry.")
+        ans = self._call_gemini(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT)
+        if ans:
+            return ans
+
+        # Fallback 1: OpenRouter
+        logger.info("[Conversational Routing] Gemini unavailable, falling back to OpenRouter.")
+        ans = self._call_openrouter(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT)
+        if ans:
+            return ans
+
+        # Fallback 2: Groq
+        logger.info("[Conversational Routing] OpenRouter unavailable, falling back to Groq.")
+        ans = self._call_groq(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT)
+        if ans:
+            return ans
+
+        # Deterministic zero-latency fallback if all cloud services offline
+        return (
+            "Hello! I am cClyptus.AI Assistant, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
+            "Right now, I am standing by to assist you with everything related to SAP Billing and Revenue Innovation Management (BRIM)!\n\n"
+            "**Use me to get details about:**\n"
+            "- **Subscription Order Management (SOM)**: Master data, provider orders, and provider contracts\n"
+            "- **Convergent Charging (CC)**: Real-time and offline rating, charge plans, and pricing logic\n"
+            "- **Convergent Invoicing (CI)**: Billable item classes (BITs), billing aggregation, and invoicing documents\n"
+            "- **Contract Accounts Receivable and Payable (FI-CA)**: Subledger accounting, open item clearing, and payment runs\n"
+            "- **Architecture & Configuration**: Transaction codes, database tables, SPRO customizing, and troubleshooting\n\n"
+            "Feel free to ask any follow-up questions regarding SAP BRIM processes or configuration below!"
+        )
+
+    def stream_conversational_reply(
+        self,
+        query: str,
+        chat_history: Optional[List[Dict[str, Any]]] = None
+    ) -> Generator[str, None, None]:
+        """
+        Progressively streams conversational and sentimental replies using the dedicated API key.
+        """
+        user_prompt = f"User: {query}\n\nRespond warmly and conversationally, explaining what you are doing, that you are the dedicated SAP BRIM AI Assistant, and how the user can use you to explore all aspects of SAP BRIM (SOM, CC, CI, FI-CA). Invite them to ask follow-up questions."
+
+        # Dedicated Conversational Tier: Gemini
+        yielded = False
+        try:
+            for token in self._stream_gemini(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT):
+                yielded = True
+                yield token
+            if yielded:
+                return
+        except Exception as e:
+            logger.warning(f"[Conversational Streaming] Gemini stream failed: {e}")
+
+        # Fallback 1: OpenRouter
+        try:
+            for token in self._stream_openrouter(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT):
+                yielded = True
+                yield token
+            if yielded:
+                return
+        except Exception as e:
+            logger.warning(f"[Conversational Streaming] OpenRouter stream failed: {e}")
+
+        # Fallback 2: Groq
+        try:
+            for token in self._stream_groq(user_prompt, CONVERSATIONAL_SYSTEM_PROMPT):
+                yielded = True
+                yield token
+            if yielded:
+                return
+        except Exception as e:
+            logger.warning(f"[Conversational Streaming] Groq stream failed: {e}")
+
+        # Deterministic fallback stream
+        fallback_text = (
+            "Hello! I am cClyptus.AI Assistant, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
+            "Right now, I am standing by to assist you with everything related to SAP Billing and Revenue Innovation Management (BRIM)!\n\n"
+            "**Use me to get details about:**\n"
+            "- **Subscription Order Management (SOM)**: Master data, provider orders, and provider contracts\n"
+            "- **Convergent Charging (CC)**: Real-time and offline rating, charge plans, and pricing logic\n"
+            "- **Convergent Invoicing (CI)**: Billable item classes (BITs), billing aggregation, and invoicing documents\n"
+            "- **Contract Accounts Receivable and Payable (FI-CA)**: Subledger accounting, open item clearing, and payment runs\n"
+            "- **Architecture & Configuration**: Transaction codes, database tables, SPRO customizing, and troubleshooting\n\n"
+            "Feel free to ask any follow-up questions regarding SAP BRIM processes or configuration below!"
+        )
+        for word in fallback_text.split(" "):
+            yield word + " "
+
+    # =========================================================
     # STREAMING
     # =========================================================
 
@@ -795,7 +1002,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
             return
         try:
             from groq import Groq
-            client = Groq(api_key=self.groq_api_key)
+            client = Groq(api_key=self.groq_api_key, timeout=8.0, max_retries=0)
         except Exception as e:
             logger.warning(f"[Tier 1: Groq] Stream client init failed: {e}")
             return
@@ -811,7 +1018,8 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                     ],
                     temperature=0.1,
                     max_tokens=4096,
-                    stream=True
+                    stream=True,
+                    timeout=8.0
                 )
                 yielded_any = False
                 for chunk in resp:
@@ -856,6 +1064,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                         temperature=0.1,
                         max_output_tokens=4096
                     ),
+                    request_options={"timeout": 10.0},
                     stream=True
                 )
                 yielded_any = False
@@ -924,31 +1133,34 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
     ) -> Generator[str, None, None]:
 
         evidence_context = ""
+        budgeted_evidence = (evidence or [])[:4]
 
-        if source_type == "knowledge_base":
+        if source_type in ("knowledge_base", "combined"):
             evidence_context = "\n\n".join(
                 [
                     (
                         f"[Document: {c.get('document_name')}, "
                         f"Page: {c.get('page_number')}, "
                         f"Section: {c.get('section')}]\n"
-                        f"{c.get('chunk_text')}"
+                        f"{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
                     )
-                    for c in evidence
+                    for c in budgeted_evidence
                 ]
             )
-
         elif source_type == "web":
             evidence_context = "\n\n".join(
                 [
                     (
                         f"[Source: {w.get('title')} "
                         f"- {w.get('domain')}]\n"
-                        f"{w.get('snippet')}"
+                        f"{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
                     )
-                    for w in evidence
+                    for w in budgeted_evidence
                 ]
             )
+
+        if len(evidence_context) > 4500:
+            evidence_context = evidence_context[:4500] + "..."
 
         user_prompt = f"""USER QUERY:
 {query}

@@ -1,0 +1,299 @@
+{
+  "dataset_split": "dev",
+  "total_questions": 132,
+  "retrieval_evaluated_questions": 132,
+  "excluded_retrieval_questions": 0,
+  "model_distribution": {
+    "openai/gpt-oss-120b": {
+      "count": 6,
+      "percentage": 4.55
+    },
+    "openai/gpt-oss-20b": {
+      "count": 12,
+      "percentage": 9.09
+    },
+    "allam-2-7b": {
+      "count": 81,
+      "percentage": 61.36
+    },
+    "liquid/lfm-2.5-2.6b:free": {
+      "count": 20,
+      "percentage": 15.15
+    },
+    "qwen/qwen3.8-27b": {
+      "count": 13,
+      "percentage": 9.85
+    }
+  },
+  "failed_over_percentage": 95.45,
+  "metrics": {
+    "Recall_at_3_fraction": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "all gold chunks across 132 questions"
+    },
+    "Recall_at_5_fraction": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "all gold chunks across 132 questions"
+    },
+    "Recall_at_10_fraction": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "all gold chunks across 132 questions"
+    },
+    "Hit_Rate_at_3": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "132 questions with gold chunks"
+    },
+    "Hit_Rate_at_5": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "132 questions with gold chunks"
+    },
+    "Hit_Rate_at_10": {
+      "mean": 1.0,
+      "ci_95": [
+        1.0,
+        1.0
+      ],
+      "denominator": "132 questions with gold chunks"
+    },
+    "MRR": {
+      "mean": 0.9962,
+      "ci_95": [
+        0.9886,
+        1.0
+      ],
+      "denominator": "132 questions with gold chunks"
+    },
+    "Multi_Module_Coverage": {
+      "mean": 0.9848,
+      "ci_95": [
+        0.9659,
+        1.0
+      ],
+      "denominator": "132 multi-module questions"
+    },
+    "Key_Fact_Coverage": {
+      "mean": 0.2903,
+      "ci_95": [
+        0.2343,
+        0.3452
+      ],
+      "denominator": "117 factual questions (refusals excluded)"
+    },
+    "LLM_Judge_Correctness": {
+      "mean": 0.5062,
+      "ci_95": [
+        0.4608,
+        0.5522
+      ],
+      "denominator": "132 questions"
+    },
+    "Refusal_and_Correction_Success": {
+      "mean": 0.4286,
+      "ci_95": [
+        0.2381,
+        0.6667
+      ],
+      "denominator": "21 refusal & false-premise questions"
+    },
+    "Supported_Claim_Rate": {
+      "mean": 0.8053,
+      "ci_95": [
+        0.7697,
+        0.8364
+      ],
+      "denominator": "all claims across 132 questions"
+    },
+    "Unsupported_Claim_Rate": {
+      "mean": 0.1947,
+      "ci_95": [
+        0.1636,
+        0.2303
+      ],
+      "denominator": "all claims across 132 questions"
+    },
+    "Identifier_Precision": {
+      "mean": 0.9476,
+      "ci_95": [
+        0.9164,
+        0.9741
+      ],
+      "denominator": "190 technical identifiers claimed"
+    },
+    "Identifier_Recall": {
+      "mean": 0.791,
+      "ci_95": [
+        0.7222,
+        0.8586
+      ],
+      "denominator": "76 expected technical identifiers"
+    },
+    "Latency_p50_ms": 2515.17,
+    "Latency_p95_ms": 36509.11
+  },
+  "categories": {
+    "conceptual": {
+      "count": 13,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.4359,
+      "llm_judge_score": 0.5555,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.1538,
+      "id_precision": 0.9769,
+      "latency_p50_ms": 4148.33
+    },
+    "configuration": {
+      "count": 14,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.4643,
+      "llm_judge_score": 0.5561,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.1143,
+      "id_precision": 0.9024,
+      "latency_p50_ms": 25869.53
+    },
+    "corpus_cannot_answer": {
+      "count": 10,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": null,
+      "llm_judge_score": 0.955,
+      "refusal_success": 0.3,
+      "unsupported_claim_rate": 0.25,
+      "id_precision": 1.0,
+      "latency_p50_ms": 2231.78
+    },
+    "cross_module_scenario": {
+      "count": 6,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.4583,
+      "llm_judge_score": 0.6208,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.1833,
+      "id_precision": 1.0,
+      "latency_p50_ms": 1927.03
+    },
+    "external_web_trigger": {
+      "count": 13,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.0962,
+      "llm_judge_score": 0.3442,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.1385,
+      "id_precision": 1.0,
+      "latency_p50_ms": 2515.17
+    },
+    "false_premise": {
+      "count": 6,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.4861,
+      "llm_judge_score": 0.5611,
+      "refusal_success": 0.1667,
+      "unsupported_claim_rate": 0.1833,
+      "id_precision": 1.0,
+      "latency_p50_ms": 2685.94
+    },
+    "hallucination_trap": {
+      "count": 8,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.0833,
+      "llm_judge_score": 0.2958,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.225,
+      "id_precision": 0.9167,
+      "latency_p50_ms": 3317.25
+    },
+    "integration": {
+      "count": 14,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.0893,
+      "llm_judge_score": 0.3196,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.1357,
+      "id_precision": 1.0,
+      "latency_p50_ms": 2301.03
+    },
+    "out_of_scope_refusal": {
+      "count": 5,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": null,
+      "llm_judge_score": 1.0,
+      "refusal_success": 1.0,
+      "unsupported_claim_rate": 0.6,
+      "id_precision": 1.0,
+      "latency_p50_ms": 40.21
+    },
+    "tcode_table": {
+      "count": 14,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 0.9643,
+      "key_fact_coverage": 0.4762,
+      "llm_judge_score": 0.5119,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.2929,
+      "id_precision": 0.8151,
+      "latency_p50_ms": 22738.41
+    },
+    "troubleshooting": {
+      "count": 15,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.3367,
+      "llm_judge_score": 0.4607,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.18,
+      "id_precision": 0.9333,
+      "latency_p50_ms": 2706.05
+    },
+    "version_specific": {
+      "count": 14,
+      "recall_at_3": 1.0,
+      "hit_rate_at_3": 1.0,
+      "mrr": 1.0,
+      "key_fact_coverage": 0.0893,
+      "llm_judge_score": 0.3411,
+      "refusal_success": null,
+      "unsupported_claim_rate": 0.15,
+      "id_precision": 0.9286,
+      "latency_p50_ms": 2264.19
+    }
+  }
+}

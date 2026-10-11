@@ -217,8 +217,8 @@ Provide a single JSON object with:
         judge_reasoning = ""
         judge_model_used = ""
 
-        # Tier A Judge: Gemini (if generator is Groq/OpenRouter)
-        if "groq" in generator_model.lower() and settings.GEMINI_API_KEY:
+        # Tier A Judge: Gemini (if generator is Groq/OpenRouter and quota not exhausted)
+        if "groq" in generator_model.lower() and settings.GEMINI_API_KEY and not getattr(self, "_gemini_quota_exhausted", False):
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -226,7 +226,7 @@ Provide a single JSON object with:
                 resp = g_model.generate_content(
                     judge_prompt,
                     generation_config=genai.types.GenerationConfig(temperature=0.0, max_output_tokens=500),
-                    request_options={"timeout": 8.0}
+                    request_options={"timeout": 5.0}
                 )
                 if resp and resp.text:
                     m = re.search(r"\"correctness_score\"\s*:\s*([0-9\.]+)", resp.text)
@@ -235,6 +235,8 @@ Provide a single JSON object with:
                         judge_model_used = "gemini-2.5-flash"
                         judge_reasoning = resp.text[:200]
             except Exception as e:
+                if "quota" in str(e).lower() or "429" in str(e):
+                    self._gemini_quota_exhausted = True
                 logger.warning(f"LLM Judge (Gemini) failed: {e}")
 
         # Fallback heuristic judge if cloud LLM judge timed out or is offline
