@@ -33,9 +33,26 @@ class GroundingEvaluator:
             abstention_quality = 1.0  # Not an abstention case
 
         # 2. Technical Identifier Accuracy
-        # Extract T-Codes and table names mentioned in answer
-        mentioned_ids = re.findall(r"\b(/[a-z0-9_]{2,}/[a-z0-9_]+|[a-z]{1,2}[0-9]{2}[a-z0-9]?|dfkk[a-z0-9_]+)\b", answer.lower())
-        filtered_ids = [tid for tid in mentioned_ids if len(tid) >= 3 and tid not in {"the", "and", "for", "with"}]
+        # High-precision pattern matching true SAP transactions, tables, and customizing views
+        TECH_EVAL_PATTERN = re.compile(
+            r"\b(/[a-z0-9_]{2,}/[a-z0-9_]+|fkkbix_[a-z0-9_]+|fkkbi_[a-z0-9_]+|fkk[a-z0-9_]+|"
+            r"fp[a-z0-9_]{2,8}|crmd_[a-z0-9_]+|farr_[a-z0-9_]+|wty_[a-z0-9_]+|"
+            r"dfkk[a-z0-9_]+|erdk|erch|but0[0-9]{2}|but0bk|mara|marc|vbak|vbap|ekko|ekpo|bseg|bkpf|v_fkk[a-z0-9_]+|"
+            r"me[0-9]{2}[a-z]?|va[0-9]{2}|vf[0-9]{2}|vk[0-9]{2}|fb[0-9]{2}|f110|"
+            r"se[0-9]{2}[a-z]?|sm[0-9]{2}|st[0-9]{2}|slg[0-9]|spro|swo1|sicf|miro|migo)\b",
+            re.IGNORECASE
+        )
+        EXCLUDED_EVAL_TOKENS = {
+            "b2b", "b2c", "p10", "p50", "p90", "p95", "p99", "v1", "v2", "v3", "ed1",
+            "2nd", "1st", "3rd", "sap", "som", "cc", "ci", "fica", "rar", "crm", "ecc",
+            "gui", "iot", "api", "erp", "rfc", "tcp", "ssl", "http", "rest", "soap",
+            "json", "xml", "csv", "sql", "hana", "btp", "cdr", "bit", "cit", "sla",
+            "e2e", "q1", "q2", "q3", "q4", "24x7", "2020", "1909", "404", "500", "100",
+            "http400", "http500", "http200", "the", "and", "for", "with"
+        }
+
+        raw_ids = [m.group(0).lower() for m in TECH_EVAL_PATTERN.finditer(answer)]
+        filtered_ids = [tid for tid in raw_ids if len(tid) >= 3 and tid not in EXCLUDED_EVAL_TOKENS]
 
         if filtered_ids:
             # Check if each mentioned ID was either in evidence or in known SAP entity registry

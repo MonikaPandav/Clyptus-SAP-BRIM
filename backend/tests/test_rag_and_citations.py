@@ -10,6 +10,7 @@ def auth_headers():
     login_resp = client.post("/api/auth/login", json={"email": "rag_evaluator@sap.com", "password": "Password123!"}).json()
     return {"Authorization": f"Bearer {login_resp['access_token']}"}
 
+@pytest.mark.live
 def test_rag_knowledge_base_retrieval(auth_headers):
     # Query clearly present in SAP MM manual
     resp = client.post(
@@ -35,6 +36,7 @@ def test_rag_knowledge_base_retrieval(auth_headers):
     assert "C:\\" not in first_citation["document"]
     assert "/Users/" not in first_citation["document"]
 
+@pytest.mark.live
 def test_rag_web_fallback_for_external_topics(auth_headers):
     # Query for SAP Ariba cloud procurement (not in our 10 primary on-prem manuals)
     resp = client.post(

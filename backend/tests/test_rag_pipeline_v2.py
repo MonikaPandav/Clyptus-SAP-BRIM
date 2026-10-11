@@ -35,6 +35,7 @@ def auth_headers():
 # ==============================================================================
 # TEST 1: STRONG INTERNAL EVIDENCE
 # ==============================================================================
+@pytest.mark.live
 def test_1_strong_internal_evidence(db_session):
     """
     Input: Question fully answered by internal SAP manuals (e.g. 3-way match in SAP MM).
@@ -59,6 +60,7 @@ def test_1_strong_internal_evidence(db_session):
 # ==============================================================================
 # TEST 2: WEAK INTERNAL EVIDENCE (< 70% CONFIDENCE)
 # ==============================================================================
+@pytest.mark.live
 def test_2_weak_internal_evidence_triggers_tavily(db_session):
     """
     Input: Valid SAP question not covered by internal on-prem manuals (e.g. SAP Ariba Cloud).
@@ -84,6 +86,7 @@ def test_2_weak_internal_evidence_triggers_tavily(db_session):
 # ==============================================================================
 # TEST 3: EXTERNAL EVIDENCE IMPROVES COVERAGE
 # ==============================================================================
+@pytest.mark.live
 def test_3_external_evidence_improves_coverage(db_session):
     """
     Input: Query on cloud SAP product.
@@ -104,6 +107,7 @@ def test_3_external_evidence_improves_coverage(db_session):
 # ==============================================================================
 # TEST 4: BOTH SOURCES INSUFFICIENT (ABSTENTION)
 # ==============================================================================
+@pytest.mark.live
 def test_4_both_sources_insufficient(db_session):
     """
     Input: Question that cannot be answered by either internal manuals or web.
@@ -233,6 +237,7 @@ def test_9_followup_question_generation():
 # ==============================================================================
 # TEST 10: SSE STREAMING AND BUFFERED VERIFICATION
 # ==============================================================================
+@pytest.mark.live
 def test_10_sse_streaming_stages(db_session):
     """
     Validates that streaming yields required progress status stages,

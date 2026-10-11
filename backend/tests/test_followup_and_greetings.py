@@ -67,3 +67,40 @@ def test_unrelated_questions_rejected_even_with_history():
         assert not cand, f"'{q}' should not be a follow-up"
         is_sap, _ = sap_classifier.classify(q)
         assert not is_sap, f"'{q}' should be rejected by classifier"
+
+
+def test_conversational_and_sentimental_detected():
+    conversational_queries = [
+        "what are you doing ?",
+        "what are you doing",
+        "hi",
+        "hii",
+        "hello",
+        "hey there",
+        "who are you?",
+        "what can you do?",
+        "how can you help me?",
+        "how are you?",
+    ]
+    for q in conversational_queries:
+        is_conv = sap_classifier.is_conversational_or_greeting(q)
+        assert is_conv is True, f"Query '{q}' should be detected as conversational"
+
+
+def test_conversational_rag_service_flow():
+    from backend.app.database import SessionLocal, init_db
+    from backend.app.services.rag_service import rag_service
+
+    init_db()
+    db = SessionLocal()
+    try:
+        res = rag_service.process_query(db, "what are you doing ?")
+        assert res["source_type"] == "conversational"
+        assert res["verification_status"] == "verified"
+        assert "SAP" in res["answer"]
+        assert len(res["follow_up_questions"]) == 3
+        for fq in res["follow_up_questions"]:
+            assert fq.endswith("?")
+    finally:
+        db.close()
+
