@@ -333,15 +333,15 @@ export const LandingPage: React.FC = () => {
                 <span className="story-badge">THE CHALLENGE</span>
                 <h3>Why Generic AI Fails in SAP</h3>
                 <p>
-                  Standard large language models <strong>hallucinate non-existent transaction codes</strong>, invent <strong>fictitious SPRO customizing paths</strong>, and confuse SAP Convergent Charging rating logic with Convergent Invoicing billing plans. In high-throughput telecommunications, utilities, and subscription businesses, <strong>a single billing configuration error can delay millions in revenue recognition</strong>.
+                  Standard large language models hallucinate non-existent transaction codes, invent fictitious SPRO customizing paths, and confuse SAP Convergent Charging rating logic with Convergent Invoicing billing plans. In high-throughput telecommunications, utilities, and subscription businesses, a single billing configuration error can delay millions in revenue recognition.
                 </p>
               </div>
 
-              <div className="about-story-card highlight-card">
+              <div className="about-story-card">
                 <span className="story-badge">THE CLYPTUS APPROACH</span>
                 <h3>Grounding Before Generation</h3>
                 <p>
-                  <strong>Clyptus.AI never relies on raw parametric memory</strong> for configuration paths or technical syntax. Every query triggers <strong>dense embedding retrieval</strong> combined with <strong>BM25 exact keyword matching</strong>, <strong>cross-encoder neural reranking</strong>, and <strong>mathematical grounding verification</strong>. If verified enterprise documentation doesn't back the answer, <strong>the system refuses rather than guessing</strong>.
+                  Clyptus.AI never relies on raw parametric memory for configuration paths or technical syntax. Every query triggers dense embedding retrieval combined with BM25 exact keyword matching, cross-encoder neural reranking, and mathematical grounding verification. If verified enterprise documentation doesn't back the answer, the system refuses rather than guessing.
                 </p>
               </div>
             </div>
@@ -350,25 +350,25 @@ export const LandingPage: React.FC = () => {
               <div className="pillar-item">
                 <div className="pillar-num">01</div>
                 <h4>Authoritative Ingestion</h4>
-                <p>Curated indexing of <strong>official SAP configuration guides</strong>, customizing dictionaries, <strong>master data schemas</strong>, and implementation blueprints.</p>
+                <p>Curated indexing of official SAP configuration guides, customizing dictionaries, master data schemas, and implementation blueprints.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">02</div>
                 <h4>Dual-Stage Reranking</h4>
-                <p><strong>Cross-encoder neural models</strong> re-evaluate candidate chunks against the specific functional query <strong>before generation begins</strong>.</p>
+                <p>Cross-encoder neural models re-evaluate candidate chunks against the specific functional query before generation begins.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">03</div>
                 <h4>Verifiable Citations</h4>
-                <p>Every response displays <strong>clickable citations</strong> with <strong>document names, section paths, exact page numbers</strong>, and similarity scores.</p>
+                <p>Every response displays clickable citations with document names, section paths, exact page numbers, and similarity scores.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">04</div>
                 <h4>Strict Tenant Isolation</h4>
-                <p>Enterprise-grade security with <strong>JWT token authorization</strong>, <strong>project workspace grouping</strong>, and <strong>absolute data confidentiality</strong>.</p>
+                <p>Enterprise-grade security with JWT token authorization, project workspace grouping, and absolute data confidentiality.</p>
               </div>
             </div>
 

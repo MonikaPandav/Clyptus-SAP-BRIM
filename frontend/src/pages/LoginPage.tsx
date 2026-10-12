@@ -70,7 +70,7 @@ export const LoginPage: React.FC = () => {
     <>
       <PageMeta
         title="Sign In"
-        description="Continue to your Clyptusap.ai knowledge workspace."
+        description="Continue to your Clyptus.AI knowledge workspace."
       />
       <main className="login-layout">
         <section className="login-panel">
@@ -86,7 +86,7 @@ export const LoginPage: React.FC = () => {
             <span className="eyebrow">SAP + BRIM KNOWLEDGE ASSISTANT</span>
             <h1>
               Welcome to<br />
-              Clyptusap.ai
+              Clyptus.AI
             </h1>
             <p>Your intelligent SAP knowledge workspace</p>
 
@@ -217,7 +217,7 @@ export const LoginPage: React.FC = () => {
 
           <div className="login-legal">
             <span>Powered by sentence-transformers &amp; cross-encoder reranking.</span>
-            <Link to="/features">Explore Clyptusap.ai</Link>
+            <Link to="/features">Explore Clyptus.AI</Link>
           </div>
         </section>
       </main>

@@ -1,0 +1,402 @@
+[
+  {
+    "id": "ea11d7bf-0f5d-43d9-b0d1-12470cacba5a",
+    "filename": "SAP_ABAP_Development_and_RAP_Standards.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "ABAP RAP Development standards (off-domain)",
+    "pages": 20,
+    "chunks": 60
+  },
+  {
+    "id": "676dbdb7-d44c-41ea-8ddd-25b2ec259cbe",
+    "filename": "SAP_Basis_Administration_and_Security_Handbook.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP Basis Administration (off-domain)",
+    "pages": 20,
+    "chunks": 62
+  },
+  {
+    "id": "a8721afb-9dd6-4b15-82ef-5f5c6a51d1af",
+    "filename": "SAP_CO_Controlling_Configuration_Handbook.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP CO Controlling (off-domain non-BRIM)",
+    "pages": 20,
+    "chunks": 65
+  },
+  {
+    "id": "c68dee0c-0bdd-4a00-a587-673ebc599b75",
+    "filename": "SAP_FI_Financial_Accounting_Guide.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP General FI Financial Accounting (off-domain non-BRIM)",
+    "pages": 20,
+    "chunks": 73
+  },
+  {
+    "id": "4f0b616e-443c-41aa-a342-75d43c226cea",
+    "filename": "SAP_Fiori_Design_and_Deployment_Manual.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP Fiori Design and Deployment (off-domain)",
+    "pages": 20,
+    "chunks": 61
+  },
+  {
+    "id": "8dcd72e4-22e4-474b-929d-b44096738466",
+    "filename": "SAP_HCM_Human_Capital_Management_Guide.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP HCM Human Capital Management (off-domain)",
+    "pages": 20,
+    "chunks": 60
+  },
+  {
+    "id": "0bc496fb-6beb-46a6-9532-0fd46fa48d16",
+    "filename": "SAP_MM_Materials_Management_Manual.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP MM Materials Management (off-domain non-BRIM)",
+    "pages": 20,
+    "chunks": 75
+  },
+  {
+    "id": "e745f2c6-ec61-4c7c-a008-75164a348887",
+    "filename": "SAP_PP_Production_Planning_Reference.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP PP Production Planning (off-domain)",
+    "pages": 20,
+    "chunks": 63
+  },
+  {
+    "id": "793d9637-cd54-4b27-abf0-d1576bbdf747",
+    "filename": "SAP_S4HANA_Architecture_and_Migration_Guide.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "General S/4HANA Migration guide (off-domain non-BRIM)",
+    "pages": 20,
+    "chunks": 60
+  },
+  {
+    "id": "6deccb8e-588e-47ab-a6ec-dface3bcfbd1",
+    "filename": "SAP_SD_Sales_and_Distribution_Handbook.pdf",
+    "tier": "self_authored",
+    "is_off_domain": true,
+    "category": "Synthetic Reference Manual",
+    "reason": "SAP SD Sales and Distribution (off-domain non-BRIM)",
+    "pages": 20,
+    "chunks": 63
+  },
+  {
+    "id": "dce30638-b560-4699-a98e-5497cc2f9576",
+    "filename": "pdfdownload.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Documentation",
+    "reason": "Official SAP Help Portal Subscription Order Management guide",
+    "pages": 283,
+    "chunks": 803
+  },
+  {
+    "id": "6e7dc557-756c-42f1-b7a6-68f8c07abdad",
+    "filename": "SAP CC.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Product Guide",
+    "reason": "Official SAP Convergent Charging 2025.1 Implementation Guide (Public)",
+    "pages": 34,
+    "chunks": 62
+  },
+  {
+    "id": "64b02ab8-8b2b-43b0-9975-5e9086ddc0df",
+    "filename": "SAP CI1.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Documentation",
+    "reason": "Official SAP Convergent Invoicing documentation export Volume 1",
+    "pages": 181,
+    "chunks": 537
+  },
+  {
+    "id": "ddd328f4-0ca4-4baa-80da-21928995231d",
+    "filename": "SAP CI2.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Documentation",
+    "reason": "Official SAP Convergent Invoicing documentation export Volume 2",
+    "pages": 217,
+    "chunks": 482
+  },
+  {
+    "id": "016e9b54-8df3-4192-b3c5-290f0d969780",
+    "filename": "SAP CI3.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Documentation",
+    "reason": "Official SAP Convergent Invoicing documentation export Volume 3",
+    "pages": 211,
+    "chunks": 681
+  },
+  {
+    "id": "405fd952-0a23-4179-800b-d0911cbc1938",
+    "filename": "SAP CI4.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Documentation",
+    "reason": "Official SAP Convergent Invoicing documentation export Volume 4",
+    "pages": 327,
+    "chunks": 708
+  },
+  {
+    "id": "a8c9fa5c-c3b6-40ca-9300-e406d6adb6c4",
+    "filename": "SAP FI-CA.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Practitioner Notes",
+    "reason": "Practitioner detailed explanation of FI-CA fundamentals",
+    "pages": 49,
+    "chunks": 49
+  },
+  {
+    "id": "13104af4-921c-4b10-b3f9-f24ec91b5ca8",
+    "filename": "2020_S4H_BRIM_SOM_Device_as_a_Service.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Solution Guide",
+    "reason": "Official SAP S/4HANA BRIM SOM Device as a Service publication",
+    "pages": 27,
+    "chunks": 27
+  },
+  {
+    "id": "b6956bd9-4928-4ff6-80a6-0ffedefc0c3c",
+    "filename": "Authorizations-in-S4-HANA-and-Fiori.pdf",
+    "tier": "sap_partner_or_book",
+    "is_off_domain": true,
+    "category": "Published Book",
+    "reason": "Rheinwerk / SAP PRESS book on Fiori authorizations (off-domain)",
+    "pages": 629,
+    "chunks": 1422
+  },
+  {
+    "id": "4223e9f7-5581-4394-b786-aafcbbc86d93",
+    "filename": "Billing_and_Revenue_Innovation_Management.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Solution Overview",
+    "reason": "Official SAP AG publication on Billing and Revenue Innovation Management",
+    "pages": 32,
+    "chunks": 39
+  },
+  {
+    "id": "bc1e2041-cfcf-46a0-952b-725493da6199",
+    "filename": "BR234_EN_SOM 2.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Training Course",
+    "reason": "Official SAP Education courseware BR234 (Subscription Order Management)",
+    "pages": 300,
+    "chunks": 364
+  },
+  {
+    "id": "4c983e4f-20d9-446c-9ba7-c5ca9287b7cd",
+    "filename": "BRIM Q Bank.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Question Bank",
+    "reason": "SAP BRIM Q-Bank collection",
+    "pages": 7,
+    "chunks": 19
+  },
+  {
+    "id": "12d1a8be-6187-4f70-b08f-607d24b30ef5",
+    "filename": "BRIM_AC240_EN_Col16.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Training Course",
+    "reason": "Official SAP Education courseware AC240 (Contract Accounts Receivable and Payable)",
+    "pages": 299,
+    "chunks": 348
+  },
+  {
+    "id": "07929eec-eb2a-4009-8f92-29ad854d3cdb",
+    "filename": "Budget billing.pdf",
+    "tier": "forum",
+    "is_off_domain": false,
+    "category": "Community Technical Guide",
+    "reason": "Community procedure on Budget Billing Plan in BRIM/ISU by Vaidehi Rajaram",
+    "pages": 5,
+    "chunks": 5
+  },
+  {
+    "id": "68155c41-5381-477e-bade-11444cd12f94",
+    "filename": "E_Book_ABAP_RESTful_Programming_Model_2020_Rel_NW_wwwERPExamsCom.pdf",
+    "tier": "sap_partner_or_book",
+    "is_off_domain": true,
+    "category": "Published Book",
+    "reason": "Rheinwerk book on ABAP RESTful Application Programming Model (off-domain RAP)",
+    "pages": 560,
+    "chunks": 1137
+  },
+  {
+    "id": "7ebbaa4d-c69e-4302-bc46-b88b087ecc4f",
+    "filename": "mg.pdf",
+    "tier": "official_sap",
+    "is_off_domain": false,
+    "category": "Official SAP Product Guide",
+    "reason": "Official SAP Convergent Charging 4.1 Master Guide (Public)",
+    "pages": 43,
+    "chunks": 81
+  },
+  {
+    "id": "e7226d25-84bb-4363-9741-2acfc52bd143",
+    "filename": "RAR Contract Reversal Process.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Practitioner Notes",
+    "reason": "Practitioner thread/notes on RAR contract reversal process",
+    "pages": 3,
+    "chunks": 5
+  },
+  {
+    "id": "64fb9aeb-e217-48c7-95a9-aa3f416ac940",
+    "filename": "SAP BRIM Press Book 2nd Edition - Expertsoft.pdf",
+    "tier": "sap_partner_or_book",
+    "is_off_domain": false,
+    "category": "Published SAP PRESS Book",
+    "reason": "SAP PRESS / Expertsoft 2nd Edition published handbook",
+    "pages": 582,
+    "chunks": 1501
+  },
+  {
+    "id": "5e6c7bca-7f27-49f2-957b-16522ed62193",
+    "filename": "SAP Revenue Recognition (RAR) Processing Flow, Exemptions, Reversals & System Integration.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Practitioner Notes",
+    "reason": "Practitioner notes on RAR flow and reversals by Moorthy Esakky",
+    "pages": 2,
+    "chunks": 3
+  },
+  {
+    "id": "cf201279-73a1-4c98-86b1-33aa79ef4db2",
+    "filename": "SAP-PRESS-Catalog-Shop.pdf",
+    "tier": "sap_partner_or_book",
+    "is_off_domain": true,
+    "category": "Catalog",
+    "reason": "SAP PRESS publications catalog (off-domain)",
+    "pages": 88,
+    "chunks": 181
+  },
+  {
+    "id": "f5cb620e-8acf-42d1-8224-79b2a5cad092",
+    "filename": "SIMPL_OP1709.pdf",
+    "tier": "official_sap",
+    "is_off_domain": true,
+    "category": "Official SAP White Paper",
+    "reason": "S/4HANA Simplification List (General ERP / non-BRIM specific)",
+    "pages": 894,
+    "chunks": 1565
+  },
+  {
+    "id": "538243b0-2fc0-4629-b8ce-c057c6b1b811",
+    "filename": "SAP_BRIM_CC_Convergent_Charging_Advanced_Architecture.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Architecture Summary",
+    "reason": "Locally compiled CC Advanced Architecture guide",
+    "pages": 11,
+    "chunks": 11
+  },
+  {
+    "id": "9327c12d-e924-40b9-9dff-a83070aaeb2c",
+    "filename": "SAP_BRIM_Convergent_Invoicing_CIT_BIT_Master_Architecture.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Architecture Summary",
+    "reason": "Locally compiled CI CIT/BIT Architecture guide",
+    "pages": 11,
+    "chunks": 11
+  },
+  {
+    "id": "6b3a8fa9-1e40-49bf-9e2f-81f6cf1a3715",
+    "filename": "SAP_BRIM_End_to_End_Integration_and_SPRO_Cookbook.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Cookbook Summary",
+    "reason": "Locally compiled BRIM SPRO Customizing Cookbook",
+    "pages": 6,
+    "chunks": 6
+  },
+  {
+    "id": "4139d095-1086-40e6-ad0c-ee326e7eb9a0",
+    "filename": "SAP_BRIM_FICA_Contract_Accounts_Master_Handbook.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Architecture Summary",
+    "reason": "Locally compiled FI-CA Master Handbook",
+    "pages": 11,
+    "chunks": 11
+  },
+  {
+    "id": "c6938874-c106-4228-a847-97b458ec099d",
+    "filename": "SAP_BRIM_SOM_Subscription_Order_Management_Master_Guide.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "Architecture Summary",
+    "reason": "Locally compiled SOM Master Guide",
+    "pages": 11,
+    "chunks": 11
+  },
+  {
+    "id": "1c46060d-db09-41a0-bdc4-52089890def9",
+    "filename": "100  Ans.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "AI Summary / Q&A",
+    "reason": "Clyptus SAP BRIM Architect 100 Question Answer Book",
+    "pages": 56,
+    "chunks": 164
+  },
+  {
+    "id": "66369dea-b5cf-4edb-850a-2037b6df90a0",
+    "filename": "100 4 ans.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "AI Summary / Q&A",
+    "reason": "SAP BRIM Expert Interview Answers 100 Questions",
+    "pages": 54,
+    "chunks": 160
+  },
+  {
+    "id": "b9480b2f-e090-4831-b4eb-7653ba38a00f",
+    "filename": "100 Ans 2.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "AI Summary / Q&A",
+    "reason": "Clyptus SAP BRIM Architect 100 Question Answer Book Vol 2",
+    "pages": 57,
+    "chunks": 133
+  },
+  {
+    "id": "cfd91e3a-b8b4-4322-99f3-ff85dd4fe1f8",
+    "filename": "SAP BRIM AI Architect.pdf",
+    "tier": "self_authored",
+    "is_off_domain": false,
+    "category": "AI Summary / Reference Answers",
+    "reason": "SAP BRIM AI Architect Reference Answers (AI-authored)",
+    "pages": 50,
+    "chunks": 149
+  }
+]

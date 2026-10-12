@@ -279,6 +279,16 @@ class RetrievalService:
 
         for idx, fused_score in sorted_candidates:
             meta = cached_meta[idx]
+            
+            # Phase 1: Exclude off-domain documents when flag is enabled (default False)
+            if getattr(settings, "EXCLUDE_OFF_DOMAIN_DOCS", False):
+                try:
+                    from backend.app.corpus.tier_definitions import DOCUMENT_TIER_MAPPING
+                    if DOCUMENT_TIER_MAPPING.get(meta["document_name"], {}).get("is_off_domain", False):
+                        continue
+                except Exception:
+                    pass
+
             v_score = float(normalized_sims[idx])
             b_score = float(bm25_scores.get(idx, 0.0))
             

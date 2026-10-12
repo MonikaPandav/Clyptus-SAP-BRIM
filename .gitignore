@@ -12,6 +12,7 @@ build/
 
 # Database files (>100MB, generated via ingest script)
 *.db
+*.db.bak
 backend/sap_assistant.db
 
 # Large raw training PDF dataset (360MB)
