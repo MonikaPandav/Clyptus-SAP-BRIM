@@ -64,7 +64,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  {isUser ? 'You' : 'cClyptus.AI Assistant'}
+                  {isUser ? 'You' : 'Clyptus.AI'}
                 </span>
 
                 {!isUser && !isStreaming && (

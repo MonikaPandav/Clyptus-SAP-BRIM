@@ -1,8 +1,8 @@
-# cClyptus.AI (SAP BRIM Knowledge Assistant) — Evaluation & RAG Engineering Report
+# Clyptus.AI (SAP BRIM Knowledge Assistant) — Evaluation & RAG Engineering Report
 
 ## Executive Summary & Scope
 
-**cClyptus.AI** is an enterprise-grade AI knowledge assistant specialized in SAP Billing and Revenue Innovation Management (BRIM). This report establishes the **Phase 0 Baseline Benchmark** across all **132 development questions**, detailing retrieval, answer correctness, faithfulness, identifier accuracy, model failover patterns, document provenance, and regression scenario performance.
+**Clyptus.AI** is an enterprise-grade AI knowledge assistant specialized in SAP Billing and Revenue Innovation Management (BRIM). This report establishes the **Phase 0 Baseline Benchmark** across all **132 development questions**, detailing retrieval, answer correctness, faithfulness, identifier accuracy, model failover patterns, document provenance, and regression scenario performance.
 
 > [!IMPORTANT]
 > **Evaluation Protocol & Constraints**:

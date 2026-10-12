@@ -9,7 +9,7 @@ from backend.app.services.answer_planner import answer_planner
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_PROMPT = """You are cClyptus.AI Assistant, an elite SAP Solution Architect and Principal Enterprise AI Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management), SAP S/4HANA, and enterprise billing architecture.
+SYSTEM_PROMPT = """You are Clyptus.AI, an elite SAP Solution Architect and Principal Enterprise AI Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management), SAP S/4HANA, and enterprise billing architecture.
 
 Your objective is to provide production-grade, technically accurate, evidence-grounded guidance for senior SAP consultants and enterprise architects.
 
@@ -36,7 +36,7 @@ CORE ARCHITECTURAL AND GROUNDING PRINCIPLES:
    - Maintain an authoritative, senior consultant tone with clean Markdown formatting."""
 
 
-CONVERSATIONAL_SYSTEM_PROMPT = """You are cClyptus.AI Assistant, an elite and friendly SAP Solution Architect and Principal Enterprise Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management).
+CONVERSATIONAL_SYSTEM_PROMPT = """You are Clyptus.AI, an elite and friendly SAP Solution Architect and Principal Enterprise Consultant specializing in SAP BRIM (Billing and Revenue Innovation Management).
 
 The user is having a casual, greeting, or conversational interaction (such as saying hello, asking "what are you doing?", "who are you?", "how are you?", or asking how to use you).
 
@@ -767,7 +767,7 @@ Instructions:
                 max_retries=0,
                 default_headers={
                     "HTTP-Referer": "https://clyptus.ai",
-                    "X-Title": "cClyptus.AI Assistant"
+                    "X-Title": "Clyptus.AI"
                 }
             )
         except Exception as e:
@@ -925,7 +925,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
 
         # Deterministic zero-latency fallback if all cloud services offline
         return (
-            "Hello! I am cClyptus.AI Assistant, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
+            "Hello! I am Clyptus.AI, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
             "Right now, I am standing by to assist you with everything related to SAP Billing and Revenue Innovation Management (BRIM)!\n\n"
             "**Use me to get details about:**\n"
             "- **Subscription Order Management (SOM)**: Master data, provider orders, and provider contracts\n"
@@ -979,7 +979,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
 
         # Deterministic fallback stream
         fallback_text = (
-            "Hello! I am cClyptus.AI Assistant, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
+            "Hello! I am Clyptus.AI, your dedicated SAP & SAP BRIM Solution Architect.\n\n"
             "Right now, I am standing by to assist you with everything related to SAP Billing and Revenue Innovation Management (BRIM)!\n\n"
             "**Use me to get details about:**\n"
             "- **Subscription Order Management (SOM)**: Master data, provider orders, and provider contracts\n"
@@ -1093,7 +1093,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                 base_url="https://openrouter.ai/api/v1",
                 default_headers={
                     "HTTP-Referer": "https://clyptus.ai",
-                    "X-Title": "cClyptus.AI Assistant"
+                    "X-Title": "Clyptus.AI"
                 }
             )
         except Exception as e:
