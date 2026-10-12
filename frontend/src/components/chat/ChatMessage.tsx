@@ -70,7 +70,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 {!isUser && !isStreaming && (
                   <>
                     <SourceTypeBadge sourceType={message.source_type} />
-                    {message.source_type !== 'refusal' && (
+                    {message.source_type !== 'refusal' && message.source_type !== 'conversational' && (
                       <>
                         <GroundingScoreBadge
                           score={message.grounding_score}
@@ -218,15 +218,29 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
 
             {/* Sources button below content */}
-            {hasSources && !isStreaming && (
+            {!isUser && !isStreaming && message.source_type !== 'refusal' && (
               <div className="mt-3.5 pt-2 flex items-center gap-2">
                 <button
                   onClick={() => setShowSourcesModal(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/90 hover:bg-slate-200 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500/40 transition text-xs font-medium shadow-xs group cursor-pointer"
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl transition text-xs font-medium shadow-xs group cursor-pointer ${
+                    hasSources
+                      ? 'bg-orange-50/90 dark:bg-[#12121e] hover:bg-orange-100 dark:hover:bg-[#1a1a2c] text-orange-950 dark:text-orange-200 border border-orange-200 dark:border-orange-500/35 hover:border-orange-400 dark:hover:border-orange-500/60'
+                      : 'bg-slate-100 dark:bg-slate-900/70 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
+                  }`}
                   title="Click to view all verified sources & citations"
                 >
                   <Eye className="w-3.5 h-3.5 text-orange-500 group-hover:scale-110 transition-transform" />
-                  <span>Sources ({sourceCount})</span>
+                  <span className="font-semibold">Sources ({sourceCount})</span>
+                  {hasCitations && (
+                    <span className="px-1.5 py-0.2 rounded bg-orange-200/70 dark:bg-orange-950/80 text-[10px] text-orange-800 dark:text-orange-300 font-mono font-bold">
+                      {message.citations!.length} KB
+                    </span>
+                  )}
+                  {hasWebSources && (
+                    <span className="px-1.5 py-0.2 rounded bg-cyan-200/70 dark:bg-cyan-950/80 text-[10px] text-cyan-800 dark:text-cyan-300 font-mono font-bold">
+                      {message.web_sources!.length} Web
+                    </span>
+                  )}
                 </button>
               </div>
             )}

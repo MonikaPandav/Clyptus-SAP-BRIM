@@ -2,18 +2,21 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   FolderPlus,
+  Folder,
   LogOut,
-  Menu,
-  MessageSquarePlus,
+  PanelLeftClose,
+  PanelLeft,
   Pin,
   PinOff,
+  Plus,
   Search,
-  Settings2,
+  Settings,
   UserRound,
   X,
   ChevronDown,
-  CircleHelp,
   Trash2,
+  Sparkles,
+  MessageSquare,
 } from 'lucide-react';
 import { BrandLogo } from '../components/navbar/BrandLogo';
 import { ProjectModal } from '../components/projects/ProjectModal';
@@ -43,6 +46,7 @@ export const AppLayout: React.FC = () => {
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 900);
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [chatsLoading, setChatsLoading] = useState(true);
@@ -67,7 +71,6 @@ export const AppLayout: React.FC = () => {
       const data = await apiGetChats();
       setChats(data);
     } catch {
-      // If backend chats endpoint fails, load from local storage or empty
       setChats([]);
     } finally {
       setChatsLoading(false);
@@ -95,8 +98,28 @@ export const AppLayout: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname, location.search]);
+
+  // Keyboard shortcut: Cmd/Ctrl + K for New Chat
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        handleNewChat();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -150,7 +173,7 @@ export const AppLayout: React.FC = () => {
   const handleDeleteChat = async (chatId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!window.confirm('Delete this chat?')) return;
+    if (!window.confirm('Delete this conversation?')) return;
     try {
       await apiDeleteChat(chatId);
       setChats(prev => prev.filter(c => c.id !== chatId));
@@ -198,7 +221,7 @@ export const AppLayout: React.FC = () => {
   };
 
   const toggleSidebar = () => {
-    if (window.innerWidth <= 900) {
+    if (isMobile) {
       setSidebarOpen(prev => !prev);
     } else {
       setDesktopCollapsed(prev => !prev);
@@ -218,262 +241,345 @@ export const AppLayout: React.FC = () => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* ChatGPT-Style Sidebar */}
       <aside className={`app-sidebar ${sidebarOpen ? 'app-sidebar-open' : ''}`} aria-label="Workspace sidebar">
-        <div className="app-brand-row">
+        {/* Top Header Row with Logo & Collapse Toggle */}
+        <div className="sidebar-top-header">
           <BrandLogo />
-          <button
-            className="icon-button mobile-sidebar-close ml-auto"
-            type="button"
-            aria-label="Close sidebar"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-1 ml-auto">
+            {isMobile ? (
+              <button
+                className="sidebar-icon-btn"
+                type="button"
+                aria-label="Close sidebar"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <X size={18} strokeWidth={2.2} />
+              </button>
+            ) : (
+              <button
+                className="sidebar-icon-btn"
+                type="button"
+                aria-label="Collapse sidebar"
+                title="Close sidebar"
+                onClick={toggleSidebar}
+              >
+                <PanelLeftClose size={18} strokeWidth={2.2} />
+              </button>
+            )}
+          </div>
         </div>
 
-        <button className="new-chat-button" type="button" onClick={handleNewChat}>
-          <MessageSquarePlus size={17} />
-          New chat
-          <span>⌘ K</span>
+        {/* Prominent ChatGPT-Style "New Chat" Button */}
+        <button
+          className="chatgpt-new-chat-btn"
+          type="button"
+          onClick={handleNewChat}
+          title="New chat (⌘K)"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-6 h-6 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+              <Plus size={16} strokeWidth={2.6} />
+            </div>
+            <span className="font-bold text-sm text-slate-900 dark:text-white truncate">New chat</span>
+          </div>
+          <span className="chatgpt-kbd">⌘K</span>
         </button>
 
-        <label className="conversation-search">
-          <Search size={15} />
+        {/* ChatGPT Minimalist Search Bar */}
+        <label className="chatgpt-search-bar">
+          <Search size={15} strokeWidth={2.2} className="text-slate-400 dark:text-zinc-500 shrink-0" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats and projects"
-            aria-label="Search chats and projects"
+            placeholder="Search chats..."
+            aria-label="Search chats"
           />
-          <kbd>/</kbd>
+          {query ? (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5"
+            >
+              <X size={12} />
+            </button>
+          ) : (
+            <kbd className="chatgpt-kbd-slash">/</kbd>
+          )}
         </label>
 
         {actionError && <p className="sidebar-error" role="alert">{actionError}</p>}
 
-        {/* History area */}
-        <div className="history-area">
-          <div className="history-caption">
-            CHATS{chatsLoading && <span>LOADING</span>}
-          </div>
-
-          {groupedChats.map(({ group, chats: items }) => (
-            <div className="sidebar-group" key={group}>
-              <span className="conversation-group">{group}</span>
-              {items.map((chat) => {
+        {/* Chat History Section */}
+        <div className="sidebar-history-area">
+          {/* Pinned Section */}
+          {(pinnedChats.length > 0 || pinnedProjects.length > 0) && (
+            <div className="sidebar-group">
+              <span className="sidebar-group-title flex items-center gap-1.5">
+                <Pin size={11} strokeWidth={2.4} className="text-orange-500" />
+                <span>Pinned</span>
+              </span>
+              {pinnedChats.map((chat) => {
                 const isSelected = location.pathname === `/app/chat/${chat.id}`;
                 return (
-                  <div className={`sidebar-item-row ${isSelected ? 'selected-chat' : ''}`} key={chat.id}>
+                  <div className={`chatgpt-chat-item ${isSelected ? 'selected-chat' : ''}`} key={`pinned-${chat.id}`}>
                     <NavLink
-                      className={({ isActive }) => `conversation-link ${isActive ? 'active' : ''}`}
+                      className="chat-item-link"
                       to={`/app/chat/${chat.id}`}
                       title={chat.title}
                     >
-                      {chat.title}
+                      <MessageSquare size={14} strokeWidth={2} className="chat-item-icon" />
+                      <span className="truncate flex-1">{chat.title}</span>
                     </NavLink>
-                    {isSelected && (
+                    <div className="chat-item-actions">
                       <button
-                        className="sidebar-delete-btn text-slate-400 hover:text-rose-400 p-1 rounded hover:bg-rose-500/15 transition cursor-pointer shrink-0"
+                        className="item-action-btn"
                         type="button"
-                        aria-label={`Delete chat ${chat.title}`}
+                        aria-label="Unpin chat"
+                        title="Unpin chat"
+                        onClick={() => toggleChatPin(chat.id)}
+                      >
+                        <PinOff size={13} strokeWidth={2} />
+                      </button>
+                      <button
+                        className="item-action-btn hover:text-rose-500"
+                        type="button"
+                        aria-label="Delete chat"
                         title="Delete chat"
                         onClick={(e) => handleDeleteChat(chat.id, e)}
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={13} strokeWidth={2} />
                       </button>
-                    )}
+                    </div>
+                  </div>
+                );
+              })}
+              {pinnedProjects.map((project) => (
+                <div className="chatgpt-chat-item" key={`pinned-proj-${project.id}`}>
+                  <NavLink
+                    className="chat-item-link"
+                    to={`/app/projects/${project.id}`}
+                    title={project.name}
+                  >
+                    <Folder size={14} strokeWidth={2} className="chat-item-icon text-orange-500" />
+                    <span className="truncate flex-1">{project.name}</span>
+                  </NavLink>
+                  <div className="chat-item-actions">
                     <button
-                      className={`sidebar-pin ${chat.isPinned ? 'is-pinned' : ''}`}
+                      className="item-action-btn"
                       type="button"
-                      aria-label={`${chat.isPinned ? 'Unpin' : 'Pin'} chat ${chat.title}`}
-                      title={chat.isPinned ? 'Unpin chat' : 'Pin chat'}
-                      onClick={() => toggleChatPin(chat.id)}
+                      aria-label="Unpin project"
+                      title="Unpin project"
+                      onClick={() => toggleProjectPin(project.id, project.isPinned)}
                     >
-                      {chat.isPinned ? <PinOff size={13} /> : <Pin size={13} />}
+                      <PinOff size={13} strokeWidth={2} />
                     </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Grouped Chats (Today, Yesterday, Earlier) */}
+          {groupedChats.map(({ group, chats: items }) => (
+            <div className="sidebar-group" key={group}>
+              <span className="sidebar-group-title">{group}</span>
+              {items.map((chat) => {
+                const isSelected = location.pathname === `/app/chat/${chat.id}`;
+                return (
+                  <div className={`chatgpt-chat-item ${isSelected ? 'selected-chat' : ''}`} key={chat.id}>
+                    <NavLink
+                      className="chat-item-link"
+                      to={`/app/chat/${chat.id}`}
+                      title={chat.title}
+                    >
+                      <MessageSquare size={14} strokeWidth={2} className="chat-item-icon" />
+                      <span className="truncate flex-1">{chat.title}</span>
+                    </NavLink>
+                    <div className="chat-item-actions">
+                      <button
+                        className="item-action-btn"
+                        type="button"
+                        aria-label={chat.isPinned ? 'Unpin chat' : 'Pin chat'}
+                        title={chat.isPinned ? 'Unpin chat' : 'Pin chat'}
+                        onClick={() => toggleChatPin(chat.id)}
+                      >
+                        {chat.isPinned ? <PinOff size={13} strokeWidth={2} /> : <Pin size={13} strokeWidth={2} />}
+                      </button>
+                      <button
+                        className="item-action-btn hover:text-rose-500"
+                        type="button"
+                        aria-label="Delete chat"
+                        title="Delete chat"
+                        onClick={(e) => handleDeleteChat(chat.id, e)}
+                      >
+                        <Trash2 size={13} strokeWidth={2} />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
             </div>
           ))}
 
-          {!chatsLoading && groupedChats.length === 0 && (
-            <p className="sidebar-empty">
-              {normalizedQuery ? 'No matching chats.' : 'Your conversations will appear here.'}
+          {!chatsLoading && groupedChats.length === 0 && pinnedChats.length === 0 && (
+            <p className="sidebar-empty-state">
+              {normalizedQuery ? 'No matching conversations.' : 'Previous chats will appear here.'}
             </p>
           )}
 
-          {/* Projects */}
-          <div className="sidebar-section-heading">
-            <span>PROJECTS</span>
-            <button
-              type="button"
-              aria-label="Create a project"
-              title="Create a project"
-              onClick={() => setProjectModalOpen(true)}
-            >
-              <FolderPlus size={14} />
-            </button>
-          </div>
-
-          {filteredProjects.map((project) => (
-            <div className="sidebar-item-row" key={project.id}>
-              <NavLink
-                className={({ isActive }) => `conversation-link project-link ${isActive ? 'active' : ''}`}
-                to={`/app/projects/${project.id}`}
-                title={project.name}
-              >
-                {project.name}
-              </NavLink>
+          {/* Projects Section */}
+          <div className="sidebar-group mt-3">
+            <div className="flex items-center justify-between px-2 py-1">
+              <span className="sidebar-group-title !p-0">Projects</span>
               <button
-                className={`sidebar-pin ${project.isPinned ? 'is-pinned' : ''}`}
                 type="button"
-                aria-label={`${project.isPinned ? 'Unpin' : 'Pin'} project ${project.name}`}
-                title={project.isPinned ? 'Unpin project' : 'Pin project'}
-                onClick={() => toggleProjectPin(project.id, project.isPinned)}
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition cursor-pointer"
+                aria-label="Create a project"
+                title="Create a project"
+                onClick={() => setProjectModalOpen(true)}
               >
-                {project.isPinned ? <PinOff size={13} /> : <Pin size={13} />}
+                <FolderPlus size={14} strokeWidth={2.2} />
               </button>
             </div>
-          ))}
 
-          {filteredProjects.length === 0 && (
-            <p className="sidebar-empty">
-              {normalizedQuery ? 'No matching projects.' : 'No projects yet.'}
-            </p>
-          )}
-
-          <button
-            className="sidebar-new-project"
-            type="button"
-            onClick={() => setProjectModalOpen(true)}
-          >
-            <FolderPlus size={14} />
-            New project
-          </button>
-
-          {/* Pinned section */}
-          <div className="sidebar-section-heading pinned-heading">
-            <span>PINNED</span>
-          </div>
-
-          {pinnedChats.length === 0 && pinnedProjects.length === 0 && (
-            <p className="sidebar-empty">Pinned items appear here.</p>
-          )}
-
-          {pinnedChats.map((chat) => {
-            const isSelected = location.pathname === `/app/chat/${chat.id}`;
-            return (
-              <div className={`sidebar-item-row ${isSelected ? 'selected-chat' : ''}`} key={`pinned-chat-${chat.id}`}>
-                <NavLink className="pinned-link flex-1" to={`/app/chat/${chat.id}`}>
-                  <Pin size={12} />
-                  <span>{chat.title}</span>
-                  <small>Chat</small>
+            {filteredProjects.map((project) => (
+              <div className="chatgpt-chat-item" key={project.id}>
+                <NavLink
+                  className="chat-item-link"
+                  to={`/app/projects/${project.id}`}
+                  title={project.name}
+                >
+                  <Folder size={14} strokeWidth={2} className="chat-item-icon text-orange-500" />
+                  <span className="truncate flex-1">{project.name}</span>
                 </NavLink>
-                {isSelected && (
+                <div className="chat-item-actions">
                   <button
-                    className="sidebar-delete-btn text-slate-400 hover:text-rose-400 p-1 rounded hover:bg-rose-500/15 transition cursor-pointer shrink-0"
+                    className="item-action-btn"
                     type="button"
-                    aria-label={`Delete chat ${chat.title}`}
-                    title="Delete chat"
-                    onClick={(e) => handleDeleteChat(chat.id, e)}
+                    aria-label={project.isPinned ? 'Unpin project' : 'Pin project'}
+                    title={project.isPinned ? 'Unpin project' : 'Pin project'}
+                    onClick={() => toggleProjectPin(project.id, project.isPinned)}
                   >
-                    <Trash2 size={12} />
+                    {project.isPinned ? <PinOff size={13} strokeWidth={2} /> : <Pin size={13} strokeWidth={2} />}
                   </button>
-                )}
+                </div>
               </div>
-            );
-          })}
-
-          {pinnedProjects.map((project) => (
-            <NavLink className="pinned-link" key={`pinned-proj-${project.id}`} to={`/app/projects/${project.id}`}>
-              <Pin size={12} />
-              <span>{project.name}</span>
-              <small>Project</small>
-            </NavLink>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Sidebar Nav */}
-        <div className="sidebar-nav">
-          <NavLink to="/app/settings">
-            <Settings2 size={17} />
-            Settings
-          </NavLink>
-        </div>
-
-        {/* Bottom user card */}
-        <div className="sidebar-bottom">
+        {/* Bottom Section with Settings and User Profile Icons */}
+        <div className="sidebar-bottom-section">
+          {/* Guide / Help item */}
           <button
-            className="workspace-help"
+            className="chatgpt-bottom-row-btn"
             type="button"
             onClick={() => setHelpModalOpen(true)}
-            title="SAP + BRIM Assistant Guide"
+            title="SAP BRIM Knowledge Assistant Guide"
           >
-            <CircleHelp size={16} />
-            <span>SAP + BRIM assistant</span>
-            <span className="help-arrow">↗</span>
+            <Sparkles size={16} strokeWidth={2.2} className="text-orange-500 shrink-0" />
+            <span className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">
+              SAP + BRIM Guide
+            </span>
           </button>
 
-          <button
-            className="account-button"
-            type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-expanded={menuOpen}
+          {/* Settings link */}
+          <NavLink
+            to="/app/settings"
+            className={({ isActive }) =>
+              `chatgpt-bottom-row-btn ${isActive ? 'active-bottom-btn' : ''}`
+            }
+            title="Account and Workspace Settings"
           >
-            <span className="account-avatar">
-              {user?.avatar ? <img src={user.avatar} alt="" /> : userInitial}
+            <Settings size={16} strokeWidth={2.2} className="text-slate-600 dark:text-zinc-400 shrink-0" />
+            <span className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">
+              Settings
             </span>
-            <span className="account-details">
-              <strong>{user?.name || 'SAP Consultant'}</strong>
-              <small>{user?.email || 'Enterprise User'}</small>
-            </span>
-            <ChevronDown size={15} />
-          </button>
+          </NavLink>
 
-          {menuOpen && (
-            <div className="account-menu">
-              <NavLink to="/app/profile" onClick={() => setMenuOpen(false)}>
-                <UserRound size={15} />
-                Your profile
-              </NavLink>
-              <button type="button" onClick={handleLogout}>
-                <LogOut size={15} />
-                Sign out
-              </button>
-            </div>
-          )}
+          {/* User Profile Card */}
+          <div className="relative mt-1">
+            <button
+              className="chatgpt-profile-btn"
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-expanded={menuOpen}
+            >
+              <span className="chatgpt-avatar shrink-0">
+                {user?.avatar ? <img src={user.avatar} alt="" /> : userInitial}
+              </span>
+              <div className="flex flex-col text-left min-w-0 flex-1 leading-tight">
+                <strong className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                  {user?.name || 'SAP Consultant'}
+                </strong>
+                <small className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 truncate">
+                  {user?.email || 'Enterprise AI User'}
+                </small>
+              </div>
+              <ChevronDown size={14} strokeWidth={2.2} className="text-slate-400 shrink-0" />
+            </button>
+
+            {menuOpen && (
+              <div className="chatgpt-profile-menu">
+                <NavLink to="/app/profile" onClick={() => setMenuOpen(false)}>
+                  <UserRound size={15} strokeWidth={2} />
+                  <span className="font-semibold text-xs">Your Profile</span>
+                </NavLink>
+                <NavLink to="/app/settings" onClick={() => setMenuOpen(false)}>
+                  <Settings size={15} strokeWidth={2} />
+                  <span className="font-semibold text-xs">Settings & Theme</span>
+                </NavLink>
+                <div className="h-px bg-slate-200 dark:bg-zinc-800 my-1" />
+                <button type="button" onClick={handleLogout} className="text-rose-600 dark:text-rose-400">
+                  <LogOut size={15} strokeWidth={2} />
+                  <span className="font-semibold text-xs">Sign out</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </aside>
 
       {/* Main Container */}
-      <main className={`app-main ${isConversation ? 'app-main-chat' : ''}`}>
+      <main className={`app-main ${isConversation ? 'app-main-chat' : 'app-main-page'}`}>
         {isConversation ? (
-          <header className="app-topbar-minimal">
-            <button
-              className="chat-menu-toggle-btn"
-              type="button"
-              aria-label="Toggle chat menu"
-              title={desktopCollapsed || !sidebarOpen ? 'Open chat menu' : 'Close chat menu'}
-              onClick={toggleSidebar}
-            >
-              <Menu size={18} />
-            </button>
-            <div className="flex items-center gap-2 ml-3">
-              <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">SAP BRIM Assistant</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/10 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/25 dark:border-orange-500/30 font-medium hidden sm:inline">
-                Enterprise AI
-              </span>
+          <header className="chatgpt-topbar">
+            <div className="flex items-center gap-2">
+              {/* Only show the open sidebar toggle when sidebar is collapsed on desktop, or when on mobile */}
+              {(desktopCollapsed || isMobile) && (
+                <button
+                  className="chatgpt-topbar-toggle-btn"
+                  type="button"
+                  aria-label="Open sidebar"
+                  title="Open sidebar"
+                  onClick={toggleSidebar}
+                >
+                  <PanelLeft size={18} strokeWidth={2.2} />
+                </button>
+              )}
+
+              {/* Seamless Model / Assistant Title (ChatGPT style, no frozen bar) */}
+              <div className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition cursor-default select-none">
+                <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                  SAP BRIM Assistant
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/25 uppercase tracking-wide">
+                  Enterprise AI
+                </span>
+              </div>
             </div>
+
+            {/* Right side New chat button */}
             <div className="ml-auto flex items-center gap-2">
               <button
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#0c0c14] hover:bg-slate-200 dark:hover:bg-[#141420] border border-slate-200 dark:border-[#1e1e2c] transition cursor-pointer shadow-sm"
+                className="chatgpt-topbar-new-chat-btn"
                 type="button"
                 onClick={handleNewChat}
-                title="Start new chat"
+                title="New chat (⌘K)"
               >
-                <MessageSquarePlus size={14} className="text-orange-500 dark:text-orange-400" />
-                <span className="hidden sm:inline">New chat</span>
+                <Plus size={15} strokeWidth={2.6} className="text-orange-500" />
+                <span className="hidden sm:inline font-bold text-xs">New chat</span>
               </button>
             </div>
           </header>
@@ -487,20 +593,20 @@ export const AppLayout: React.FC = () => {
                 title={desktopCollapsed ? 'Open sidebar' : 'Toggle sidebar'}
                 onClick={toggleSidebar}
               >
-                <Menu size={19} />
+                <PanelLeft size={19} strokeWidth={2.2} />
               </button>
               <div className="app-breadcrumb">
-                <strong>
+                <strong className="font-bold text-sm text-slate-900 dark:text-white">
                   {location.pathname.split('/').pop()?.replace(/^\w/, (c) => c.toUpperCase()) || 'Workspace'}
                 </strong>
               </div>
             </div>
             <div className="app-top-actions">
-              <button className="top-new-chat" type="button" onClick={handleNewChat}>
-                <MessageSquarePlus size={14} />
+              <button className="top-new-chat font-bold text-xs" type="button" onClick={handleNewChat}>
+                <Plus size={14} strokeWidth={2.4} />
                 New chat
               </button>
-              <span className="backend-status">
+              <span className="backend-status font-semibold text-xs">
                 <i />
                 Live connected
               </span>

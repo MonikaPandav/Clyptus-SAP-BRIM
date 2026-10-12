@@ -150,5 +150,16 @@ class FollowupService:
         # Fallback to guaranteed valid 3 questions
         return self.generate_deterministic_followups(query, answer, selected_evidence)[:self.question_count]
 
+    def generate_starter_followups(self) -> List[str]:
+        """
+        Generates 3 starter follow-up questions tailored to SAP BRIM for conversational replies.
+        """
+        return [
+            "Can you explain the end-to-end SAP BRIM billing and invoicing process flow?",
+            "How does Convergent Invoicing process and aggregate raw billable items (BITs)?",
+            "What is the difference between online charging and offline rating in SAP CC?"
+        ]
+
 
 followup_service = FollowupService()
+

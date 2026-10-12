@@ -8,9 +8,34 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
+import socket
+from urllib.parse import urlparse
+
+def _is_postgres_reachable(url: str) -> bool:
+    """Fast TCP socket probe (0.25s) to avoid 15s psycopg2 connection timeout when Postgres is offline."""
+    try:
+        parsed = urlparse(url)
+        host = parsed.hostname or "localhost"
+        port = parsed.port or 5432
+        with socket.create_connection((host, port), timeout=0.25):
+            return True
+    except Exception:
+        return False
+
 def get_engine():
     """Attempt connecting to configured PostgreSQL database; fallback to SQLite if unavailable."""
     postgres_url = settings.DATABASE_URL
+    if not _is_postgres_reachable(postgres_url):
+        logger.info(
+            f"PostgreSQL port not reachable at configured target. "
+            f"Using local high-performance SQLite engine ({settings.SQLITE_FALLBACK_URL})."
+        )
+        sqlite_engine = create_engine(
+            settings.SQLITE_FALLBACK_URL,
+            connect_args={"check_same_thread": False}
+        )
+        return sqlite_engine
+
     try:
         engine = create_engine(postgres_url, pool_pre_ping=True, connect_args={"connect_timeout": 1})
         # Test connection

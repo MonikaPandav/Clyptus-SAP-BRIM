@@ -106,7 +106,8 @@ class EvidenceSelectionService:
             matched_tech = sum(1 for tid in query_tech_ids if tid in combined_text)
             tech_match_signal = matched_tech / len(query_tech_ids)
         else:
-            tech_match_signal = 1.0  # not penalized if query doesn't specify IDs
+            # If query does not specify technical IDs, scale signal with question term coverage
+            tech_match_signal = min(1.0, term_coverage)
 
         # 4. BRIM Component Alignment
         # Check if chunks belong to relevant SAP manuals (BRIM, SOM, CC, CI, FICA, S/4HANA)
@@ -347,19 +348,19 @@ class EvidenceSelectionService:
                     f"Internal confidence was {internal_conf:.2f}."
                 )
 
-            # If external search was weak but internal has partial evidence
-            elif internal_eval["quality_score"] >= 0.40:
+            # If external search was weak but internal has sufficient evidence
+            elif internal_eval["sufficiency"]:
                 selected_set = normalized_internal[:settings.RERANK_TOP_K]
                 selected_source_type = "knowledge_base"
                 best_quality = internal_eval["quality_score"]
-                summary = f"External search yielded insufficient results; falling back to best internal evidence (Quality: {best_quality:.2f})."
+                summary = f"External search yielded insufficient results; falling back to verified internal evidence (Quality: {best_quality:.2f})."
 
             else:
                 # Both sources insufficient
                 selected_set = []
                 selected_source_type = "insufficient"
                 best_quality = max(internal_eval["quality_score"], external_eval["quality_score"])
-                summary = f"Insufficient evidence in both internal manuals ({internal_conf:.2f}) and approved web sources."
+                summary = f"Insufficient authoritative evidence in both internal manuals ({internal_conf:.2f}) and approved web sources."
 
         else:
             # External search disabled or not triggered but internal passed threshold

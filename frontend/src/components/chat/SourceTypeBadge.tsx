@@ -1,12 +1,21 @@
 import React from 'react';
-import { Database, Globe, Layers, AlertCircle } from 'lucide-react';
+import { Database, Globe, Layers, AlertCircle, Sparkles } from 'lucide-react';
 
 interface SourceTypeBadgeProps {
-  sourceType?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted' | 'security_policy';
+  sourceType?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
 }
 
 export const SourceTypeBadge: React.FC<SourceTypeBadgeProps> = ({ sourceType }) => {
   if (!sourceType) return null;
+
+  if (sourceType === 'conversational') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        <Sparkles className="w-3 h-3 text-emerald-400" />
+        <span>SAP BRIM Assistant</span>
+      </span>
+    );
+  }
 
   if (sourceType === 'interrupted') {
     return (

@@ -7,12 +7,18 @@ from backend.app.config import settings
 logger = logging.getLogger(__name__)
 
 # SAP technical patterns for strict verification (only real SAP transactions and tables)
+from backend.app.services.sap_entity_service import sap_entity_service
+
+# High-precision SAP technical patterns for strict verification
 TCODE_PATTERN = re.compile(
-    r"\b(/[a-z0-9_]{2,}/[a-z0-9_]+|fkkbix_[a-z0-9_]+|fkk[a-z0-9_]+|fpe[0-9]|fp[0-9]{2}|vk[0-9]{2}|va[0-9]{2}|vf[0-9]{2}|me[0-9]{2}[a-z]?|se[0-9]{2}[a-z]?|sm[0-9]{2}|spro|swo1|sicf)\b",
+    r"\b(/[a-z0-9_]{2,}/[a-z0-9_]+|fkkbix_[a-z0-9_]+|fkkbi_[a-z0-9_]+|fkk[a-z0-9_]+|"
+    r"fp[a-z0-9_]{2,8}|crmd_[a-z0-9_]+|farr_[a-z0-9_]+|wty_[a-z0-9_]+|"
+    r"me[0-9]{2}[a-z]?|va[0-9]{2}|vf[0-9]{2}|vk[0-9]{2}|fb[0-9]{2}|f110|"
+    r"se[0-9]{2}[a-z]?|sm[0-9]{2}|st[0-9]{2}|slg[0-9]|spro|swo1|sicf|miro|migo)\b",
     re.IGNORECASE
 )
 TABLE_PATTERN = re.compile(
-    r"\b(dfkk[a-z0-9_]+|fkk[a-z0-9_]+|erdk|erch|but000|but020|mara|marc|vbak|vbap|ekko|ekpo|bseg|bkpf|v_fkk[a-z0-9_]+)\b",
+    r"\b(dfkk[a-z0-9_]+|erdk|erch|but0[0-9]{2}|but0bk|mara|marc|vbak|vbap|ekko|ekpo|bseg|bkpf|v_fkk[a-z0-9_]+)\b",
     re.IGNORECASE
 )
 SPRO_PATTERN = re.compile(
@@ -20,18 +26,50 @@ SPRO_PATTERN = re.compile(
     re.IGNORECASE
 )
 
-# Common words/acronyms to ignore so they aren't false-positived as T-codes
+# Non-TCode words and acronyms to ignore so they aren't false-positived as technical identifiers
 EXCLUDED_TECH_TOKENS = {
-    "b2b", "b2c", "p10", "ed1", "2nd", "1st", "3rd", "sap", "som", "cc", "ci",
-    "fica", "rar", "crm", "ecc", "gui", "iot", "api", "erp", "rfc", "tcp", "ssl",
-    "http", "rest", "soap", "json", "xml", "csv", "sql", "hana", "btp"
+    "b2b", "b2c", "p10", "p50", "p90", "p95", "p99", "v1", "v2", "v3", "ed1",
+    "2nd", "1st", "3rd", "sap", "som", "cc", "ci", "fica", "rar", "crm", "ecc",
+    "gui", "iot", "api", "erp", "rfc", "tcp", "ssl", "http", "rest", "soap",
+    "json", "xml", "csv", "sql", "hana", "btp", "cdr", "bit", "cit", "sla",
+    "e2e", "q1", "q2", "q3", "q4", "24x7", "2020", "1909", "404", "500", "100",
+    "http400", "http500", "http200"
 }
 
 STOP_WORDS = {
     "what", "is", "the", "a", "an", "how", "to", "in", "of", "and", "for", "with",
     "does", "do", "explain", "can", "you", "tell", "me", "about", "this", "that", "these",
     "those", "are", "from", "into", "onto", "upon", "which", "there", "their", "they",
-    "here", "based", "according", "following", "overview", "summary", "functions"
+    "here", "based", "according", "following", "overview", "summary", "functions",
+    "also", "used", "been", "have", "has", "will", "would", "could", "should", "process",
+    "system", "between", "during", "before", "after", "through", "ensures", "ensuring"
+}
+
+# Comprehensive registry of standard SAP BRIM & S/4HANA objects
+VERIFIED_STANDARD_SAP_OBJECTS = {
+    # CI Transactions & Tables
+    "spro", "fkkbi_class", "fkkbix_class", "fkkbix_conf", "fkkbix_bit_mon", "fkkbix_cit_mon",
+    "fkkbix_rate", "fkkbix_bill", "fkkbix_inv", "fkkbix_bit_disp", "fkkbix",
+    "dfkkbixbit0", "dfkkbixbit1", "dfkkbixbit2", "dfkkbixbit3", "dfkkbixbit4",
+    "dfkkbixcit0", "dfkkbixcit1", "dfkkbixcit2", "dfkkbixcit3", "dfkkbixcit4",
+    "dfkkbict", "dfkkbict_it", "dfkkbict_py", "dfkkbict_tx", "dfkkinv_ord", "dfkkinv_doc",
+
+    # FI-CA Transactions & Tables
+    "fpc0", "fpc1", "fpc2", "fpc3", "fpl9", "fpma", "fprel", "fpva", "fpvb",
+    "fpcopara", "fpci", "fpg1", "fpg4", "fp05", "fp08", "fp30", "fp40",
+    "fpe1", "fpe2", "fpe3", "dfkkko", "dfkkop", "dfkkopk", "dfkklocks", "dfkkco",
+    "dfkkcoll", "dfkkdumi", "fkkvk", "fkkvkp", "erdk", "erch",
+
+    # SOM, RAR & S/4HANA
+    "crmd_order", "com_product", "wty_claim", "farr_rai_mon",
+    "slg1", "sm30", "sm37", "sm59", "se16", "se16n", "se38", "se80", "sicf", "swo1",
+    "st05", "st22", "we02", "we20", "f110",
+
+    # ERP Standard
+    "me21n", "me22n", "me23n", "me21", "me22", "me23",
+    "va01", "va02", "va03", "vf01", "vf02", "vf03", "fb01", "fb02", "fb03", "fb05",
+    "migo", "miro", "ekko", "ekpo", "bseg", "bkpf", "mara", "marc", "vbak", "vbap",
+    "but000", "but020", "but050", "but051", "but0bk"
 }
 
 
@@ -39,6 +77,7 @@ class GroundingService:
     """
     High-Precision Claim-Level Grounding Verification Service for SAP BRIM Knowledge Assistant.
     Calibrated for senior 8+ years SAP BRIM consultants.
+    Strictly verifies technical claims individually against retrieved evidence.
     """
 
     def __init__(self):
@@ -49,7 +88,7 @@ class GroundingService:
         """Splits answer into discrete factual statements while filtering decorative formatting."""
         if not text:
             return []
-        
+
         sentences = []
         for line in text.split("\n"):
             line = line.strip()
@@ -58,8 +97,15 @@ class GroundingService:
                 continue
             # Strip list numbers or bullets
             clean_line = re.sub(r"^(\*|\-|\d+\.|\d+\))\s*", "", line).strip()
-            if len(clean_line) > 20:
-                sentences.append(clean_line)
+            if not clean_line:
+                continue
+
+            # Split on sentence boundaries (. ! ?)
+            parts = re.split(r"(?<=[.!?])\s+", clean_line)
+            for p in parts:
+                p = p.strip()
+                if len(p) >= 15:
+                    sentences.append(p)
 
         return sentences
 
@@ -86,6 +132,24 @@ class GroundingService:
         pattern = rf"(?<![a-z0-9]){re.escape(term.lower())}(?![a-z0-9])"
         return bool(re.search(pattern, text.lower()))
 
+    @staticmethod
+    def passes_gate(
+        grounding_score: float,
+        unsupported_claims: List[str],
+        total_claims: int,
+        hallucinated_ids: List[str],
+        contradicted_claims: Optional[List[str]] = None,
+        threshold: float = 0.80
+    ) -> bool:
+        if contradicted_claims is None:
+            contradicted_claims = []
+        return bool(
+            grounding_score >= threshold
+            and len(hallucinated_ids) == 0
+            and len(contradicted_claims) == 0
+            and len(unsupported_claims) <= max(1, int(total_claims * 0.25))
+        )
+
     def verify_answer(
         self,
         query: str,
@@ -95,9 +159,14 @@ class GroundingService:
     ) -> Dict[str, Any]:
         """
         Performs claim-level grounding verification of the generated answer against evidence.
+        Classifies each technical statement:
+        - directly supported
+        - supported with qualification
+        - unsupported
+        - contradicted
         """
         # Refusal or empty answer
-        if source_type == "refusal" or not answer.strip():
+        if source_type in ("refusal", "abstention") or not answer.strip():
             return {
                 "grounding_score": 0.0,
                 "passes_grounding_gate": False,
@@ -107,8 +176,8 @@ class GroundingService:
                 "contradicted_claims": [],
                 "critical_unsupported_claims": [],
                 "all_material_claims_cited": False,
-                "verification_status": "abstention",
-                "summary": "Response is a scope refusal."
+                "verification_status": "abstention" if source_type == "abstention" else "rejected",
+                "summary": "Response is an abstention or scope refusal."
             }
 
         if not evidence_passages:
@@ -135,7 +204,6 @@ class GroundingService:
         # Extract material sentences as claims
         sentences = self._extract_sentences(answer)
         if not sentences:
-            # Fallback for very brief answers
             sentences = [answer.strip()]
 
         claims_result = []
@@ -146,7 +214,6 @@ class GroundingService:
 
         for stmt in sentences:
             stmt_lower = stmt.lower()
-            # Extract key terms from the statement
             raw_tokens = re.findall(r"\b[a-z0-9\/\-_]{3,}\b", stmt_lower)
             stmt_terms = [t for t in raw_tokens if t not in STOP_WORDS]
 
@@ -155,6 +222,8 @@ class GroundingService:
             unsupported_stmt_tech = [
                 tid for tid in stmt_tech_ids
                 if tid not in evidence_tech_ids
+                and tid not in VERIFIED_STANDARD_SAP_OBJECTS
+                and not sap_entity_service.is_known_sap_identifier(tid)
             ]
 
             # Calculate overlap with evidence
@@ -168,7 +237,7 @@ class GroundingService:
             supporting_source_ids = []
             for p in evidence_passages:
                 p_text = (p.get("chunk_text") or p.get("snippet") or "").lower()
-                if stmt_terms and sum(1 for t in stmt_terms if self._contains_term(p_text, t)) / len(stmt_terms) >= 0.50:
+                if stmt_terms and sum(1 for t in stmt_terms if self._contains_term(p_text, t)) / len(stmt_terms) >= 0.20:
                     supporting_source_ids.append(p.get("source_id", "source"))
 
             # Determine Claim Status
@@ -179,22 +248,18 @@ class GroundingService:
                     if ut not in critical_unsupported:
                         critical_unsupported.append(ut)
                 unsupported_claims.append(stmt)
-            elif overlap_ratio >= 0.30:
+            elif overlap_ratio >= 0.25:
                 status = "supported"
                 reason = f"Evidence directly supports statement (overlap: {overlap_ratio:.2f})."
                 supported_claims.append(stmt)
-            elif overlap_ratio >= 0.15:
+            elif overlap_ratio >= 0.12:
                 status = "partially_supported"
                 reason = f"Corroborated by evidence concepts (overlap: {overlap_ratio:.2f})."
                 supported_claims.append(stmt)
             else:
-                status = "contextual"
-                reason = f"Contextual explanation (overlap: {overlap_ratio:.2f})."
-                # If statement terms are standard architectural explanations, grant baseline credit
-                if len(stmt_terms) <= 6 or overlap_ratio >= 0.10 or any(kw in stmt_lower for kw in ["sap", "brim", "fi-ca", "fica", "cc", "ci", "som", "posting", "clearing", "contract", "process", "rule", "step", "table", "transaction"]):
-                    supported_claims.append(stmt)
-                else:
-                    unsupported_claims.append(stmt)
+                status = "unsupported"
+                reason = f"Insufficient evidence support for statement (overlap: {overlap_ratio:.2f})."
+                unsupported_claims.append(stmt)
 
             claims_result.append({
                 "claim": stmt,
@@ -205,43 +270,41 @@ class GroundingService:
             })
 
         # Calculate Grounding Score - calibrated to be honest and accurate
-        # This score represents actual evidence coverage, not inflated confidence
         total_claims = len(claims_result)
         if total_claims > 0:
             support_ratio = len(supported_claims) / total_claims
-            # Honest calibration:
-            # ≥75% supported → 82%-94% grounding (excellent)
-            # ≥55% supported → 70%-82% grounding (good)
-            # ≥35% supported → 55%-70% grounding (moderate - may trigger web search if this is internal_conf too)
-            # <35% supported → 30%-55% grounding (weak)
             if support_ratio >= 0.75:
-                raw_grounding = 0.82 + 0.12 * min(1.0, (support_ratio - 0.75) / 0.25)
+                raw_grounding = 0.80 + 0.14 * min(1.0, (support_ratio - 0.75) / 0.25)
             elif support_ratio >= 0.55:
-                raw_grounding = 0.70 + 0.12 * ((support_ratio - 0.55) / 0.20)
+                raw_grounding = 0.70 + 0.10 * ((support_ratio - 0.55) / 0.20)
             elif support_ratio >= 0.35:
                 raw_grounding = 0.55 + 0.15 * ((support_ratio - 0.35) / 0.20)
             else:
-                raw_grounding = max(0.30, support_ratio * 1.5)
+                raw_grounding = max(0.20, support_ratio * 1.0)
         else:
             raw_grounding = 0.50
 
-        # Only penalize if confirmed fabricated identifiers are detected
+        # Penalize if fabricated identifiers or completely unsupported claims are present
         if critical_unsupported:
-            penalty = min(0.15, len(critical_unsupported) * 0.05)
-            final_grounding_score = max(0.50, raw_grounding - penalty)
+            penalty = min(0.30, len(critical_unsupported) * 0.10)
+            final_grounding_score = max(0.20, raw_grounding - penalty)
+        elif len(unsupported_claims) > len(supported_claims):
+            final_grounding_score = min(raw_grounding, 0.45)
         else:
             final_grounding_score = raw_grounding
 
-        final_grounding_score = max(0.30, min(0.97, round(final_grounding_score, 2)))
+        final_grounding_score = max(0.15, min(0.98, round(final_grounding_score, 2)))
 
-        # Mandatory Publication Rule:
+        # Publication Rule:
         # 1. Grounding score >= ANSWER_GROUNDING_THRESHOLD (0.80)
-        # 2. No critical unverified SAP technical identifiers (T-codes, tables)
-        # 3. No contradicted claims
+        # 2. Zero critical unverified SAP technical identifiers (T-codes, tables)
+        # 3. Zero contradicted claims
+        # 4. Material claim support consistency (unsupported claims <= 25% of total claims)
         passes_gate = bool(
             final_grounding_score >= self.grounding_threshold
             and len(critical_unsupported) == 0
             and len(contradicted_claims) == 0
+            and len(unsupported_claims) <= max(1, int(total_claims * 0.25))
         )
 
         # Check for explicit boundary / abstention markers in answer
@@ -250,7 +313,7 @@ class GroundingService:
             "couldn't find sufficient", "could not find sufficient", "unable to provide a fully verified",
             "not available in the", "cannot be answered", "information was not found",
             "does not exist in standard sap", "not documented in the available",
-            "outside the scope", "confidential", "personal phone number"
+            "outside the scope", "confidential", "personal phone number", "unable to answer"
         ]):
             passes_gate = False
             verification_status = "abstention"
@@ -278,23 +341,10 @@ class GroundingService:
             "unsupported_claims": unsupported_claims,
             "contradicted_claims": contradicted_claims,
             "critical_unsupported_claims": critical_unsupported,
-            "all_material_claims_cited": len(supported_claims) == total_claims,
+            "all_material_claims_cited": len(supported_claims) == total_claims and total_claims > 0,
             "verification_status": verification_status,
             "summary": summary
         }
-
-    def evaluate_grounding(
-        self,
-        query: str,
-        answer: str,
-        chunks: List[Dict[str, Any]],
-        source_type: str = "knowledge_base"
-    ) -> float:
-        """
-        Backwards-compatible API for legacy callers returning float grounding score.
-        """
-        res = self.verify_answer(query, answer, chunks, source_type=source_type)
-        return float(res["grounding_score"])
 
 
 grounding_service = GroundingService()

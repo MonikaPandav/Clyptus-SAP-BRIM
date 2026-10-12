@@ -6,11 +6,15 @@ from backend.app.config import settings
 
 logger = logging.getLogger(__name__)
 
+import threading
+
 class EmbeddingService:
     def __init__(self):
         self._model = None
         self._model_failed = False
         self.embedding_dim = settings.EMBEDDING_DIM
+        self._query_cache: dict = {}
+        self._cache_lock = threading.Lock()
 
     def _get_model(self):
         if self._model is not None:
@@ -68,6 +72,11 @@ class EmbeddingService:
         if not cleaned:
             return [0.0] * self.embedding_dim
 
+        # Check embedding cache
+        with self._cache_lock:
+            if cleaned in self._query_cache:
+                return self._query_cache[cleaned]
+
         model_info = self._get_model()
         if model_info:
             tag, model = model_info
@@ -80,11 +89,21 @@ class EmbeddingService:
                 norm = np.linalg.norm(emb)
                 if norm > 0:
                     emb = emb / norm
-                return emb.tolist()
+                res = emb.tolist()
+                with self._cache_lock:
+                    if len(self._query_cache) >= 1024:
+                        self._query_cache.pop(next(iter(self._query_cache)))
+                    self._query_cache[cleaned] = res
+                return res
             except Exception as e:
                 logger.warning(f"Embedding encoding error ({tag}): {e}. Falling back.")
 
-        return self._fallback_embed(cleaned)
+        res = self._fallback_embed(cleaned)
+        with self._cache_lock:
+            if len(self._query_cache) >= 1024:
+                self._query_cache.pop(next(iter(self._query_cache)))
+            self._query_cache[cleaned] = res
+        return res
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         if not texts:

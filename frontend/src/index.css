@@ -242,55 +242,90 @@ h1,h2,h3,p{margin-top:0}
 .account-menu button:hover{background:#f0f0ec;color:#30312c}
 .account-menu .form-error{padding:0 9px}
 
-/* Authenticated application shell */
-.app-shell{min-height:100vh;display:grid;grid-template-columns:258px minmax(0,1fr);background:#fbfbf9}
-.app-sidebar{height:100vh;position:sticky;top:0;background:#f5f5f2;border-right:1px solid #e8e8e2;padding:19px 14px 13px;display:flex;flex-direction:column}
-.app-brand-row{display:flex;align-items:center;justify-content:space-between;padding:0 5px 20px}
-.app-brand-row .brand-name{font-size:15px}
-.app-brand-row .brand-mark{width:26px;height:26px}
-.app-brand-row .brand-mark>span{width:12px;height:12px}
-.workspace-tag{font-size:7px;letter-spacing:.13em;color:var(--orange);border:1px solid rgba(255,98,0,0.3);background:rgba(255,98,0,0.06);border-radius:4px;padding:3px 6px;font-weight:700}
-.new-chat-button{height:39px;border:1px solid #e5e5df;background:#fbfbf9;border-radius:7px;display:flex;align-items:center;gap:9px;padding:0 10px;font-size:11px;font-weight:600;text-align:left;transition:border .2s,background .2s,box-shadow .2s,color .2s}
-.new-chat-button:hover{border-color:var(--orange);background:#fff;box-shadow:0 3px 12px rgba(255,98,0,0.14)}
-.new-chat-button:hover svg{color:var(--orange)}
-.new-chat-button svg{color:#767770;transition:color .2s}
-.new-chat-button span{margin-left:auto;font-size:9px;color:#aaa}
-.conversation-search{margin-top:13px;height:35px;border:1px solid #e8e8e2;background:#f9f9f6;border-radius:6px;display:flex;align-items:center;gap:7px;padding:0 9px;color:#9a9b94;transition:border .2s,box-shadow .2s}
-.conversation-search:focus-within{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,98,0,0.15)}
-.conversation-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#50514b;font-size:10px}
-.conversation-search input::placeholder{color:#a0a19a}
-.conversation-search kbd{font-size:9px;color:#a0a19a}
-.history-area{padding-top:24px;flex:1;min-height:0;overflow:auto}
-.history-caption{font-size:8px;font-weight:700;letter-spacing:.1em;color:#92938d;padding:0 5px;display:flex;justify-content:space-between}
-.history-caption span{color:#b0b1aa;font-weight:500;letter-spacing:.05em}
-.conversation-list{margin-top:11px}
-.conversation-group{display:block;margin:14px 6px 6px;font-size:8px;font-weight:700;letter-spacing:.08em;color:#aaaba4}
-.conversation-link{height:32px;display:flex;align-items:center;padding:0 8px;border-radius:6px;color:#75766f;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .15s}
-.conversation-link:hover,.conversation-link.active{background:rgba(255,98,0,0.08);color:var(--orange-dark);font-weight:600}
-.history-empty{padding:12px 6px;font-size:10px;color:#999a93}
-.preview-disclaimer{font-size:9px;line-height:1.6;color:#a1a29b;margin:13px 5px}
-.sidebar-nav{border-top:1px solid #e4e4de;padding-top:10px;display:grid;gap:3px}
-.sidebar-nav a{display:flex;align-items:center;gap:10px;height:35px;padding:0 8px;border-radius:6px;font-size:11px;color:#73746e;transition:all .15s}
-.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,98,0,0.08);color:var(--orange-dark);font-weight:600}
-.sidebar-nav a.active svg,.sidebar-nav a:hover svg{color:var(--orange)}
-.sidebar-bottom{position:relative;border-top:1px solid #e4e4de;margin-top:11px;padding-top:12px}
-.workspace-help{width:100%;height:32px;display:flex;align-items:center;gap:8px;padding:0 8px;color:#85867f;font-size:10px;border:1px solid transparent;border-radius:6px;background:transparent;cursor:pointer;transition:all .15s ease;text-align:left}
-.workspace-help:hover{color:var(--orange-dark);background:rgba(255,98,0,0.08);border-color:rgba(255,98,0,0.2)}
-.workspace-help .help-arrow{margin-left:auto;transition:transform .15s ease}
-.workspace-help:hover .help-arrow{color:var(--orange);transform:translate(2px,-2px)}
-.dark .workspace-help{color:#94a3b8}
-.dark .workspace-help:hover{color:#ff8533;background:rgba(255,98,0,0.12);border-color:rgba(255,98,0,0.25)}
-.account-button{width:100%;border:0;background:transparent;margin-top:7px;padding:7px 5px;display:flex;align-items:center;gap:9px;text-align:left;border-radius:7px}
-.account-button:hover{background:#eaeae5}
-.account-avatar,.top-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff6200,#ea5300);color:#fff;display:grid;place-items:center;font:700 11px "Manrope",sans-serif;box-shadow:0 2px 8px rgba(255,98,0,0.25)}
-.account-details{display:flex;flex-direction:column;gap:3px;flex:1}
-.account-details strong{font-size:10px;font-weight:600}
-.account-details small{font-size:9px;color:#969790}
+/* Authenticated application shell - ChatGPT layout */
+.app-shell{height:100vh;max-height:100vh;overflow:hidden;display:grid;grid-template-columns:260px minmax(0,1fr);background:#fbfbf9;transition:grid-template-columns 0.28s cubic-bezier(0.4,0,0.2,1)}
+.app-sidebar{height:100vh;width:260px;position:sticky;top:0;background:#f9f9f9;border-right:1px solid #e5e5e5;padding:12px 10px 10px;display:flex;flex-direction:column;z-index:25;transition:transform 0.28s cubic-bezier(0.4,0,0.2,1),opacity 0.2s ease,width 0.28s cubic-bezier(0.4,0,0.2,1)}
+.dark .app-sidebar{background:#171717;border-color:#262626;color:#f4f4f5}
+
+/* Top header row inside sidebar */
+.sidebar-top-header{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 10px;min-height:40px}
+.sidebar-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;color:#475569;cursor:pointer;transition:all 0.15s ease}
+.sidebar-icon-btn:hover{background:#ebebeb;color:#0f172a}
+.dark .sidebar-icon-btn{color:#a1a1aa}
+.dark .sidebar-icon-btn:hover{background:#262626;color:#ffffff}
+
+/* Prominent ChatGPT-style New Chat button */
+.chatgpt-new-chat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:12px;border:1px solid #e5e5e5;background:#ffffff;color:#0f172a;cursor:pointer;transition:all 0.18s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.chatgpt-new-chat-btn:hover{background:#f4f4f5;border-color:#d4d4d8;box-shadow:0 3px 10px rgba(0,0,0,0.06);transform:translateY(-0.5px)}
+.chatgpt-new-chat-btn:active{transform:scale(0.99)}
+.dark .chatgpt-new-chat-btn{background:#212121;border-color:#2e2e2e;color:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
+.dark .chatgpt-new-chat-btn:hover{background:#282828;border-color:#3f3f46;box-shadow:0 4px 14px rgba(0,0,0,0.35)}
+.chatgpt-kbd{font-size:10px;font-weight:700;padding:2px 5px;border-radius:5px;background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b}
+.dark .chatgpt-kbd{background:#18181b;border-color:#27272a;color:#a1a1aa}
+
+/* Minimalist Search Bar */
+.chatgpt-search-bar{margin-top:8px;display:flex;align-items:center;gap:8px;padding:0 10px;height:36px;border-radius:10px;border:1px solid #e5e5e5;background:#ffffff;transition:all 0.15s ease}
+.chatgpt-search-bar:focus-within{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,98,0,0.15)}
+.dark .chatgpt-search-bar{background:#1e1e1e;border-color:#2e2e2e}
+.dark .chatgpt-search-bar:focus-within{border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,98,0,0.25)}
+.chatgpt-search-bar input{width:100%;border:none;outline:none;background:transparent;font-size:12px;font-weight:600;color:#0f172a}
+.dark .chatgpt-search-bar input{color:#f4f4f5}
+.chatgpt-search-bar input::placeholder{color:#94a3b8;font-weight:500}
+.chatgpt-kbd-slash{font-size:10px;font-weight:700;color:#94a3b8;padding:1px 5px;border-radius:4px;background:#f1f5f9}
+.dark .chatgpt-kbd-slash{background:#27272a;color:#71717a}
+
+/* History Area */
+.sidebar-history-area{flex:1;min-height:0;overflow-y:auto;margin-top:10px;padding-right:2px}
+.sidebar-group{margin-bottom:12px}
+.sidebar-group-title{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;padding:8px 10px 4px}
+.dark .sidebar-group-title{color:#a1a1aa}
+
+/* Chat Item Row */
+.chatgpt-chat-item{display:flex;align-items:center;justify-content:space-between;border-radius:10px;margin-bottom:2px;padding:1px 4px;transition:all 0.15s ease;position:relative}
+.chatgpt-chat-item:hover{background:#ececec}
+.dark .chatgpt-chat-item:hover{background:#212121}
+.chatgpt-chat-item.selected-chat{background:#e2e8f0}
+.dark .chatgpt-chat-item.selected-chat{background:#2a2a2a}
+.chat-item-link{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:7px 6px;text-decoration:none;font-size:13px;font-weight:600;color:#1e293b;border-radius:8px}
+.chatgpt-chat-item.selected-chat .chat-item-link{font-weight:700;color:#0f172a}
+.dark .chat-item-link{color:#e4e4e7}
+.dark .chatgpt-chat-item.selected-chat .chat-item-link{color:#ffffff;font-weight:700}
+.chat-item-icon{color:#94a3b8;flex-shrink:0}
+.dark .chat-item-icon{color:#71717a}
+.chatgpt-chat-item:hover .chat-item-icon,.chatgpt-chat-item.selected-chat .chat-item-icon{color:var(--orange)}
+
+.chat-item-actions{display:flex;align-items:center;gap:2px;opacity:0;transition:opacity 0.15s ease;flex-shrink:0}
+.chatgpt-chat-item:hover .chat-item-actions,.chatgpt-chat-item.selected-chat .chat-item-actions{opacity:1}
+.item-action-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;border:none;background:transparent;color:#64748b;cursor:pointer;transition:all 0.15s ease}
+.item-action-btn:hover{background:rgba(0,0,0,0.08);color:#0f172a}
+.dark .item-action-btn{color:#a1a1aa}
+.dark .item-action-btn:hover{background:rgba(255,255,255,0.1);color:#ffffff}
+.sidebar-empty-state{padding:16px 10px;font-size:12px;font-weight:500;color:#94a3b8;text-align:center}
+
+/* Bottom Section */
+.sidebar-bottom-section{border-top:1px solid #e5e5e5;padding-top:8px;margin-top:auto;display:flex;flex-direction:column;gap:3px}
+.dark .sidebar-bottom-section{border-color:#262626}
+.chatgpt-bottom-row-btn{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:10px;border:none;background:transparent;cursor:pointer;text-decoration:none;transition:background 0.15s ease;text-align:left}
+.chatgpt-bottom-row-btn:hover,.chatgpt-bottom-row-btn.active-bottom-btn{background:#ececec}
+.dark .chatgpt-bottom-row-btn:hover,.dark .chatgpt-bottom-row-btn.active-bottom-btn{background:#212121}
+
+.chatgpt-profile-btn{display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all 0.15s ease}
+.chatgpt-profile-btn:hover{background:#ececec}
+.dark .chatgpt-profile-btn:hover{background:#212121}
+.chatgpt-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff6200,#ea5300);color:#ffffff;display:grid;place-items:center;font:800 12px "Manrope",sans-serif;box-shadow:0 2px 6px rgba(255,98,0,0.25);overflow:hidden}
+
+.chatgpt-profile-menu{position:absolute;bottom:50px;left:0;right:0;z-index:50;background:#ffffff;border:1px solid #e5e5e5;border-radius:12px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,0.15)}
+.dark .chatgpt-profile-menu{background:#1c1c1c;border-color:#2e2e2e;box-shadow:0 14px 34px rgba(0,0,0,0.5)}
+.chatgpt-profile-menu a,.chatgpt-profile-menu button{width:100%;height:34px;display:flex;align-items:center;gap:9px;padding:0 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;text-decoration:none;color:#334155;transition:background 0.12s ease}
+.chatgpt-profile-menu a:hover,.chatgpt-profile-menu button:hover{background:#f1f5f9}
+.dark .chatgpt-profile-menu a,.dark .chatgpt-profile-menu button{color:#e2e8f0}
+.dark .chatgpt-profile-menu a:hover,.dark .chatgpt-profile-menu button:hover{background:#282828}
 .account-button>svg{color:#898a83}
 .account-menu{position:absolute;bottom:55px;left:4px;right:4px;z-index:5;background:#fff;border:1px solid #e5e5df;border-radius:8px;padding:5px;box-shadow:0 9px 25px #20201815}
 .account-menu a{height:31px;display:flex;align-items:center;gap:8px;padding:0 8px;border-radius:5px;font-size:10px;color:#6c6d66}
-.account-menu a:hover{background:#f3f3ef}
-.app-main{min-width:0;min-height:100vh;display:flex;flex-direction:column}
+.app-main{min-width:0;height:100vh;max-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.app-main-chat{height:100vh;max-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.app-main-page{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column}
 .app-topbar{height:55px;flex:none;border-bottom:1px solid #efefea;padding:0 27px;display:flex;align-items:center;justify-content:space-between}
 .app-breadcrumb{display:flex;align-items:center;gap:9px;color:#9b9c95;font-size:10px}
 .app-breadcrumb strong{font-weight:600;color:#50514b}
@@ -618,13 +653,17 @@ h1,h2,h3,p{margin-top:0}
   .about-stats-band{grid-template-columns:1fr}
 }
 
-/* Minimal Topbar for Chat View - Menu button only */
-.app-topbar-minimal{height:52px;min-height:52px;padding:0 16px;background:#ffffff;border-bottom:1px solid #e8e8e3;display:flex;align-items:center;justify-content:flex-start;position:relative;z-index:20;transition:background .2s,border-color .2s}
-.dark .app-topbar-minimal{background:#000000;border-bottom:1px solid #14141c}
-.chat-menu-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid #e2e8f0;background:#f8f8f6;color:#334155;cursor:pointer;transition:all .18s ease;flex-shrink:0}
-.chat-menu-toggle-btn:hover{background:#edece8;border-color:var(--orange);color:#0f172a;box-shadow:0 0 14px rgba(255,98,0,0.15)}
-.dark .chat-menu-toggle-btn{border-color:#232330;background:#09090e;color:#cbd5e1}
-.dark .chat-menu-toggle-btn:hover{background:#161622;border-color:var(--orange);color:#ffffff;box-shadow:0 0 14px rgba(255,98,0,0.3)}
+/* Seamless ChatGPT-style topbar - NO frozen outside border bar */
+.chatgpt-topbar{height:46px;min-height:46px;padding:0 16px;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;flex-shrink:0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:none!important;transition:background .2s ease}
+.dark .chatgpt-topbar{background:rgba(0,0,0,0.7);border-bottom:none!important}
+.chatgpt-topbar-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid transparent;background:transparent;color:#334155;cursor:pointer;transition:all 0.15s ease}
+.chatgpt-topbar-toggle-btn:hover{background:#ebebeb;color:#0f172a}
+.dark .chatgpt-topbar-toggle-btn{color:#a1a1aa}
+.dark .chatgpt-topbar-toggle-btn:hover{background:#262626;color:#ffffff}
+.chatgpt-topbar-new-chat-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;border:1px solid #e5e5e5;background:#ffffff;color:#0f172a;cursor:pointer;transition:all 0.15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.chatgpt-topbar-new-chat-btn:hover{background:#f4f4f5;border-color:#d4d4d8;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.dark .chatgpt-topbar-new-chat-btn{background:#1e1e1e;border-color:#2e2e2e;color:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.dark .chatgpt-topbar-new-chat-btn:hover{background:#282828;border-color:#3f3f46}
 
 
 /* Desktop collapsible sidebar */

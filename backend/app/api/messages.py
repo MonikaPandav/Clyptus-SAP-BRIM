@@ -326,17 +326,32 @@ def handle_streaming_response(
                     citations = event.get("citations", [])
                     web_sources = event.get("web_sources", [])
 
-                    # Persist single assistant message to DB
-                    assistant_msg = Message(
-                        chat_id=chat_id,
-                        role="assistant",
-                        content=full_answer,
-                        source_type=source_type,
-                        grounding_score=grounding
+                    # Anti-duplicate persistence check:
+                    # Check if an interrupted or duplicate message was already saved for this turn
+                    last_msg = (
+                        save_db.query(Message)
+                        .filter(Message.chat_id == chat_id)
+                        .order_by(Message.created_at.desc())
+                        .first()
                     )
-                    save_db.add(assistant_msg)
-                    save_db.commit()
-                    save_db.refresh(assistant_msg)
+                    if last_msg and last_msg.role == "assistant" and last_msg.source_type == "interrupted":
+                        # Upgrade the interrupted message to the final verified answer
+                        assistant_msg = last_msg
+                        assistant_msg.content = full_answer
+                        assistant_msg.source_type = source_type
+                        assistant_msg.grounding_score = grounding
+                        save_db.commit()
+                    else:
+                        assistant_msg = Message(
+                            chat_id=chat_id,
+                            role="assistant",
+                            content=full_answer,
+                            source_type=source_type,
+                            grounding_score=grounding
+                        )
+                        save_db.add(assistant_msg)
+                        save_db.commit()
+                        save_db.refresh(assistant_msg)
 
                     if citations:
                         for c in citations:
@@ -379,19 +394,27 @@ def handle_streaming_response(
             yield f"data: {json.dumps(err_event)}\n\n"
 
         finally:
-            # If aborted/interrupted before normal 'done' event, persist partial answer
+            # If aborted/interrupted before normal 'done' event, persist partial answer only if not already saved
             if not done_payload and accumulated_text.strip():
                 try:
-                    partial_msg = Message(
-                        chat_id=chat_id,
-                        role="assistant",
-                        content=accumulated_text.strip(),
-                        source_type="interrupted",
-                        grounding_score=0.0
+                    last_msg = (
+                        save_db.query(Message)
+                        .filter(Message.chat_id == chat_id)
+                        .order_by(Message.created_at.desc())
+                        .first()
                     )
-                    save_db.add(partial_msg)
-                    save_db.commit()
-                    logger.info(f"Persisted partially generated response ({len(accumulated_text)} chars) for chat {chat_id}")
+                    # Only insert if client didn't already call save-partial
+                    if not (last_msg and last_msg.role == "assistant"):
+                        partial_msg = Message(
+                            chat_id=chat_id,
+                            role="assistant",
+                            content=accumulated_text.strip(),
+                            source_type="interrupted",
+                            grounding_score=0.0
+                        )
+                        save_db.add(partial_msg)
+                        save_db.commit()
+                        logger.info(f"Persisted partially generated response ({len(accumulated_text)} chars) for chat {chat_id}")
                 except Exception as save_err:
                     logger.error(f"Failed to persist partial interrupted message: {save_err}")
             save_db.close()

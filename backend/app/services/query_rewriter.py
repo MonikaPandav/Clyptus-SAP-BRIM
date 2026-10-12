@@ -40,8 +40,9 @@ class QueryRewriter:
             r"^(hi+|hey+|hello+|howdy|hola|namaste|greetings)\b",
             r"^(good\s+(morning|afternoon|evening|night|day))\b",
             r"\b(how\s+are\s+you|how're\s+you|how\s+is\s+it\s+going|how\s+do\s+you\s+feel)\b",
-            r"\b(who\s+are\s+you|what\s+is\s+your\s+name|what's\s+your\s+name)\b",
-            r"\b(what\s+can\s+you\s+do|tell\s+me\s+about\s+yourself)\b",
+            r"\b(what\s+are\s+you\s+doing|what're\s+you\s+doing|what\s+are\s+u\s+doing|what\s+r\s+u\s+doing)\b",
+            r"\b(who\s+are\s+you|what\s+is\s+your\s+name|what's\s+your\s+name|introduce\s+yourself)\b",
+            r"\b(what\s+can\s+you\s+do|what\s+do\s+you\s+do|tell\s+me\s+about\s+yourself|how\s+to\s+use\s+you|use\s+me)\b",
             r"\b(thank\s+you|thanks|thx|thank\s+u)\b",
             r"\b(bye|goodbye|see\s+you|cya)\b",
             r"\b(love\s+you|hate\s+you|are\s+you\s+(happy|sad|real|human|ai|bot))\b",
@@ -155,8 +156,8 @@ class QueryRewriter:
             if not content:
                 continue
 
-            # Skip rejected/refusal messages
-            if msg.get("source_type") == "refusal":
+            # Skip rejected/refusal and conversational messages
+            if msg.get("source_type") in ("refusal", "conversational"):
                 continue
 
             if msg.get("role") == "user":

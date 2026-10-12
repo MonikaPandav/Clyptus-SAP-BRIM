@@ -33,7 +33,7 @@ export interface Message {
   chat_id: string;
   role: 'user' | 'assistant';
   content: string;
-  source_type?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted' | 'security_policy';
+  source_type?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
   grounding_score?: number;
   confidence?: number;
   grounding?: string;

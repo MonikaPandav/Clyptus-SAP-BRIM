@@ -60,8 +60,169 @@ SAP_TECHNICAL_ENTITIES: Dict[str, Dict[str, Any]] = {
         "description": "Billable Item Tax Data (TX) Table.",
         "key_fields": ["MANDT", "BITNUMBER", "TAX_AMOUNT", "TAX_DATE"]
     },
+    "fkkbi_class": {
+        "name": "FKKBI_CLASS",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Maintain and Generate Billable Item Classes.",
+        "standard_use": "Configures and generates technical structures and database tables for BIT classes."
+    },
+    "fkkbix_class": {
+        "name": "FKKBIX_CLASS",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Billable Item Class Configuration and Generation.",
+        "standard_use": "Central transaction to create, edit, activate, and generate BIT classes in CI."
+    },
+    "fkkbix_conf": {
+        "name": "FKKBIX_CONF",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Display Configuration of Billable Item Classes.",
+        "standard_use": "Inspects generated tables, fields, and interfaces for active BIT classes."
+    },
+    "fkkbix_bit_mon": {
+        "name": "FKKBIX_BIT_MON",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Billable Item Monitor.",
+        "standard_use": "Monitors raw, billable, billed, and excepted billable items across statuses."
+    },
+    "fkkbix_cit_mon": {
+        "name": "FKKBIX_CIT_MON",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Consumption Item Monitor.",
+        "standard_use": "Monitors unrated and rated consumption items received from mediation or Convergent Charging."
+    },
+    "fkkbix_rate": {
+        "name": "FKKBIX_RATE",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Execute Mass Rating in Convergent Invoicing.",
+        "standard_use": "Performs rating runs on consumption items within CI."
+    },
+    "fkkbix_bill": {
+        "name": "FKKBIX_BILL",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Execute Billing in Convergent Invoicing.",
+        "standard_use": "Aggregates billable items into billing documents."
+    },
+    "fkkbix_inv": {
+        "name": "FKKBIX_INV",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Execute Invoicing in Convergent Invoicing.",
+        "standard_use": "Processes invoicing orders and posts legal invoices to FI-CA."
+    },
+    "fkkbix_bit_disp": {
+        "name": "FKKBIX_BIT_DISP",
+        "type": "tcode",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Display Single Billable Items.",
+        "standard_use": "Displays individual BIT records with all custom and standard fields."
+    },
+    "dfkkbixbit0": {
+        "name": "DFKKBIXBIT0",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Billable Items: Raw Status Table (Status 0).",
+        "key_fields": ["MANDT", "BITCAT", "BITSTATUS", "BITNUMBER"]
+    },
+    "dfkkbixbit2": {
+        "name": "DFKKBIXBIT2",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Billable Items: Billable Status Table (Status 2).",
+        "key_fields": ["MANDT", "BITCAT", "BITSTATUS", "BITNUMBER", "VKONT", "GPART"]
+    },
+    "dfkkbixbit4": {
+        "name": "DFKKBIXBIT4",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Billable Items: Billed/Invoiced Status Table (Status 4).",
+        "key_fields": ["MANDT", "BITCAT", "BITSTATUS", "BITNUMBER", "INVDOCNO"]
+    },
+    "dfkkbixcit0": {
+        "name": "DFKKBIXCIT0",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Consumption Items: Raw / Unrated Table.",
+        "key_fields": ["MANDT", "CITCAT", "CITSTATUS", "CITNUMBER"]
+    },
+    "dfkkbixcit1": {
+        "name": "DFKKBIXCIT1",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Consumption Items: Rated Table.",
+        "key_fields": ["MANDT", "CITCAT", "CITSTATUS", "CITNUMBER"]
+    },
+    "dfkkinv_ord": {
+        "name": "DFKKINV_ORD",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Invoicing Orders Trigger Table.",
+        "key_fields": ["MANDT", "SRCDOCTYPE", "SRCDOCNO"]
+    },
+    "dfkkinv_doc": {
+        "name": "DFKKINV_DOC",
+        "type": "table",
+        "component": "SAP Convergent Invoicing (CI)",
+        "description": "Invoicing Document Master Table.",
+        "key_fields": ["MANDT", "INVDOCNO", "VKONT", "GPART"]
+    },
 
     # SAP FI-CA (Contract Accounts Receivable and Payable)
+    "fpl9": {
+        "name": "FPL9",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Account Balance Display (Contract Account Overview).",
+        "standard_use": "Central 360-degree transaction displaying all open items, cleared items, invoices, and payments for a contract account."
+    },
+    "fpma": {
+        "name": "FPMA",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Automatic Clearing Run in FI-CA.",
+        "standard_use": "Mass batch clearing of open debits and credits based on configured clearing variants."
+    },
+    "fprel": {
+        "name": "FPREL",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Release Open Items for Dunning / Payment.",
+        "standard_use": "Releases payment or dunning locks on open receivables."
+    },
+    "fpci": {
+        "name": "FPCI",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Clarification Processing in FI-CA.",
+        "standard_use": "Investigates payment lots or invoicing exceptions in clarification worklists."
+    },
+    "fpg1": {
+        "name": "FPG1",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Transfer to General Ledger (FI-CA to FI-GL).",
+        "standard_use": "Posts closed reconciliation keys as summary postings to general ledger accounts."
+    },
+    "fpg4": {
+        "name": "FPG4",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Reconciliation Key Display and Processing.",
+        "standard_use": "Inspects status, totals, and G/L transfer status of FI-CA reconciliation keys."
+    },
+    "fp08": {
+        "name": "FP08",
+        "type": "tcode",
+        "component": "SAP FI-CA",
+        "description": "Reverse Document in FI-CA.",
+        "standard_use": "Reverses individual FI-CA accounting documents and restores cleared items."
+    },
     "fpcopara": {
         "name": "FPCOPARA",
         "type": "tcode",
@@ -132,6 +293,96 @@ SAP_TECHNICAL_ENTITIES: Dict[str, Dict[str, Any]] = {
         "description": "FI-CA Document: General Ledger Items.",
         "key_fields": ["MANDT", "OPBEL", "OPUPK", "HKONT", "BETRW"]
     },
+    "erdk": {
+        "name": "ERDK",
+        "type": "table",
+        "component": "SAP Invoicing",
+        "description": "Print Document Header Table.",
+        "key_fields": ["MANDT", "OPBEL", "PRINTDOCNO"]
+    },
+    "erch": {
+        "name": "ERCH",
+        "type": "table",
+        "component": "SAP Billing",
+        "description": "Billing Document Lines / Master Table.",
+        "key_fields": ["MANDT", "BELNR", "BUKRS"]
+    },
+
+    # SOM & Subscription Management
+    "crmd_order": {
+        "name": "CRMD_ORDER",
+        "type": "tcode",
+        "component": "SAP Subscription Order Management (SOM)",
+        "description": "Maintain Business Transactions / Provider Orders.",
+        "standard_use": "Creates and maintains subscription provider orders and provider contracts in SOM."
+    },
+    "com_product": {
+        "name": "COM_PRODUCT",
+        "type": "tcode",
+        "component": "SAP SOM",
+        "description": "Product Master Maintenance.",
+        "standard_use": "Maintains subscription products, bundles, and cross-catalog mapping to CC charge plans."
+    },
+    "wty_claim": {
+        "name": "WTY_CLAIM",
+        "type": "tcode",
+        "component": "SAP SOM / Warranty",
+        "description": "Warranty and Allowance Claims Processing.",
+        "standard_use": "Processes allowance adjustments and usage warranty claims."
+    },
+
+    # RAR & S/4HANA Revenue Accounting
+    "farr_rai_mon": {
+        "name": "FARR_RAI_MON",
+        "type": "tcode",
+        "component": "SAP RAR",
+        "description": "Revenue Accounting Item (RAI) Monitor.",
+        "standard_use": "Monitors order, invoice, and fulfillment RAIs for IFRS 15 revenue recognition."
+    },
+
+    # Basis & Administration
+    "slg1": {
+        "name": "SLG1",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "Application Log: Display Logs.",
+        "standard_use": "Inspects execution logs, billing errors, and batch job diagnostics across BRIM components."
+    },
+    "sm59": {
+        "name": "SM59",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "RFC Destinations (Display and Maintain).",
+        "standard_use": "Configures TCP/IP and ABAP RFC connections between S/4HANA, Convergent Charging, and mediation."
+    },
+    "we02": {
+        "name": "WE02",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "IDoc List / Monitor.",
+        "standard_use": "Inspects status of inbound and outbound IDocs in integration scenarios."
+    },
+    "st05": {
+        "name": "ST05",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "Performance Analysis / SQL Trace.",
+        "standard_use": "Traces database accesses, buffer hits, and SQL performance for high-volume billing runs."
+    },
+    "st22": {
+        "name": "ST22",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "ABAP Dump Analysis.",
+        "standard_use": "Inspects short dumps and runtime exceptions in custom BAdIs or standard billing programs."
+    },
+    "f110": {
+        "name": "F110",
+        "type": "tcode",
+        "component": "SAP Financial Accounting",
+        "description": "Automatic Payment Program.",
+        "standard_use": "Executes mass payment runs for standard accounts payable and receivable."
+    },
 
     # Master Data Entities
     "but000": {
@@ -140,6 +391,13 @@ SAP_TECHNICAL_ENTITIES: Dict[str, Dict[str, Any]] = {
         "component": "SAP Master Data (BP)",
         "description": "Business Partner General Data Table (Central Header).",
         "key_fields": ["CLIENT", "PARTNER", "TYPE", "NAME_FIRST", "NAME_LAST"]
+    },
+    "but020": {
+        "name": "BUT020",
+        "type": "table",
+        "component": "SAP Master Data (BP)",
+        "description": "Business Partner Addresses Table.",
+        "key_fields": ["CLIENT", "PARTNER", "ADDRNUMBER"]
     },
     "fkkvkp": {
         "name": "FKKVKP",
@@ -177,6 +435,13 @@ SAP_TECHNICAL_ENTITIES: Dict[str, Dict[str, Any]] = {
         "component": "SAP Basis / Customizing",
         "description": "Call View Maintenance.",
         "standard_use": "Maintains configuration tables and views defined in ABAP Dictionary."
+    },
+    "sm37": {
+        "name": "SM37",
+        "type": "tcode",
+        "component": "SAP Basis",
+        "description": "Overview of Background Jobs.",
+        "standard_use": "Monitors and schedules batch background jobs for billing, invoicing, and clearing."
     },
     "se16": {
         "name": "SE16",

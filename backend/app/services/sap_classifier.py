@@ -44,13 +44,15 @@ SENTIMENTAL_AND_GREETING_PATTERNS = [
     r"^(hi+|hey+|hello+|howdy|hola|namaste|greetings)\b",
     r"^(good\s+(morning|afternoon|evening|night|day))\b",
     r"\b(how\s+are\s+you|how're\s+you|how\s+is\s+it\s+going|how\s+do\s+you\s+feel)\b",
+    r"\b(what\s+are\s+you\s+doing|what're\s+you\s+doing|what\s+are\s+u\s+doing|what\s+r\s+u\s+doing)\b",
     r"\b(who\s+are\s+you|what\s+is\s+your\s+name|what's\s+your\s+name|introduce\s+yourself)\b",
-    r"\b(what\s+can\s+you\s+do|what\s+do\s+you\s+do|tell\s+me\s+about\s+yourself)\b",
+    r"\b(what\s+can\s+you\s+do|what\s+do\s+you\s+do|tell\s+me\s+about\s+yourself|how\s+can\s+you\s+help\s+me|how\s+to\s+use\s+you|use\s+me)\b",
     r"\b(tell\s+me\s+a\s+joke|make\s+me\s+laugh|sing\s+a\s+song|write\s+a\s+story|write\s+a\s+poem)\b",
     r"\b(thank\s+you|thanks|thx|thank\s+u)\b",
     r"\b(bye|goodbye|see\s+you|cya)\b",
     r"\b(i\s+love\s+you|i\s+hate\s+you|do\s+you\s+love\s+me|are\s+you\s+(happy|sad|real|human|ai|bot))\b",
     r"^(ok|okay|cool|nice|great|awesome|fine|alright|sure)\b",
+    r"\b(help|start|get\s+started)\b",
 ]
 
 GENERAL_UNRELATED_PATTERNS = [
@@ -87,6 +89,32 @@ class SAPClassifier:
             pattern = rf"(?<![a-z0-9]){escaped}(?![a-z0-9])"
 
         return bool(re.search(pattern, text, re.IGNORECASE))
+
+    @classmethod
+    def is_conversational_or_greeting(cls, query: str) -> bool:
+        """
+        Detects whether a query is a greeting, sentimental question, or general conversational
+        inquiry (e.g. 'what are you doing?', 'hi', 'who are you?', 'how are you?', 'what can you do?').
+        """
+        text = query.strip().lower()
+        if not text:
+            return False
+
+        # If user explicitly specifies deep configuration, tcodes, or specific database tables,
+        # treat as technical rather than pure conversational greeting.
+        deep_tech_terms = {
+            "configure", "configuration", "spro", "badi", "bapi", "idoc", "f110", "fpc1",
+            "bit", "cit", "provider contract", "charge plan", "billable item", "consumption item",
+            "acdoca", "dfkkop", "mara"
+        }
+        if any(cls._contains_term(text, t) for t in deep_tech_terms):
+            return False
+
+        for pattern in SENTIMENTAL_AND_GREETING_PATTERNS:
+            if re.search(pattern, text, re.IGNORECASE):
+                return True
+
+        return False
 
     @classmethod
     def classify(cls, query: str) -> Tuple[bool, str]:

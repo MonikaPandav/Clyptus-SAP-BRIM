@@ -287,7 +287,7 @@ export const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-52px)] min-w-0 bg-[#ffffff] dark:bg-[#000000] relative text-slate-800 dark:text-slate-100 font-sans transition-colors">
+    <div className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-[#ffffff] dark:bg-[#000000] relative text-slate-800 dark:text-slate-100 font-sans transition-colors overflow-hidden">
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}

@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
     EMBEDDING_DIM: int = 384
     TOP_K: int = int(os.getenv("TOP_K", "50"))
-    RERANK_TOP_K: int = int(os.getenv("RERANK_TOP_K", "8"))
+    RERANK_TOP_K: int = int(os.getenv("RERANK_TOP_K", "4"))
     SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.60"))
     GROUNDING_THRESHOLD: float = float(os.getenv("GROUNDING_THRESHOLD", "0.65"))
 
