@@ -8,10 +8,10 @@
 | `BRIM_AC240_EN_Col16.pdf` | **official_sap** | `IN-DOMAIN` | 348 | 299 | Official SAP Education courseware AC240 (Contract Accounts Receivable and Payable) |
 | `Billing_and_Revenue_Innovation_Management.pdf` | **official_sap** | `IN-DOMAIN` | 39 | 32 | Official SAP AG publication on Billing and Revenue Innovation Management |
 | `SAP CC.pdf` | **official_sap** | `IN-DOMAIN` | 62 | 34 | Official SAP Convergent Charging 2025.1 Implementation Guide (Public) |
-| `SAP CI1.pdf` | **official_sap** | `IN-DOMAIN` | 537 | 181 | Official SAP Convergent Invoicing documentation export Volume 1 |
-| `SAP CI2.pdf` | **official_sap** | `IN-DOMAIN` | 482 | 217 | Official SAP Convergent Invoicing documentation export Volume 2 |
-| `SAP CI3.pdf` | **official_sap** | `IN-DOMAIN` | 681 | 211 | Official SAP Convergent Invoicing documentation export Volume 3 |
-| `SAP CI4.pdf` | **official_sap** | `IN-DOMAIN` | 708 | 327 | Official SAP Convergent Invoicing documentation export Volume 4 |
+| `SAP CI1.pdf` | **official_sap** | `OFF-DOMAIN` | 537 | 181 | SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM |
+| `SAP CI2.pdf` | **official_sap** | `OFF-DOMAIN` | 482 | 217 | SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM |
+| `SAP CI3.pdf` | **official_sap** | `OFF-DOMAIN` | 681 | 211 | SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM |
+| `SAP CI4.pdf` | **official_sap** | `OFF-DOMAIN` | 708 | 327 | SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM |
 | `SIMPL_OP1709.pdf` | **official_sap** | `OFF-DOMAIN` | 1,565 | 894 | S/4HANA Simplification List (General ERP / non-BRIM specific) |
 | `mg.pdf` | **official_sap** | `IN-DOMAIN` | 81 | 43 | Official SAP Convergent Charging 4.1 Master Guide (Public) |
 | `pdfdownload.pdf` | **official_sap** | `IN-DOMAIN` | 803 | 283 | Official SAP Help Portal Subscription Order Management guide |

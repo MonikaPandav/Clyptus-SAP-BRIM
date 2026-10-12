@@ -4,6 +4,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 22,
     "chunk_ids": [
       "02d54bc2-2736-476d-9d2e-0aff6bb3e85c",
@@ -35,6 +36,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 16,
     "chunk_ids": [
       "1215e216-1ab2-432d-a488-99674d5ea87a",
@@ -60,6 +62,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "80d8663f-72c7-4379-8646-1ad8d4477e12"
@@ -70,6 +73,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "20e87a2d-92f7-49f0-8719-f576dec927a5",
@@ -82,6 +86,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 11,
     "chunk_ids": [
       "1c468c54-3af0-4543-a052-740195587917",
@@ -102,6 +107,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 12,
     "chunk_ids": [
       "201b3ec9-fc40-4d96-bb81-9c7f3940db22",
@@ -123,6 +129,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 9,
     "chunk_ids": [
       "32193a7e-7a56-4fd7-b239-8bf03da149d9",
@@ -141,6 +148,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "32193a7e-7a56-4fd7-b239-8bf03da149d9",
@@ -156,6 +164,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "0652f8ca-2062-4026-b410-ad68ca3da04d",
@@ -171,6 +180,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 13,
     "chunk_ids": [
       "023be35e-5110-4ac0-bfaf-8aaba31ec002",
@@ -193,6 +203,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 15,
     "chunk_ids": [
       "062f89cb-49e3-45a3-82b9-6c0efbe15812",
@@ -217,6 +228,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 12,
     "chunk_ids": [
       "0355d966-8148-4c93-8b3f-80e73f9f122f",
@@ -238,6 +250,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "164d2219-94f4-41dc-b441-f0cc89440748",
@@ -250,6 +263,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "164d2219-94f4-41dc-b441-f0cc89440748",
@@ -262,6 +276,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 20,
     "chunk_ids": [
       "0051e808-8f2e-4cff-8038-03b607ed1a5e",
@@ -291,6 +306,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "07ba0402-1145-4c01-a13b-6de08df8899b",
@@ -308,6 +324,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 50,
     "chunk_ids": [
       "06b92ad2-9988-4341-be97-3993eed8bdbf",
@@ -367,6 +384,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "8e667ebf-1cc6-43e5-a4fb-ef3af98e8961",
@@ -380,6 +398,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "1257efcc-d22a-4988-82fc-774d01d020fb",
@@ -393,6 +412,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "095bae3b-c4d7-481d-86ca-40afd0b97ea7",
@@ -409,6 +429,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 18,
     "chunk_ids": [
       "048a9f98-c607-4c03-890f-cf3cc6132ef7",
@@ -436,6 +457,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "027bda37-3c24-4d2f-8812-a896f8096069",
@@ -452,6 +474,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004",
@@ -469,6 +492,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "8af9a128-3eb3-407f-abd2-fda3a76afc6e",
@@ -480,6 +504,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "42fb3bbc-a348-43c3-8d8a-6a42d54d14a7",
@@ -497,6 +522,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "a6052d18-f5af-43af-b1c6-555968fb9f92",
@@ -509,6 +535,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 10,
     "chunk_ids": [
       "24517a21-2bf8-4a35-8909-b536605bca2d",
@@ -528,6 +555,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 24,
     "chunk_ids": [
       "088195e7-2790-4cb1-ad56-6077efcb0b1a",
@@ -561,6 +589,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "760444ee-20be-452f-896d-0ec016ef2546"
@@ -571,6 +600,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "760444ee-20be-452f-896d-0ec016ef2546",
@@ -582,6 +612,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "760444ee-20be-452f-896d-0ec016ef2546",
@@ -593,6 +624,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f8b06dbd-ee55-48c3-b561-80f6e125cf2b"
@@ -603,6 +635,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b150f0c6-972f-45f1-9077-86793d0de6c9",
@@ -614,6 +647,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a395a2f0-abd1-498d-8d10-13bbf8f8ef1e"
@@ -624,6 +658,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a395a2f0-abd1-498d-8d10-13bbf8f8ef1e"
@@ -634,6 +669,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 12,
     "chunk_ids": [
       "136c8ee1-5f34-4e2c-bfff-9c253b63e0c7",
@@ -655,6 +691,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "136c8ee1-5f34-4e2c-bfff-9c253b63e0c7",
@@ -672,6 +709,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 13,
     "chunk_ids": [
       "13d056aa-619a-45a1-9f96-309a825894af",
@@ -694,6 +732,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "4fc0c9ce-6bb8-478d-8fa3-2628c2bfeae1",
@@ -705,6 +744,7 @@
     "type": "technical_object",
     "module": "CI",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "4fc0c9ce-6bb8-478d-8fa3-2628c2bfeae1"
@@ -715,6 +755,7 @@
     "type": "technical_object",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 190,
     "chunk_ids": [
       "03b082e7-2357-42e4-9c19-2f04e36809e5",
@@ -914,6 +955,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "acc4ee46-8904-4da5-898c-689aec54735a"
@@ -924,6 +966,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "acc4ee46-8904-4da5-898c-689aec54735a"
@@ -934,6 +977,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "4c779734-3d8c-4984-a30a-cb9fbd30a7ae",
@@ -945,6 +989,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "df3d7ea5-1ff0-479c-8496-f616fad26a82"
@@ -955,6 +1000,7 @@
     "type": "technical_object",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 27,
     "chunk_ids": [
       "01c09f2a-8abd-4cbb-b545-50c67ec4d245",
@@ -991,6 +1037,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 7,
     "chunk_ids": [
       "1b6fdcf3-66cc-49a9-a049-677d5026dfca",
@@ -1007,6 +1054,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "dcdab32b-5c11-4ffa-b55b-c786bda58189"
@@ -1017,6 +1065,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "85414e60-afa0-41e8-93c6-166c2ebea71b",
@@ -1028,6 +1077,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "85414e60-afa0-41e8-93c6-166c2ebea71b",
@@ -1039,6 +1089,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "85414e60-afa0-41e8-93c6-166c2ebea71b",
@@ -1050,6 +1101,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "85414e60-afa0-41e8-93c6-166c2ebea71b",
@@ -1061,6 +1113,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 12,
     "chunk_ids": [
       "117aa9d9-43c1-4b69-b761-72a714a8e390",
@@ -1082,6 +1135,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "4e8ad993-3006-47ec-a293-eff0ccc95291",
@@ -1094,6 +1148,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "4e8ad993-3006-47ec-a293-eff0ccc95291",
@@ -1105,6 +1160,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "1d2ff1e1-1787-42b8-820d-97817445b651",
@@ -1117,6 +1173,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "1d2ff1e1-1787-42b8-820d-97817445b651",
@@ -1129,6 +1186,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 8,
     "chunk_ids": [
       "0daaca6d-0a96-405b-828a-49514a10cbd4",
@@ -1146,6 +1204,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 6,
     "chunk_ids": [
       "4a8e805c-d453-4bad-b277-29b2a800576a",
@@ -1161,6 +1220,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 12,
     "chunk_ids": [
       "3ad76f10-3a4c-4099-9cbc-b8d19cf0fd88",
@@ -1182,6 +1242,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "240e7c35-3ec1-49f1-8377-f77a2e4e88ab"
@@ -1192,6 +1253,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "240e7c35-3ec1-49f1-8377-f77a2e4e88ab"
@@ -1202,6 +1264,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "e9818aa9-f548-460f-bf0c-d4fba1030ac4"
@@ -1212,6 +1275,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 6,
     "chunk_ids": [
       "139af362-344c-4923-93de-cdcfc7317e54",
@@ -1227,6 +1291,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 7,
     "chunk_ids": [
       "139af362-344c-4923-93de-cdcfc7317e54",
@@ -1243,6 +1308,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 34,
     "chunk_ids": [
       "0091370d-43f9-4dbf-83f0-abc6184da333",
@@ -1286,6 +1352,7 @@
     "type": "table",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "dbe99fbe-e648-43cd-9ea7-7e8ec33d3f8d"
@@ -1296,6 +1363,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 11,
     "chunk_ids": [
       "38a18957-e472-4b28-b3cc-967b3a7d6afa",
@@ -1316,6 +1384,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 18,
     "chunk_ids": [
       "0652f8ca-2062-4026-b410-ad68ca3da04d",
@@ -1343,6 +1412,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 15,
     "chunk_ids": [
       "0b04ac48-b28b-4320-8a31-422e87125b98",
@@ -1367,6 +1437,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "0b04ac48-b28b-4320-8a31-422e87125b98",
@@ -1383,6 +1454,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "1d5d7cc8-a4b1-4b0f-a8fc-525658a1cacc",
@@ -1394,6 +1466,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "672f1dd5-4f55-432f-b5a7-0887c8f6c9cf",
@@ -1405,6 +1478,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "4634bc89-740e-41b3-9295-1a9e2fc2aecd",
@@ -1416,6 +1490,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "101ee18e-7e29-4338-bdd4-0f58e2c688c1",
@@ -1429,6 +1504,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "8f625bf4-6060-47e0-a6c9-e2ec372f9af0",
@@ -1442,6 +1518,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "3a067b33-d786-4eec-81c5-6f2430a71a51",
@@ -1453,6 +1530,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "059fe585-b685-4964-a78e-94b25c0b05f9",
@@ -1468,6 +1546,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 154,
     "chunk_ids": [
       "00016abc-0efb-43a4-9e1a-397ed4a818db",
@@ -1631,6 +1710,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b5d378c0-c10a-4bca-a242-eb25ff704cd2",
@@ -1642,6 +1722,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1652,6 +1733,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1662,6 +1744,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1672,6 +1755,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1682,6 +1766,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1692,6 +1777,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5974fec2-298a-4112-9e6e-0cd49ee03f9c"
@@ -1702,6 +1788,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "551e87fa-9e45-4a86-943e-9a0ab19a0a0c"
@@ -1712,6 +1799,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 9,
     "chunk_ids": [
       "0fdcf573-0a5d-4bf6-aa8a-d00cc8a591cd",
@@ -1730,6 +1818,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "5e09f562-4117-4abe-9a8c-37572b064a92",
@@ -1742,6 +1831,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 10,
     "chunk_ids": [
       "2e435dd8-7e02-4c05-bef9-692836473cb3",
@@ -1761,6 +1851,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "bb49ec6b-8ae8-494e-ae5f-a771ef4834a8"
@@ -1771,6 +1862,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "bb49ec6b-8ae8-494e-ae5f-a771ef4834a8"
@@ -1781,6 +1873,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "bb49ec6b-8ae8-494e-ae5f-a771ef4834a8"
@@ -1791,6 +1884,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "7b63d188-c62a-45cd-8168-d64940a54838",
@@ -1802,6 +1896,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 11,
     "chunk_ids": [
       "02363d91-8883-4c71-ac33-b4aee364850f",
@@ -1822,6 +1917,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 74,
     "chunk_ids": [
       "0466f868-e6b0-451e-a369-6823f99672a3",
@@ -1905,6 +2001,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 16,
     "chunk_ids": [
       "00506787-ab0d-433d-8da8-70cd6566fb1e",
@@ -1930,6 +2027,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 74,
     "chunk_ids": [
       "0414b89e-93e7-4e4d-b7e8-f68a720a7877",
@@ -2013,6 +2111,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 50,
     "chunk_ids": [
       "033e4d66-97c2-461a-8bfa-38963cdcc341",
@@ -2072,6 +2171,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "1c468c54-3af0-4543-a052-740195587917",
@@ -2083,6 +2183,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "1c468c54-3af0-4543-a052-740195587917",
@@ -2094,6 +2195,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2106,6 +2208,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "03b40197-0283-4d03-8a6e-56bdad967dc0",
@@ -2117,6 +2220,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "263f3a9d-ec97-4295-b5e5-ab2bdc7da2af",
@@ -2134,6 +2238,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "82a85bba-88e0-4a0c-a930-4d65191612ea"
@@ -2144,6 +2249,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "96a18957-43e2-4702-84e0-d5b453299eeb",
@@ -2155,6 +2261,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2166,6 +2273,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2179,6 +2287,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 16,
     "chunk_ids": [
       "0051e808-8f2e-4cff-8038-03b607ed1a5e",
@@ -2204,6 +2313,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2216,6 +2326,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2230,6 +2341,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "2399261c-1282-4831-959b-d972e7a233dc",
@@ -2244,6 +2356,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "0051e808-8f2e-4cff-8038-03b607ed1a5e",
@@ -2259,6 +2372,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "7696b28f-e885-477b-8db1-bf11a69e0975",
@@ -2270,6 +2384,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca",
@@ -2282,6 +2397,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "027bda37-3c24-4d2f-8812-a896f8096069",
@@ -2299,6 +2415,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "6f336ee0-b5ee-4422-8769-d7018de2e702",
@@ -2312,6 +2429,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "11c3e7fd-d942-4ef5-b7d0-7ec6018a0106",
@@ -2327,6 +2445,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "05487bb2-ef3f-4873-9d8b-e21ba85665a2",
@@ -2339,6 +2458,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "251aea80-0771-41f9-80f7-ddf503437f01",
@@ -2351,6 +2471,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "282a4e2f-23d1-41a3-b9d7-155d13ea8ffc",
@@ -2362,6 +2483,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "027bda37-3c24-4d2f-8812-a896f8096069",
@@ -2377,6 +2499,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c3efc633-7cd6-4837-9476-3e5a61d0b207"
@@ -2387,6 +2510,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "1c468c54-3af0-4543-a052-740195587917",
@@ -2398,6 +2522,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "1c468c54-3af0-4543-a052-740195587917",
@@ -2412,6 +2537,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "3a635864-779c-45c2-9052-3b0dcf7bf06f",
@@ -2426,6 +2552,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "431c81a2-c314-48ea-8485-62539f0e3bf7"
@@ -2436,6 +2563,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "627d13d3-1359-4f62-8440-cb6b81443698"
@@ -2446,6 +2574,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "7696b28f-e885-477b-8db1-bf11a69e0975",
@@ -2458,6 +2587,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "a6325a3e-ff11-41f5-8204-02f66b42a281",
@@ -2469,6 +2599,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a7d1ca17-8e19-4dad-8179-5829098ba892"
@@ -2479,6 +2610,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a6325a3e-ff11-41f5-8204-02f66b42a281"
@@ -2489,6 +2621,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6ff7ad77-1ff1-4eb4-be25-afeeec10bffc"
@@ -2499,6 +2632,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "2b0ac2d9-4965-4d37-a9ce-27a22cbb8980",
@@ -2516,6 +2650,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "2b0ac2d9-4965-4d37-a9ce-27a22cbb8980",
@@ -2533,6 +2668,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 10,
     "chunk_ids": [
       "043b6cc5-94b7-4055-895a-15cb0a9e64c3",
@@ -2552,6 +2688,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 116,
     "chunk_ids": [
       "004b22a3-969e-446b-98e8-69af6caa2269",
@@ -2677,6 +2814,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "9820e8e8-135c-4407-a88a-864d9a41e80a"
@@ -2687,6 +2825,7 @@
     "type": "table",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "0051e808-8f2e-4cff-8038-03b607ed1a5e",
@@ -2699,6 +2838,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "76de516d-4da3-4acf-a399-186ba62be1bc",
@@ -2710,6 +2850,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "a8aceab6-2ba2-4ee2-baaa-122ed014770d"
@@ -2720,6 +2861,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "cd8c410d-dc44-4f1b-9641-b198024561ab",
@@ -2731,6 +2873,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "ea162dc3-b8a9-4b75-9a8b-179bc0d1547b"
@@ -2741,6 +2884,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "be184993-35fb-43b3-b572-ce90f3205db8"
@@ -2751,6 +2895,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "452a6e6e-fdfe-4570-b9c5-ea3c62debbc4"
@@ -2761,6 +2906,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "c8abdda3-fa42-4916-b52e-e956671b14b8"
@@ -2771,6 +2917,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "c8abdda3-fa42-4916-b52e-e956671b14b8"
@@ -2781,6 +2928,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "c8abdda3-fa42-4916-b52e-e956671b14b8",
@@ -2793,6 +2941,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "c8abdda3-fa42-4916-b52e-e956671b14b8"
@@ -2803,6 +2952,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "65a7b07a-b2f2-4b64-a0e6-1a3dc6246a34",
@@ -2814,6 +2964,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "3c8ad725-ffc5-4360-9459-ce7959c35f35",
@@ -2825,6 +2976,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "3c8ad725-ffc5-4360-9459-ce7959c35f35",
@@ -2836,6 +2988,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "65a7b07a-b2f2-4b64-a0e6-1a3dc6246a34"
@@ -2846,6 +2999,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 4,
     "chunk_ids": [
       "253ccd22-34d2-47a2-a351-b4ac4394bd8f",
@@ -2859,6 +3013,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "0badef81-40ff-47a8-9d28-ba74b433ff5c",
@@ -2870,6 +3025,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "fc4138aa-2135-4eb8-a407-993ccea1bebc"
@@ -2880,6 +3036,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "fc4138aa-2135-4eb8-a407-993ccea1bebc"
@@ -2890,6 +3047,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "0badef81-40ff-47a8-9d28-ba74b433ff5c"
@@ -2900,6 +3058,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "5641fce5-7e77-4735-8ad3-c9c606ae4e5a"
@@ -2910,6 +3069,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 5,
     "chunk_ids": [
       "0e4c30a7-5c64-4886-8298-49af09941662",
@@ -2924,6 +3084,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "08e56e09-ba19-45f7-8c86-dcb7752c26cc"
@@ -2934,6 +3095,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 4,
     "chunk_ids": [
       "408163cf-9357-4a1b-a0b7-8c803685b5fd",
@@ -2947,6 +3109,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 4,
     "chunk_ids": [
       "408163cf-9357-4a1b-a0b7-8c803685b5fd",
@@ -2960,6 +3123,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 4,
     "chunk_ids": [
       "408163cf-9357-4a1b-a0b7-8c803685b5fd",
@@ -2973,6 +3137,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "408163cf-9357-4a1b-a0b7-8c803685b5fd",
@@ -2984,6 +3149,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "f058436a-7850-4385-a81a-4a29ae043e9d"
@@ -2994,6 +3160,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "a4a7f183-154d-4ba1-b172-f58c65323db8"
@@ -3004,6 +3171,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "c1d48c2b-6ff7-4d81-ad2d-abdc31d30756"
@@ -3014,6 +3182,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "11291726-4b21-42fe-ab77-98bdd09c8c5e"
@@ -3024,6 +3193,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "56d4c927-1af2-43b7-b0c0-8f3de8a51f60"
@@ -3034,6 +3204,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "56d4c927-1af2-43b7-b0c0-8f3de8a51f60"
@@ -3044,6 +3215,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "62da0db1-d5d3-4096-a3e2-ffc2745b9438"
@@ -3054,6 +3226,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "5ca87e1a-9a55-4686-9fdc-d66196819eda"
@@ -3064,6 +3237,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "94c7af50-6036-4c6f-88a2-dd74d29652e4"
@@ -3074,6 +3248,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "6dabf3a3-1c67-4cc7-b3bf-7a2a72798708"
@@ -3084,6 +3259,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "09fad93e-37ef-4d3a-b2b8-a3a3cfb768cf",
@@ -3096,6 +3272,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "19dd3187-0b28-4447-b124-d6b35b28979e"
@@ -3106,6 +3283,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 7,
     "chunk_ids": [
       "1e6783fd-33e7-479b-96ab-57605cf57336",
@@ -3122,6 +3300,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "fddf0db8-45b6-4fa2-b0c6-762b18ce6dc3"
@@ -3132,6 +3311,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "26aa81f8-92d5-4122-b3e8-18f6f134d973",
@@ -3143,6 +3323,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "26aa81f8-92d5-4122-b3e8-18f6f134d973"
@@ -3153,6 +3334,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "54d8d32d-cb13-499f-95cc-ee1d62e88a59"
@@ -3163,6 +3345,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "54d8d32d-cb13-499f-95cc-ee1d62e88a59"
@@ -3173,6 +3356,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "54d8d32d-cb13-499f-95cc-ee1d62e88a59"
@@ -3183,6 +3367,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "4959ff98-e2de-41b5-a100-e02fe941a5d2",
@@ -3194,6 +3379,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "54d8d32d-cb13-499f-95cc-ee1d62e88a59"
@@ -3204,6 +3390,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "4959ff98-e2de-41b5-a100-e02fe941a5d2"
@@ -3214,6 +3401,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "4959ff98-e2de-41b5-a100-e02fe941a5d2"
@@ -3224,6 +3412,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "4959ff98-e2de-41b5-a100-e02fe941a5d2"
@@ -3234,6 +3423,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "becee3d3-fee7-4e5f-bbf5-6a1a090c5ec6"
@@ -3244,6 +3434,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "becee3d3-fee7-4e5f-bbf5-6a1a090c5ec6"
@@ -3254,6 +3445,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "342b5b66-8436-45bb-b4c9-57a442ecd2cc"
@@ -3264,6 +3456,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "342b5b66-8436-45bb-b4c9-57a442ecd2cc"
@@ -3274,6 +3467,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "535c7697-a422-41dc-ab96-a1c873058d42"
@@ -3284,6 +3478,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "668934aa-8ed2-4f64-a760-165e6f78eafb"
@@ -3294,6 +3489,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "afae5930-8b13-42ef-8375-8e00ba049842"
@@ -3304,6 +3500,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "afae5930-8b13-42ef-8375-8e00ba049842"
@@ -3314,6 +3511,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "038955b3-0f40-464a-93bb-cd34397c00a6"
@@ -3324,6 +3522,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "7cee181f-3ba7-40ae-a5c4-f20e5c3f0f9e",
@@ -3335,6 +3534,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "4839ef0a-6582-4491-95e5-984f6c0f3eb8",
@@ -3347,6 +3547,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "5673a35b-751d-4b66-8fe2-7a98247ff10b"
@@ -3357,6 +3558,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "761fb0a9-4632-49d6-acf8-0e33d7a9ef9b"
@@ -3367,6 +3569,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "21109207-cc38-409f-8861-86392f3c26fc",
@@ -3378,6 +3581,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "39aba859-f2bb-433a-8b30-0070db7b8ad0",
@@ -3389,6 +3593,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c"
@@ -3399,6 +3604,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c"
@@ -3409,6 +3615,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c",
@@ -3420,6 +3627,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c",
@@ -3431,6 +3639,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c",
@@ -3442,6 +3651,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 3,
     "chunk_ids": [
       "6166e23a-7929-4d59-9eed-bf111024a00c",
@@ -3454,6 +3664,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd",
@@ -3465,6 +3676,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd",
@@ -3476,6 +3688,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd",
@@ -3487,6 +3700,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "d7540ed1-582b-47ab-8bfa-4bc0fa12881f"
@@ -3497,6 +3711,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "d7540ed1-582b-47ab-8bfa-4bc0fa12881f"
@@ -3507,6 +3722,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "d7540ed1-582b-47ab-8bfa-4bc0fa12881f"
@@ -3517,6 +3733,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd"
@@ -3527,6 +3744,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd"
@@ -3537,6 +3755,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd"
@@ -3547,6 +3766,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "0ebca62b-2088-4363-8a22-2b4faaa410bd"
@@ -3557,6 +3777,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "46cbf4fe-3b59-4201-94df-70836a2f6df9"
@@ -3567,6 +3788,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "46cbf4fe-3b59-4201-94df-70836a2f6df9"
@@ -3577,6 +3799,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "46cbf4fe-3b59-4201-94df-70836a2f6df9"
@@ -3587,6 +3810,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "64d1beb8-cabb-4e8d-ae02-48c3ae517112"
@@ -3597,6 +3821,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "64d1beb8-cabb-4e8d-ae02-48c3ae517112"
@@ -3607,6 +3832,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 1,
     "chunk_ids": [
       "64d1beb8-cabb-4e8d-ae02-48c3ae517112"
@@ -3617,6 +3843,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "forum",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "1a9e5c03-76ab-4f70-80cb-30f269e24af7",
@@ -3631,6 +3858,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "17b1e9a4-e7ee-4467-9cbe-b4d4d1d405ca",
@@ -3642,6 +3870,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 34,
     "chunk_ids": [
       "037941ab-1e6e-4c0b-a9ab-e21946cb11a2",
@@ -3685,6 +3914,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "595b299a-4a5e-4303-ba3a-e6d7138b2f0e"
@@ -3695,6 +3925,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "00424c2b-2682-4b87-827d-2d9b8e7358fd",
@@ -3706,6 +3937,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 23,
     "chunk_ids": [
       "02d54bc2-2736-476d-9d2e-0aff6bb3e85c",
@@ -3738,6 +3970,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6a8ab13f-8ae8-4722-ae91-734d4bad39af"
@@ -3748,6 +3981,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 29,
     "chunk_ids": [
       "02d54bc2-2736-476d-9d2e-0aff6bb3e85c",
@@ -3786,6 +4020,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "60f89041-ee70-4e28-81f9-46d47d90570b",
@@ -3797,6 +4032,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "bac38376-7bc9-44f3-99d3-44069fc444d6",
@@ -3808,6 +4044,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "21df3f74-9c21-4c35-8f98-b51c5209854a",
@@ -3819,6 +4056,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "0f31cf91-be8f-4199-baeb-17a04508b4a9",
@@ -3836,6 +4074,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "35e6c9b0-0cc1-42e0-be72-9469b4a98e91"
@@ -3846,6 +4085,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "1ba8ee68-3080-4db9-b126-0cae6b17a3a3",
@@ -3859,6 +4099,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ca57af3d-84fc-45cf-bc11-7a015bce5233"
@@ -3869,6 +4110,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "0c4500b6-ba69-4aa6-9a07-9b003db58d07",
@@ -3881,6 +4123,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "10d535ef-bde2-4898-9a4d-a626a7de9af8",
@@ -3894,6 +4137,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "5511bd14-d577-424f-b630-a333389d09a3",
@@ -3907,6 +4151,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "620b9303-b11c-4a59-bf2f-784e2afc7f3e"
@@ -3917,6 +4162,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f92c59b8-8491-42b5-87aa-0f82e4321fa9"
@@ -3927,6 +4173,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "076f71ec-3e70-4e90-b841-500c0cf09eae"
@@ -3937,6 +4184,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "dec5748e-5a51-4fef-ab2b-f6007c7e211a"
@@ -3947,6 +4195,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3d123f11-929c-49c2-9b60-29e99b84b549"
@@ -3957,6 +4206,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "7da9e58e-e17e-41a2-8477-0d73831ed926",
@@ -3969,6 +4219,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e6da3e3a-074f-4003-a1b5-d5f8bad52a89"
@@ -3979,6 +4230,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "7e6eda08-e1ae-43ac-acb8-ecdbb64713c7",
@@ -3990,6 +4242,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "7a45ff97-26c5-45a8-88f4-c40d74aa8c58",
@@ -4001,6 +4254,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "28bfd1bc-15a4-4cce-8c20-794244cc57df",
@@ -4013,6 +4267,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3525e766-f50e-462b-bf4b-d46d32715184"
@@ -4023,6 +4278,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "1df7b046-3faf-4176-b6cd-d6f6215ab2ac"
@@ -4033,6 +4289,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "05626dad-6730-44bf-809b-597afdf4fdf2",
@@ -4045,6 +4302,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5506cc61-a449-49e5-8fc6-bb5ae7b8fb0b"
@@ -4055,6 +4313,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "02fc052c-4e79-4b35-9982-32389333ec05"
@@ -4065,6 +4324,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "13a93d8b-e9fe-4672-92e5-22cf3f33adba"
@@ -4075,6 +4335,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": true,
     "occurrence_count": 2,
     "chunk_ids": [
       "7a10b11c-5d46-4275-b564-de82c11cc413",
@@ -4086,6 +4347,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "25c85718-e7e2-4b10-862e-d01037aa3c38",
@@ -4097,6 +4359,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "1b47f7d8-4950-4ea9-a478-3443ba9c73de",
@@ -4108,6 +4371,7 @@
     "type": "table",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27",
@@ -4120,6 +4384,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "1467a3d1-6327-4fb4-a354-d391809cf398",
@@ -4136,6 +4401,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948",
@@ -4151,6 +4417,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "22ac66b7-99b0-4d92-8d56-11db5c05f99d",
@@ -4162,6 +4429,7 @@
     "type": "table",
     "module": "SOM",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "35a783e4-8641-47dd-ab5d-6c02032ba63f"
@@ -4172,6 +4440,7 @@
     "type": "table",
     "module": "SOM",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "045e09fb-f2cf-4340-a047-6392b06fef09",
@@ -4183,6 +4452,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "1e374d66-8731-4350-9380-0787276a29a7",
@@ -4195,6 +4465,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "21340eb4-51fc-441a-a57c-624bf6010b9e",
@@ -4210,6 +4481,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c971e656-78d6-43c0-9d4f-7d49d6395f86"
@@ -4220,6 +4492,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 15,
     "chunk_ids": [
       "55167e81-2c8e-4424-8cfb-4067656dfff1",
@@ -4244,6 +4517,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 10,
     "chunk_ids": [
       "203ae8cb-8eb0-4f7f-85c1-b551cd594380",
@@ -4263,6 +4537,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3fb30f30-fd2e-464c-ab18-9a2ea5087192"
@@ -4273,6 +4548,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "19074deb-1a01-43b4-933f-d8bd1608f823"
@@ -4283,6 +4559,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "19074deb-1a01-43b4-933f-d8bd1608f823"
@@ -4293,6 +4570,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "19074deb-1a01-43b4-933f-d8bd1608f823",
@@ -4310,6 +4588,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "2b8eddea-ad38-4e6d-82a6-809247ea126b",
@@ -4321,6 +4600,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "180df3e8-188a-4f3e-a895-74e12992d730",
@@ -4333,6 +4613,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "2e6beac9-e836-4f5c-bbed-c2caf7a311a4",
@@ -4350,6 +4631,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d9d5bc3c-f9ba-4ae5-982d-8abaabad70ef"
@@ -4360,6 +4642,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d9d5bc3c-f9ba-4ae5-982d-8abaabad70ef"
@@ -4370,6 +4653,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2bfa8ac9-8447-476f-806b-0a23024f772a",
@@ -4382,6 +4666,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d9d5bc3c-f9ba-4ae5-982d-8abaabad70ef"
@@ -4392,6 +4677,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "0051e808-8f2e-4cff-8038-03b607ed1a5e",
@@ -4409,6 +4695,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5a89d706-786e-4e09-9ae0-9e5bbff7ccfc"
@@ -4419,6 +4706,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d0e17a85-e08a-43c4-bed4-4789e2a9492f"
@@ -4429,6 +4717,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a398ed19-0870-4413-9f8e-f609020541cb"
@@ -4439,6 +4728,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a398ed19-0870-4413-9f8e-f609020541cb"
@@ -4449,6 +4739,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "54e6eb0b-bfd4-4427-b62e-cc82e11521a7"
@@ -4459,6 +4750,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e977a283-2b51-489d-ae3d-0cb1ab2040c7"
@@ -4469,6 +4761,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "0ee582cd-5c7a-43f4-9df8-0f12ec4598e7",
@@ -4480,6 +4773,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "40534917-d86f-4bf1-8680-b6e8443eca88"
@@ -4490,6 +4784,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "60db15b3-1ee2-4e47-8620-82763b0946f4",
@@ -4501,6 +4796,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "0b8c71d0-aed4-4d71-98d4-7ce6f0c19b39"
@@ -4511,6 +4807,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "83253549-5cb0-4b1d-a628-e028d95a475d",
@@ -4522,6 +4819,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "83253549-5cb0-4b1d-a628-e028d95a475d"
@@ -4532,6 +4830,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "83253549-5cb0-4b1d-a628-e028d95a475d",
@@ -4544,6 +4843,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 11,
     "chunk_ids": [
       "3b81c42a-cb22-464e-ae3e-9f42a4040db1",
@@ -4564,6 +4864,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "4a319a0b-c72a-4380-a625-319bbf953cbe",
@@ -4576,6 +4877,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "615866ad-925a-4a9e-b367-3857b42e7150",
@@ -4589,6 +4891,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "bbbc7659-b202-463c-816b-7e5d53b84d16",
@@ -4600,6 +4903,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5a787bff-f8c9-4321-8404-d7f7e0e938b6"
@@ -4610,6 +4914,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a045f40c-4efd-4240-b838-e53dbd9dd84e"
@@ -4620,6 +4925,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "782e5782-0f79-4906-b825-09901a94acb4"
@@ -4630,6 +4936,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "782e5782-0f79-4906-b825-09901a94acb4"
@@ -4640,6 +4947,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "dfd0772d-67d5-4584-983e-00bfd549a4e4"
@@ -4650,6 +4958,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f683706f-dab8-4fe2-a9b7-88ec8c88d6a4"
@@ -4660,6 +4969,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "02c5b69d-3f06-42d0-b27b-b9ad050f5f22",
@@ -4672,6 +4982,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "ce44a2e6-e1f7-47f7-8bdc-76371526afb8",
@@ -4683,6 +4994,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "eec359a8-8a60-43ff-a792-d59148af99c0"
@@ -4693,6 +5005,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "1fba23e0-8f85-4509-bb1d-2a83f77fa525",
@@ -4710,6 +5023,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "134fdd84-3f57-42a7-ae7d-a8a7d0d22fb6",
@@ -4721,6 +5035,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "effa3db9-a03e-41f8-8985-7f35c685f3ee"
@@ -4731,6 +5046,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e65f26f7-79be-4c31-99ef-73af773f5b88"
@@ -4741,6 +5057,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "e65f26f7-79be-4c31-99ef-73af773f5b88",
@@ -4752,6 +5069,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "09f54422-f659-4935-941f-1f017c3a0c17",
@@ -4763,6 +5081,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "847e7d16-d95e-4248-a8da-7196cb5e92ee",
@@ -4774,6 +5093,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "4911b80e-87fb-443d-a737-11060200820e",
@@ -4787,6 +5107,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "253ccd22-34d2-47a2-a351-b4ac4394bd8f",
@@ -4803,6 +5124,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "a3d6dbcd-884f-4185-ba15-ebb1d0481a02",
@@ -4814,6 +5136,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "1e7376f8-1c8c-4354-9395-3a1cbe259e43",
@@ -4826,6 +5149,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "2cbf8894-89b3-4247-9d4e-ac59cc8218f6",
@@ -4841,6 +5165,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "0158755a-4e65-46b2-878e-d466ef7d9af7",
@@ -4852,6 +5177,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e25676ad-9833-49cb-94aa-ba7989439a23"
@@ -4862,6 +5188,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "05971cbc-eee0-4fca-a84d-bddd545f1e40",
@@ -4877,6 +5204,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2e832d7b-21c4-4388-9bc7-ea0769334616",
@@ -4889,6 +5217,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "6c142adb-6291-4a39-8e64-c5808f935d4d",
@@ -4900,6 +5229,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "0de0a89b-39b8-4af7-8214-42a4b6c5e4cb",
@@ -4913,6 +5243,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d4edab02-ecc9-450e-86da-6ca664ac48b8"
@@ -4923,6 +5254,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "198ef357-f8ac-457a-87a6-437b411fd18f",
@@ -4935,6 +5267,7 @@
     "type": "tcode",
     "module": "RAR",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "66727f73-f017-49e4-82ba-95f08bdeb381"
@@ -4945,6 +5278,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "743f3bcc-3c74-492d-8f32-056144e4773c"
@@ -4955,6 +5289,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "5aa995ef-3546-4b50-8914-b5f53456c5a5",
@@ -4966,6 +5301,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "11457774-7035-4c76-a3b5-4966a8f6d593",
@@ -4978,6 +5314,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "15e2dc85-1a08-426c-a623-cbc3de66d478",
@@ -4989,6 +5326,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "bdacc853-57c4-4406-a098-d3105c70c7de"
@@ -4999,6 +5337,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "abceef7e-744f-407f-a3c7-e6eedbca740f"
@@ -5009,6 +5348,7 @@
     "type": "tcode",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "abceef7e-744f-407f-a3c7-e6eedbca740f"
@@ -5019,6 +5359,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "395235b9-af32-4414-ab9a-a62ec4e43a4f",
@@ -5030,6 +5371,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "46de5efe-fcd9-478f-9a52-0fd379b5ccab"
@@ -5040,6 +5382,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27"
@@ -5050,6 +5393,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27"
@@ -5060,6 +5404,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27"
@@ -5070,6 +5415,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27"
@@ -5080,6 +5426,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27"
@@ -5090,6 +5437,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "75c208b2-0d75-43e2-be57-8de7429bde27",
@@ -5101,6 +5449,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c77be1f1-b1d0-46fd-8902-62937fc5baa6"
@@ -5111,6 +5460,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "bb4f71fe-7dea-472e-8552-6f025e676440"
@@ -5121,6 +5471,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6f22a4c8-1a32-4cca-af84-60d12bf8bc4b"
@@ -5131,6 +5482,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c2f59da2-9406-417c-bcc8-f3c4e01b3c22"
@@ -5141,6 +5493,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c799a329-44d5-4c68-aa4a-78bc1e618f3c"
@@ -5151,6 +5504,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "31a56016-822e-4ea7-a6e6-a7b9b3c98310"
@@ -5161,6 +5515,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 6,
     "chunk_ids": [
       "1cfd2d61-aa06-428d-9b0d-3929062f447c",
@@ -5176,6 +5531,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a6300afd-7445-4950-a432-f0c47cdbf07d"
@@ -5186,6 +5542,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d3199d61-6549-4889-bd66-ad2f10a286b3"
@@ -5196,6 +5553,7 @@
     "type": "table",
     "module": "CC",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "be7ebd4b-7ad8-4ea4-b0ac-472161a60943"
@@ -5206,6 +5564,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a3d6dbcd-884f-4185-ba15-ebb1d0481a02"
@@ -5216,6 +5575,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a3d6dbcd-884f-4185-ba15-ebb1d0481a02"
@@ -5226,6 +5586,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a3d6dbcd-884f-4185-ba15-ebb1d0481a02"
@@ -5236,6 +5597,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5aa995ef-3546-4b50-8914-b5f53456c5a5"
@@ -5246,6 +5608,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5aa995ef-3546-4b50-8914-b5f53456c5a5"
@@ -5256,6 +5619,7 @@
     "type": "table",
     "module": "CI",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "5aa995ef-3546-4b50-8914-b5f53456c5a5",
@@ -5267,6 +5631,7 @@
     "type": "table",
     "module": "General",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c0d3af5f-bae7-436a-af48-7439cfaec9c5"
@@ -5277,6 +5642,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "73a0fc5d-dc90-4234-8319-90522faa69a3"
@@ -5287,6 +5653,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "73a0fc5d-dc90-4234-8319-90522faa69a3"
@@ -5297,6 +5664,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "73a0fc5d-dc90-4234-8319-90522faa69a3",
@@ -5308,6 +5676,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "sap_partner_or_book",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fbad4a04-e76a-4e5d-b5cd-dfeabca864ec"
@@ -5318,6 +5687,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "0e45dd8c-a2a4-404c-86f5-87c2f1f11bed",
@@ -5330,6 +5700,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "1c209d1c-5eb2-4167-8e7a-a06086902501",
@@ -5344,6 +5715,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "02b407fa-accd-45a7-953e-f7071ab4a237",
@@ -5355,6 +5727,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "4203aa17-61d8-4644-8b71-6455289bb8da",
@@ -5367,6 +5740,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fdb6374e-4547-4792-b2ee-5f26f82e1be6"
@@ -5377,6 +5751,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "263f3a9d-ec97-4295-b5e5-ab2bdc7da2af",
@@ -5390,6 +5765,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "7e69c005-8c99-4745-b458-84decb0243b7"
@@ -5400,6 +5776,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "baf7d69d-a133-45e4-9d97-b187fd764304"
@@ -5410,6 +5787,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004",
@@ -5423,6 +5801,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004",
@@ -5435,6 +5814,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5445,6 +5825,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5455,6 +5836,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5465,6 +5847,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5475,6 +5858,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5485,6 +5869,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "38f800a1-a4f4-4f91-a41e-b92adf6d9004"
@@ -5495,6 +5880,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 10,
     "chunk_ids": [
       "0b226123-59db-4978-97bc-25821b0143f3",
@@ -5514,6 +5900,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "dce16637-5cd5-4d6c-8274-ce8174e88bfa"
@@ -5524,6 +5911,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5534,6 +5922,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5544,6 +5933,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5554,6 +5944,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5564,6 +5955,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5574,6 +5966,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5584,6 +5977,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5594,6 +5988,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5604,6 +5999,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5614,6 +6010,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5624,6 +6021,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5634,6 +6032,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5644,6 +6043,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5654,6 +6054,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5664,6 +6065,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5674,6 +6076,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5684,6 +6087,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5694,6 +6098,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9ba1cd4b-7370-4712-820c-24b44f6b827d"
@@ -5704,6 +6109,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "8860bb19-be6c-4209-9325-7a491ba1101e",
@@ -5715,6 +6121,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "8860bb19-be6c-4209-9325-7a491ba1101e",
@@ -5726,6 +6133,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5736,6 +6144,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5746,6 +6155,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5756,6 +6166,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5766,6 +6177,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5776,6 +6188,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5786,6 +6199,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5796,6 +6210,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5806,6 +6221,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "92260200-e8ff-4a49-bf0a-27b6f65546d6"
@@ -5816,6 +6232,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d",
@@ -5827,6 +6244,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d",
@@ -5838,6 +6256,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d",
@@ -5849,6 +6268,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5859,6 +6279,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5869,6 +6290,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5879,6 +6301,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5889,6 +6312,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5899,6 +6323,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5909,6 +6334,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5919,6 +6345,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5929,6 +6356,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "50ee5291-140b-4f3f-8566-ae448bca983d"
@@ -5939,6 +6367,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "79ae3ad5-a1fc-4734-926c-98bc20b44ec0"
@@ -5949,6 +6378,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "25c9b587-2d20-4998-9f0d-8d307b4e1874"
@@ -5959,6 +6389,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "25c9b587-2d20-4998-9f0d-8d307b4e1874"
@@ -5969,6 +6400,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "27aeddee-bbbf-4bc2-8d3f-d6ebb488b18d"
@@ -5979,6 +6411,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "34eec5bb-74b5-46aa-90f8-3fb868459a1f"
@@ -5989,6 +6422,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "2d416a29-9b97-4444-a31b-c9a9b1c17c58"
@@ -5999,6 +6433,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e2e437da-29a3-46ad-ae9b-abc2d9ad6899"
@@ -6009,6 +6444,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca",
@@ -6020,6 +6456,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6030,6 +6467,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6040,6 +6478,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6050,6 +6489,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6060,6 +6500,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6070,6 +6511,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6080,6 +6522,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca",
@@ -6091,6 +6534,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6101,6 +6545,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6111,6 +6556,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6121,6 +6567,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "10eac95c-e10a-49cc-9ac4-bed89f17cdca"
@@ -6131,6 +6578,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "cf6ccc5f-6d95-423f-b6b5-3a9ad2b6aac4"
@@ -6141,6 +6589,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "cf6ccc5f-6d95-423f-b6b5-3a9ad2b6aac4"
@@ -6151,6 +6600,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "cf6ccc5f-6d95-423f-b6b5-3a9ad2b6aac4"
@@ -6161,6 +6611,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "65931f14-e2a4-483f-a46b-9308c39cc261",
@@ -6174,6 +6625,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "737b23ec-7277-4f4a-8d7e-65d395204216",
@@ -6185,6 +6637,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "737b23ec-7277-4f4a-8d7e-65d395204216",
@@ -6196,6 +6649,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "06b50400-8f6b-4f22-828c-91d192be0e54",
@@ -6207,6 +6661,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "06b50400-8f6b-4f22-828c-91d192be0e54",
@@ -6218,6 +6673,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6228,6 +6684,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6238,6 +6695,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6248,6 +6706,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6258,6 +6717,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6268,6 +6728,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6278,6 +6739,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6288,6 +6750,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6298,6 +6761,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6308,6 +6772,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6318,6 +6783,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de"
@@ -6328,6 +6794,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de",
@@ -6339,6 +6806,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de",
@@ -6350,6 +6818,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b1ddc1fb-cdfa-4645-8c31-0e07ecd7a4de",
@@ -6361,6 +6830,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6371,6 +6841,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6381,6 +6852,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6391,6 +6863,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6401,6 +6874,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6411,6 +6885,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6421,6 +6896,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fcf4f917-6196-4472-95a5-5ed529d55b1a"
@@ -6431,6 +6907,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "5aa30d3a-9c4d-4343-bf77-9815bf24ce05",
@@ -6442,6 +6919,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948"
@@ -6452,6 +6930,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948"
@@ -6462,6 +6941,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948"
@@ -6472,6 +6952,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948"
@@ -6482,6 +6963,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "272b4c7d-1de7-4b3d-89a2-37e51a2be948",
@@ -6494,6 +6976,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6504,6 +6987,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6514,6 +6998,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6524,6 +7009,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6534,6 +7020,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6544,6 +7031,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6554,6 +7042,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6564,6 +7053,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6574,6 +7064,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "710c2ee3-bdf0-4e69-a91b-6926dcd6f3ba"
@@ -6584,6 +7075,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b46db7a8-a06c-4962-b3c3-55d504962a42",
@@ -6595,6 +7087,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fbfa5974-3754-4f2b-b0b7-3d53c80eb784"
@@ -6605,6 +7098,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "2d7b6744-067e-4c4a-88a6-48200d2b13ad",
@@ -6616,6 +7110,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 12,
     "chunk_ids": [
       "0b226123-59db-4978-97bc-25821b0143f3",
@@ -6637,6 +7132,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6647,6 +7143,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6657,6 +7154,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6667,6 +7165,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6677,6 +7176,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6687,6 +7187,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6697,6 +7198,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6707,6 +7209,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6717,6 +7220,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6727,6 +7231,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6737,6 +7242,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "74ecacaa-234b-4e2e-9a3b-5ded750cc61c"
@@ -6747,6 +7253,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ce7273e3-ff29-480f-b42a-44a1a37efce4"
@@ -6757,6 +7264,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2e7cc413-b0ff-42e3-a09b-d7be3f09965e",
@@ -6769,6 +7277,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "da4eaf74-68ed-49f5-918d-add0db416d31"
@@ -6779,6 +7288,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "da4eaf74-68ed-49f5-918d-add0db416d31"
@@ -6789,6 +7299,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "058a73b4-0e0f-4d55-9e3a-074478883e2d",
@@ -6802,6 +7313,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "3aca1bea-5e31-4845-bb0c-2f31d0680dc7",
@@ -6814,6 +7326,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "3aca1bea-5e31-4845-bb0c-2f31d0680dc7",
@@ -6825,6 +7338,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "c0ba4df9-0e54-439f-b8f9-23046cc7b955"
@@ -6835,6 +7349,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "8d180cdb-20a7-4a28-bf71-5b4bae7ef44d"
@@ -6845,6 +7360,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "8d180cdb-20a7-4a28-bf71-5b4bae7ef44d"
@@ -6855,6 +7371,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f407005d-68d8-4206-a757-fe14b961f182"
@@ -6865,6 +7382,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5b690fb1-3c3c-419d-9f59-f598c2252411"
@@ -6875,6 +7393,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "185e4c1f-caf7-4f57-91e2-1883a6dab89b"
@@ -6885,6 +7404,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "266d1f18-044f-47e1-aa01-05bab50c9d9a"
@@ -6895,6 +7415,7 @@
     "type": "table",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f13c1000-62b8-4ba1-87a9-1b53b0465d93"
@@ -6905,6 +7426,7 @@
     "type": "table",
     "module": "CC",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b09fe2b6-60eb-4295-9211-119a91c6c903"
@@ -6915,6 +7437,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "b09fe2b6-60eb-4295-9211-119a91c6c903"
@@ -6925,6 +7448,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "52b58715-23c1-4c88-a472-57b60de14881"
@@ -6935,6 +7459,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "40265e55-9509-47e9-ba55-91236c517bc0",
@@ -6946,6 +7471,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "9284fda0-420a-4e52-8dcf-d1bf06babb39"
@@ -6956,6 +7482,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "dd7c0c19-ff22-4fc0-a92f-4467287bb78c"
@@ -6966,6 +7493,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "dd7c0c19-ff22-4fc0-a92f-4467287bb78c"
@@ -6976,6 +7504,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "78f6d12f-9279-440b-aac9-050a7308a76b"
@@ -6986,6 +7515,7 @@
     "type": "report_or_fm",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "78f6d12f-9279-440b-aac9-050a7308a76b"
@@ -6996,6 +7526,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "a6776193-9054-4020-8cd4-2302665eba47"
@@ -7006,6 +7537,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fa935a48-5e59-4343-804e-08a5513af966"
@@ -7016,6 +7548,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fa935a48-5e59-4343-804e-08a5513af966"
@@ -7026,6 +7559,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "fa935a48-5e59-4343-804e-08a5513af966"
@@ -7036,6 +7570,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6835d830-62b0-4b3c-9f4e-7d0133f853e5"
@@ -7046,6 +7581,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6835d830-62b0-4b3c-9f4e-7d0133f853e5"
@@ -7056,6 +7592,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "cbfbd677-2229-4650-843a-fc64decc0121"
@@ -7066,6 +7603,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 8,
     "chunk_ids": [
       "3e6fab11-ee06-4543-99d2-fceff8e6f0b5",
@@ -7083,6 +7621,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "56b51341-9152-4638-9bec-ae620b6e3d2d",
@@ -7097,6 +7636,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7108,6 +7648,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7119,6 +7660,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7130,6 +7672,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7141,6 +7684,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7152,6 +7696,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7163,6 +7708,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7174,6 +7720,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "3e6fab11-ee06-4543-99d2-fceff8e6f0b5",
@@ -7186,6 +7733,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "90f9dcb9-8927-46a7-b884-b5b2fb5c9768",
@@ -7197,6 +7745,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "7f291d50-fd32-471f-a18e-38003f712186",
@@ -7209,6 +7758,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5fed9eb1-024e-410e-93cc-dba4e7c051e1"
@@ -7219,6 +7769,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d7805a81-4e75-45f2-a945-c53145aab447"
@@ -7229,6 +7780,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "875016ae-56f1-444f-9aa9-a83a6f228a36",
@@ -7241,6 +7793,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "e3ab06f4-6184-4a5d-9bf0-b32674c821ca"
@@ -7251,6 +7804,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "4bd56642-495f-4d60-a4fc-abdc2984c3f9",
@@ -7262,6 +7816,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f55966dc-63cf-41de-8dee-867a50f42755"
@@ -7272,6 +7827,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f55966dc-63cf-41de-8dee-867a50f42755"
@@ -7282,6 +7838,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "5ac5d05c-5734-436b-b0b8-1ef5cf5ba2af",
@@ -7293,6 +7850,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "f2cbea4b-4c59-43b9-beab-63f594df8bb2"
@@ -7303,6 +7861,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b6929d9c-1caa-4df7-8e85-d2b030aeadc2",
@@ -7314,6 +7873,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b6929d9c-1caa-4df7-8e85-d2b030aeadc2",
@@ -7325,6 +7885,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b6929d9c-1caa-4df7-8e85-d2b030aeadc2",
@@ -7336,6 +7897,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "b6929d9c-1caa-4df7-8e85-d2b030aeadc2",
@@ -7347,6 +7909,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "253998f8-bfbf-451f-8646-9bb941584bfc",
@@ -7358,6 +7921,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ac018628-c066-40a9-86f8-650c1df76708"
@@ -7368,6 +7932,7 @@
     "type": "table",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "2f63ac5d-35a9-4bb7-a946-d056bff7278d"
@@ -7378,6 +7943,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "492123b9-2843-45ae-b2ab-1cf0922daa64",
@@ -7389,6 +7955,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "263cff34-9d34-48d4-b9f4-092ceaa23f12"
@@ -7399,6 +7966,7 @@
     "type": "tcode",
     "module": "General",
     "tier": "official_sap",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "263cff34-9d34-48d4-b9f4-092ceaa23f12",
@@ -7410,6 +7978,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "ace0ff11-badc-4335-aa97-07925f9b49fc",
@@ -7421,6 +7990,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "016c4625-0d1b-45aa-8b34-961c9ac84a81",
@@ -7434,6 +8004,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "3d645b7d-0e61-4a36-8d5a-4e0d3e374cb6",
@@ -7447,6 +8018,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "3d645b7d-0e61-4a36-8d5a-4e0d3e374cb6",
@@ -7460,6 +8032,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 9,
     "chunk_ids": [
       "2cbf8894-89b3-4247-9d4e-ac59cc8218f6",
@@ -7478,6 +8051,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "df6375d1-9d1d-44be-be2d-4ac4be4cae4b"
@@ -7488,6 +8062,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "df6375d1-9d1d-44be-be2d-4ac4be4cae4b"
@@ -7498,6 +8073,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "df6375d1-9d1d-44be-be2d-4ac4be4cae4b"
@@ -7508,6 +8084,7 @@
     "type": "report_or_fm",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "df6375d1-9d1d-44be-be2d-4ac4be4cae4b"
@@ -7518,6 +8095,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "c929bc62-1b82-41e1-8390-506648bed253",
@@ -7529,6 +8107,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "d595ddf7-3c5f-41c7-859d-4195d6c3cc77",
@@ -7540,6 +8119,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d595ddf7-3c5f-41c7-859d-4195d6c3cc77"
@@ -7550,6 +8130,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "d595ddf7-3c5f-41c7-859d-4195d6c3cc77",
@@ -7561,6 +8142,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "32193a7e-7a56-4fd7-b239-8bf03da149d9",
@@ -7574,6 +8156,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d595ddf7-3c5f-41c7-859d-4195d6c3cc77"
@@ -7584,6 +8167,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d595ddf7-3c5f-41c7-859d-4195d6c3cc77"
@@ -7594,6 +8178,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "016c4625-0d1b-45aa-8b34-961c9ac84a81"
@@ -7604,6 +8189,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "016c4625-0d1b-45aa-8b34-961c9ac84a81"
@@ -7614,6 +8200,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "016c4625-0d1b-45aa-8b34-961c9ac84a81"
@@ -7624,6 +8211,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "016c4625-0d1b-45aa-8b34-961c9ac84a81"
@@ -7634,6 +8222,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3d645b7d-0e61-4a36-8d5a-4e0d3e374cb6"
@@ -7644,6 +8233,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "3e73f6e7-3cd6-48a6-8d95-8b1f422b9dc3",
@@ -7660,6 +8250,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "2cbf8894-89b3-4247-9d4e-ac59cc8218f6",
@@ -7671,6 +8262,7 @@
     "type": "report_or_fm",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d3216eda-5eb5-44c8-83b0-5f5a6015a2b2"
@@ -7681,6 +8273,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6a33f260-6041-4241-ab53-b6a88c66d65a"
@@ -7691,6 +8284,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6a33f260-6041-4241-ab53-b6a88c66d65a"
@@ -7701,6 +8295,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "6a33f260-6041-4241-ab53-b6a88c66d65a"
@@ -7711,6 +8306,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "8b06345b-21e2-43c1-9c5a-232a52288786",
@@ -7722,6 +8318,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 13,
     "chunk_ids": [
       "1ec7e5b9-e2ed-45fd-be35-c69c3c1f829a",
@@ -7744,6 +8341,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "5d730516-9b80-4327-9064-27a36c9f590c",
@@ -7757,6 +8355,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ef3b70fc-ec77-409a-a704-37d8575d3f54"
@@ -7767,6 +8366,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ef3b70fc-ec77-409a-a704-37d8575d3f54"
@@ -7777,6 +8377,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ef3b70fc-ec77-409a-a704-37d8575d3f54"
@@ -7787,6 +8388,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "cecede55-6065-4b4c-80b7-e0f5b378843e",
@@ -7799,6 +8401,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "cecede55-6065-4b4c-80b7-e0f5b378843e",
@@ -7810,6 +8413,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "253ccd22-34d2-47a2-a351-b4ac4394bd8f",
@@ -7823,6 +8427,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ef3b70fc-ec77-409a-a704-37d8575d3f54"
@@ -7833,6 +8438,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "ef3b70fc-ec77-409a-a704-37d8575d3f54"
@@ -7843,6 +8449,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "2cbf8894-89b3-4247-9d4e-ac59cc8218f6",
@@ -7854,6 +8461,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "062f89cb-49e3-45a3-82b9-6c0efbe15812",
@@ -7866,6 +8474,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "343f0d53-caf5-4d75-8d38-b1f01eb26486"
@@ -7876,6 +8485,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3d7eb78f-beb5-462c-8218-c8b5136e5f38"
@@ -7886,6 +8496,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3d7eb78f-beb5-462c-8218-c8b5136e5f38"
@@ -7896,6 +8507,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "3d7eb78f-beb5-462c-8218-c8b5136e5f38"
@@ -7906,6 +8518,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "2c1c865c-76f7-4ffc-a252-64e5d9b8e176",
@@ -7922,6 +8535,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 3,
     "chunk_ids": [
       "2c1c865c-76f7-4ffc-a252-64e5d9b8e176",
@@ -7934,6 +8548,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "7cee181f-3ba7-40ae-a5c4-f20e5c3f0f9e"
@@ -7944,6 +8559,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "7cee181f-3ba7-40ae-a5c4-f20e5c3f0f9e"
@@ -7954,6 +8570,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "8b06345b-21e2-43c1-9c5a-232a52288786"
@@ -7964,6 +8581,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "8b06345b-21e2-43c1-9c5a-232a52288786"
@@ -7974,6 +8592,7 @@
     "type": "tcode",
     "module": "SOM",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 7,
     "chunk_ids": [
       "0daaca6d-0a96-405b-828a-49514a10cbd4",
@@ -7990,6 +8609,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "d09e4c74-f508-469e-9ac7-16cf67df9925"
@@ -8000,6 +8620,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "2e6beac9-e836-4f5c-bbed-c2caf7a311a4",
@@ -8013,6 +8634,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 5,
     "chunk_ids": [
       "134a7926-58b8-4dcf-9fc0-1eae142d9cf5",
@@ -8027,6 +8649,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "88e11c0a-ec96-4aab-b290-8ba6db247eae",
@@ -8040,6 +8663,7 @@
     "type": "table",
     "module": "RAR",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 4,
     "chunk_ids": [
       "3e73f6e7-3cd6-48a6-8d95-8b1f422b9dc3",
@@ -8053,6 +8677,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5cffc3f2-9986-4f57-abc2-8c1690b329a2"
@@ -8063,6 +8688,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "5cffc3f2-9986-4f57-abc2-8c1690b329a2"
@@ -8073,6 +8699,7 @@
     "type": "tcode",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "134a7926-58b8-4dcf-9fc0-1eae142d9cf5"
@@ -8083,6 +8710,7 @@
     "type": "report_or_fm",
     "module": "SOM",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "35f308d2-7f1e-45cd-8f4c-f35a4d571db8"
@@ -8093,6 +8721,7 @@
     "type": "tcode",
     "module": "CC",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 1,
     "chunk_ids": [
       "707da4a2-b507-43a7-b9d0-26aa0687dfb9"
@@ -8103,6 +8732,7 @@
     "type": "table",
     "module": "FI-CA",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "88e11c0a-ec96-4aab-b290-8ba6db247eae",
@@ -8114,6 +8744,7 @@
     "type": "table",
     "module": "CI",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "6e21cff9-10fb-445f-8bb8-5ee49c03957a",
@@ -8125,10 +8756,65 @@
     "type": "tcode",
     "module": "CM",
     "tier": "self_authored",
+    "official_verified": false,
     "occurrence_count": 2,
     "chunk_ids": [
       "9b1ad0af-eaa0-49b4-987f-9bbaafd1efc0",
       "c9b3979b-f245-4547-97d1-6941c5f5efae"
     ]
+  },
+  "FKKBIX_BIT_MON": {
+    "identifier": "FKKBIX_BIT_MON",
+    "type": "table",
+    "module": "CI",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
+  },
+  "FKKINV_MASS": {
+    "identifier": "FKKINV_MASS",
+    "type": "table",
+    "module": "General",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
+  },
+  "FKKBIX_BIT_TRANS": {
+    "identifier": "FKKBIX_BIT_TRANS",
+    "type": "table",
+    "module": "CI",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
+  },
+  "SRCTRADOC": {
+    "identifier": "SRCTRADOC",
+    "type": "technical_object",
+    "module": "General",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
+  },
+  "FPC0": {
+    "identifier": "FPC0",
+    "type": "tcode",
+    "module": "FI-CA",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
+  },
+  "FPC1": {
+    "identifier": "FPC1",
+    "type": "tcode",
+    "module": "FI-CA",
+    "tier": "none",
+    "official_verified": false,
+    "occurrence_count": 0,
+    "chunk_ids": []
   }
 }

@@ -62,7 +62,11 @@ def test_off_domain_flags_coverage():
         "SAP_PP_Production_Planning_Reference.pdf",
         "SAP_S4HANA_Architecture_and_Migration_Guide.pdf",
         "SAP_SD_Sales_and_Distribution_Handbook.pdf",
-        "SAP-PRESS-Catalog-Shop.pdf"
+        "SAP-PRESS-Catalog-Shop.pdf",
+        "SAP CI1.pdf",
+        "SAP CI2.pdf",
+        "SAP CI3.pdf",
+        "SAP CI4.pdf"
     ]
     for doc in off_domain_docs:
         assert corpus_service.is_document_off_domain(doc) is True, f"{doc} should be marked off-domain"
@@ -72,7 +76,6 @@ def test_off_domain_flags_coverage():
         "BR234_EN_SOM 2.pdf",
         "BRIM_AC240_EN_Col16.pdf",
         "SAP CC.pdf",
-        "SAP CI1.pdf",
         "SAP BRIM Press Book 2nd Edition - Expertsoft.pdf",
         "pdfdownload.pdf"
     ]

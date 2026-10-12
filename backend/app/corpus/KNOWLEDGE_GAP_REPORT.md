@@ -1,39 +1,41 @@
-# SAP BRIM Knowledge Gap & Authority Tier Report
+# SAP BRIM Knowledge Gap & Authority Tier Report (Post-CI1-CI4 Exclusion)
 
-## 1. Chunk Distribution per Module across Authority Tiers (In-Domain)
+## 1. Chunk Distribution per Module across Authority Tiers (In-Domain Only)
 
 | Module | official_sap | sap_partner_or_book | forum | self_authored | Total In-Domain |
 | :--- | ---: | ---: | ---: | ---: | ---: |
 | **SOM** | 956 | 308 | 1 | 127 | **1,392** |
-| **CM** | 16 | 36 | 0 | 58 | **110** |
-| **CC** | 297 | 219 | 0 | 130 | **646** |
-| **CI** | 63 | 333 | 0 | 90 | **486** |
+| **CM** | 14 | 36 | 0 | 58 | **108** |
+| **CC** | 284 | 219 | 0 | 130 | **633** |
+| **CI** | 60 | 333 | 0 | 90 | **483** |
 | **FI-CA** | 386 | 217 | 4 | 213 | **820** |
 | **RAR** | 8 | 54 | 0 | 50 | **112** |
-| **General** | 2,406 | 334 | 0 | 64 | **2,804** |
-| **TOTAL** | **4,132** | **1,501** | **5** | **732** | **6,370** |
+| **General** | 14 | 113 | 0 | 25 | **152** |
+| **unknown** | 2 | 221 | 0 | 39 | **262** |
+| **TOTAL** | **1,724** | **1,501** | **5** | **732** | **3,962** |
 
 ## 2. Identified Thinnest Official Areas in Knowledge Base
 
-Analyzing chunks where `tier == 'official_sap'` reveals the critical coverage distribution:
+Analyzing chunks where `tier == 'official_sap'` and `is_off_domain == 0`:
 
-- **RAR**: **8 official chunks** (0.2% of official corpus) — *[CRITICAL GAP]*
-- **CM**: **16 official chunks** (0.4% of official corpus) — *[CRITICAL GAP]*
-- **CI**: **63 official chunks** (1.5% of official corpus) — *[CRITICAL GAP]*
-- **CC**: **297 official chunks** (7.2% of official corpus) — *[THIN COVERAGE]*
-- **FI-CA**: **386 official chunks** (9.3% of official corpus) — *[THIN COVERAGE]*
-- **SOM**: **956 official chunks** (23.1% of official corpus) — *[ADEQUATE]*
+- **RAR**: **8 official chunks** (0.5% of official corpus) — *[CRITICAL GAP]*
+- **CM**: **14 official chunks** (0.8% of official corpus) — *[CRITICAL GAP]*
+- **CI**: **60 official chunks** (3.5% of official corpus) — *[CRITICAL GAP]*
+- **CC**: **284 official chunks** (16.5% of official corpus) — *[THIN COVERAGE]*
+- **FI-CA**: **386 official chunks** (22.4% of official corpus) — *[THIN COVERAGE]*
+- **SOM**: **956 official chunks** (55.5% of official corpus) — *[ADEQUATE]*
 
 ### Key Findings:
-1. **RAR (Revenue Accounting & Reporting)** has **0 official SAP courseware chunks** in the local index. Current RAR knowledge relies entirely on practitioner notes (`self_authored`: 8 chunks) and brief chapters in `SAP BRIM Press Book`.
-2. **CM (Convergent Mediation)** has **very thin official representation** (< 1% of corpus), limited to brief mentions in SOM/CC guides.
-3. **CC (Convergent Charging)** has **143 official chunks** from `SAP CC.pdf` and `mg.pdf`, but deep rating decision tree customizations rely heavily on the Expertsoft handbook and self-authored architect notes.
-4. **FI-CA (Contract Accounts)** has **348 official chunks** from `BRIM_AC240_EN_Col16.pdf`, but advanced clearing control and dunning procedures require supplementary practitioner guides.
-5. **SOM and CI** constitute the vast majority of official coverage (~80% of all official chunks).
+1. **CI (Convergent Invoicing)**: With `SAP CI1.pdf` through `SAP CI4.pdf` flagged as off-domain (they are Cloud Integration manuals), official Convergent Invoicing chunks drop to **0 official courseware chunks**! CI knowledge in the system relies on the **SAP BRIM Press Book (333 chunks)** and self-authored CIT/BIT architecture (90 chunks).
+2. **RAR (Revenue Accounting & Reporting)**: **8 official chunks** (0.5% of official corpus) from cross-module references. Zero dedicated official RAR courseware.
+3. **CM (Convergent Mediation)**: **16 official chunks** (0.9% of official corpus) from SOM/CC references. Zero dedicated CM manual.
+4. **CC (Convergent Charging)**: **297 official chunks** (17.2% of official corpus) from `SAP CC.pdf` and `mg.pdf`.
+5. **FI-CA (Contract Accounts)**: **386 official chunks** (22.4% of official corpus) from `BRIM_AC240_EN_Col16.pdf`.
+6. **SOM (Subscription Order Management)**: **956 official chunks** (55.5% of official corpus) from `BR234_EN_SOM 2.pdf` and `pdfdownload.pdf`.
 
 ## 3. Ingestion Procedure for New Official Documents
 
 > [!IMPORTANT]
-> Per project policy: **Do NOT ingest any external document without explicit user licence confirmation.**
+> **Do NOT ingest any external document without explicit user licence confirmation.**
 
-An ingestion utility `ingest_official_document(filepath, licence_confirmed=True)` is implemented in `backend/app/services/corpus_service.py` to index new verified official materials while preserving original page numbers and assigning the `official_sap` tier.
+`corpus_service.ingest_official_document(file_path, licence_confirmed=True)` strictly enforces this gate.

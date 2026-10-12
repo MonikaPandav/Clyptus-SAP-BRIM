@@ -148,8 +148,13 @@ def tag_chunk_modules(chunk_text: str, document_name: str = "", score_threshold:
             active_modules = [max_mod]
             primary = max_mod
         else:
-            active_modules = ["General"]
-            primary = "General"
+            # Check for general SAP BRIM / architecture keywords
+            if re.search(r"\b(sap\s+billing\s+and\s+revenue\s+innovation\s+management|sap\s+brim|\bbrim\b|order-to-cash|quote-to-cash|solution\s+overview|solution\s+in\s+detail|master\s+data|integration\s+architecture)\b", chunk_text, re.I):
+                active_modules = ["General"]
+                primary = "General"
+            else:
+                active_modules = ["unknown"]
+                primary = "unknown"
     else:
         # If 4 or more modules are tagged with comparable high scores, mark as General as well
         if len(active_modules) >= 4 and all(scores[m] >= 2.5 for m in active_modules[:4]):
