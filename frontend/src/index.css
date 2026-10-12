@@ -1124,3 +1124,44 @@ h1,h2,h3,p{margin-top:0}
   color: var(--orange);
 }
 
+/* Landing Page Bold Emphasis Typography */
+.hero-description strong,
+.hero-trust strong,
+.video-supporting-copy p strong,
+.statement-inner p strong,
+.intro-content p strong,
+.workflow-heading p strong,
+.workflow-step p strong,
+.features-heading p strong,
+.response-copy p strong,
+.boundary-card p strong,
+.question-heading p strong,
+.about-clyptus-section p strong,
+.about-pillars-grid p strong,
+.usecase-card p strong,
+.faq-item p strong,
+.final-cta p strong {
+  font-weight: 700;
+  color: #18181b;
+}
+
+.dark .hero-description strong,
+.dark .hero-trust strong,
+.dark .video-supporting-copy p strong,
+.dark .statement-inner p strong,
+.dark .intro-content p strong,
+.dark .workflow-heading p strong,
+.dark .workflow-step p strong,
+.dark .features-heading p strong,
+.dark .response-copy p strong,
+.dark .boundary-card p strong,
+.dark .question-heading p strong,
+.dark .about-clyptus-section p strong,
+.dark .about-pillars-grid p strong,
+.dark .usecase-card p strong,
+.dark .faq-item p strong,
+.dark .final-cta p strong {
+  font-weight: 700;
+  color: #f8fafc;
+}
+

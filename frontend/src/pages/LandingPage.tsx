@@ -31,22 +31,22 @@ const brimAreas = [
   { abbreviation: 'SAP + BRIM', title: 'Connected knowledge across the entire SAP landscape.', icon: Compass },
 ];
 
-const retrievalSteps = [
-  ['01', 'Question', 'Start with your SAP question in everyday technical or functional terms.', MessageCircle],
-  ['02', 'Retrieve', 'Dense embeddings & BM25 search across indexed enterprise manuals.', Search],
-  ['03', 'Rank', 'Cross-encoder reranking prioritizes highest-relevance context.', Gauge],
-  ['04', 'Generate', 'Real-time streaming generation informed strictly by verified knowledge.', Sparkles],
-  ['05', 'Ground', 'Automated grounding checks verify factual alignment and prevent hallucination.', ShieldCheck],
-  ['06', 'Respond', 'Interactive answers with verified citations and grounding confidence.', ArrowRight],
-] as const;
+const retrievalSteps: Array<[string, string, React.ReactNode, React.ComponentType<{ size?: number }>]> = [
+  ['01', 'Question', <>Start with your SAP question in <strong>everyday technical or functional terms</strong>.</>, MessageCircle],
+  ['02', 'Retrieve', <><strong>Dense embeddings & BM25 search</strong> across indexed enterprise manuals.</>, Search],
+  ['03', 'Rank', <><strong>Cross-encoder reranking</strong> prioritizes highest-relevance context.</>, Gauge],
+  ['04', 'Generate', <><strong>Real-time streaming generation</strong> informed strictly by verified knowledge.</>, Sparkles],
+  ['05', 'Ground', <><strong>Automated grounding checks</strong> verify factual alignment and prevent hallucination.</>, ShieldCheck],
+  ['06', 'Respond', <><strong>Interactive answers</strong> with verified citations and grounding confidence.</>, ArrowRight],
+];
 
-const useCases = [
-  ['Configuration', 'Where is this specific SAP setting configured in SPRO?'],
-  ['Transaction codes', 'Which transaction code manages billable items or billing runs?'],
-  ['Concepts', 'What is the lifecycle of a billable item in Convergent Invoicing?'],
-  ['Processes', 'Walk me step-by-step through the SAP BRIM rating and charging flow.'],
-  ['Troubleshooting', 'Billing completed but no invoice document created. What should I check?'],
-  ['Documentation', 'Synthesize complex FI-CA clearing rules from official SAP documentation.'],
+const useCases: Array<[string, React.ReactNode]> = [
+  ['Configuration', <>Where is this specific SAP setting configured in <strong>SPRO</strong>?</>],
+  ['Transaction codes', <>Which <strong>transaction code</strong> manages billable items or billing runs?</>],
+  ['Concepts', <>What is the <strong>lifecycle of a billable item</strong> in Convergent Invoicing?</>],
+  ['Processes', <>Walk me step-by-step through the <strong>SAP BRIM rating and charging flow</strong>.</>],
+  ['Troubleshooting', <>Billing completed but <strong>no invoice document created</strong>. What should I check?</>],
+  ['Documentation', <>Synthesize complex <strong>FI-CA clearing rules</strong> from official SAP documentation.</>],
 ];
 
 const exampleQuestions = [
@@ -106,7 +106,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.55 }}
           >
             <div className="hero-kicker">
-              <span className="kicker-mark">C</span> SAP + BRIM ENTERPRISE ASSISTANT
+              <span className="kicker-mark">C</span> <strong>SAP + BRIM</strong> ENTERPRISE ASSISTANT
             </div>
             <h1>
               Your SAP questions.<br />
@@ -114,11 +114,11 @@ export const LandingPage: React.FC = () => {
               exact context.
             </h1>
             <p className="hero-description">
-              Clyptusap.ai is an AI-powered SAP knowledge platform built to help consultants and developers navigate SAP & BRIM with grounded, cited responses.
+              <strong>Clyptus.AI</strong> is an enterprise AI knowledge platform built to help consultants and architects navigate <strong>SAP &amp; BRIM</strong> with <strong>grounded, verified citations</strong>.
             </p>
             <div className="hero-actions">
               <Link className="button button-brand" to="/login">
-                Ask Clyptusap.ai <ArrowUpRight size={17} />
+                Ask Clyptus.AI <ArrowUpRight size={17} />
               </Link>
               <Link className="text-link" to="/how-it-works">
                 See how it works <ArrowRight size={16} />
@@ -126,7 +126,7 @@ export const LandingPage: React.FC = () => {
             </div>
             <div className="hero-trust">
               <span className="trust-line" />
-              SAP-focused · Hybrid Retrieval · Grounded in verified documentation
+              <strong>SAP-Focused</strong> · <strong>Hybrid Retrieval</strong> · <strong>Grounded in Verified Documentation</strong>
             </div>
           </motion.div>
 
@@ -138,9 +138,9 @@ export const LandingPage: React.FC = () => {
           >
             <VideoShowcase />
             <div className="video-supporting-copy">
-              <strong>See Clyptusap.ai in action</strong>
+              <strong>See Clyptus.AI in action</strong>
               <p>
-                Ask a question. Clyptusap.ai retrieves relevant SAP knowledge, generates answers with real-time ChatGPT streaming animations, and surfaces verified citations.
+                Ask a question. <strong>Clyptus.AI</strong> retrieves relevant SAP knowledge, generates answers with <strong>real-time streaming</strong>, and surfaces <strong>verified citations</strong>.
               </p>
             </div>
           </motion.div>
@@ -156,7 +156,7 @@ export const LandingPage: React.FC = () => {
             <span className="eyebrow">ENTERPRISE SAP KNOWLEDGE, IN CONTEXT</span>
             <p>
               From complex SAP configuration doubts<br />
-              <span>to verified answers and authoritative documentation.</span>
+              <span>to <strong>verified answers</strong> and <strong>authoritative documentation</strong>.</span>
             </p>
           </div>
         </section>
@@ -165,15 +165,15 @@ export const LandingPage: React.FC = () => {
         <section className="section section-wrap intro-section">
           <div className="intro-label">
             <span className="section-index">01</span>
-            <span className="eyebrow">WHAT IS CLYTUSAP.AI</span>
+            <span className="eyebrow">WHAT IS CLYPTUS.AI</span>
           </div>
           <div className="intro-content">
             <h2>An AI assistant<br />built specifically for <span>SAP knowledge.</span></h2>
             <p>
-              SAP is vast and intricate. Answers depend on precise module interactions, transaction codes, custom customizing settings, and system architectures.
+              SAP is vast and intricate. Answers depend on <strong>precise module interactions</strong>, <strong>transaction codes</strong>, <strong>SPRO customizing settings</strong>, and <strong>system architectures</strong>.
             </p>
             <p>
-              Clyptusap.ai uses Developer-Managed RAG to retrieve the exact documentation before answering, eliminating hallucinations and delivering enterprise grounding.
+              <strong>Clyptus.AI</strong> uses <strong>Developer-Managed RAG</strong> to retrieve the exact documentation before answering, <strong>eliminating hallucinations</strong> and delivering <strong>enterprise grounding</strong>.
             </p>
             <Link className="text-link" to="/how-it-works">
               See how answers are grounded <ArrowRight size={16} />
@@ -190,7 +190,7 @@ export const LandingPage: React.FC = () => {
                 <h2>Retrieve first.<br /><span>Answer second.</span></h2>
               </div>
               <p>
-                Dense embeddings, BM25 lexical search, cross-encoder reranking, and citation tracking ensure rock-solid answers.
+                <strong>Dense embeddings</strong>, <strong>BM25 lexical search</strong>, <strong>cross-encoder reranking</strong>, and <strong>citation tracking</strong> ensure rock-solid answers.
               </p>
             </div>
             <div className="workflow-track workflow-track-six">
@@ -222,7 +222,7 @@ export const LandingPage: React.FC = () => {
               <h2>Built for SAP.<br /><span>Deeply focused on BRIM.</span></h2>
             </div>
             <p>
-              Full coverage across billing, rating, charging, subscription management, and financial accounts.
+              Full coverage across <strong>billing, rating, charging, subscription order management (SOM)</strong>, and <strong>contract accounts (FI-CA)</strong>.
             </p>
           </div>
           <div className="feature-grid">
@@ -250,7 +250,7 @@ export const LandingPage: React.FC = () => {
             <span className="eyebrow">SOURCES + CONFIDENCE</span>
             <h2>Don't just get an answer.<br /><span>See what supports it.</span></h2>
             <p>
-              Clyptusap.ai provides clickable sources, grounding score badges, and page citations alongside each response.
+              <strong>Clyptus.AI</strong> provides <strong>clickable sources</strong>, <strong>grounding score badges</strong>, and <strong>exact page citations</strong> alongside each response.
             </p>
           </div>
           <ResponsePreview />
@@ -261,9 +261,9 @@ export const LandingPage: React.FC = () => {
           <div className="section section-wrap boundary-grid">
             <article className="boundary-card">
               <span className="eyebrow">WHEN KNOWLEDGE IS INSUFFICIENT</span>
-              <h2>When the knowledge isn't there,<br /><span>Clyptusap.ai says so.</span></h2>
+              <h2>When the knowledge isn't there,<br /><span>Clyptus.AI says so.</span></h2>
               <p>
-                When retrieved documentation does not sufficiently support an answer, the assistant refuses to hallucinate invented settings or transaction codes.
+                When retrieved documentation does not sufficiently support an answer, the assistant <strong>refuses to hallucinate</strong> invented settings or transaction codes.
               </p>
               <div className="boundary-example">
                 <strong>User</strong>
@@ -282,7 +282,7 @@ export const LandingPage: React.FC = () => {
               <span className="eyebrow">DOMAIN BOUNDARY</span>
               <h2>Focused<br /><span>by design.</span></h2>
               <p>
-                Clyptusap.ai is strictly specialized in SAP ERP, S/4HANA, Fiori, ABAP, Basis, and BRIM. General non-enterprise queries are rejected at pre-flight.
+                <strong>Clyptus.AI</strong> is strictly specialized in <strong>SAP ERP, S/4HANA, Fiori, ABAP, Basis, and BRIM</strong>. General non-enterprise queries are <strong>rejected at pre-flight</strong>.
               </p>
               <div className="boundary-example">
                 <strong>User</strong>
@@ -300,7 +300,7 @@ export const LandingPage: React.FC = () => {
             <span className="eyebrow">START WITH WHAT YOU'RE WORKING ON</span>
             <h2>Ask the SAP question<br /><span>already in front of you.</span></h2>
             <p>
-              Ask about transaction codes, error messages, customizing paths, process integration, or configuration guidelines.
+              Ask about <strong>transaction codes</strong>, <strong>error messages</strong>, <strong>SPRO customizing paths</strong>, <strong>process integration</strong>, or <strong>configuration guidelines</strong>.
             </p>
           </div>
           <div className="question-list">
@@ -318,13 +318,13 @@ export const LandingPage: React.FC = () => {
         <section id="about" className="about-clyptus-section section-wrap">
           <div className="about-clyptus-inner">
             <div className="about-header">
-              <span className="eyebrow">ABOUT CLYPTUS &amp; CLYPTUSAP.AI</span>
+              <span className="eyebrow">ABOUT CLYPTUS &amp; CLYPTUS.AI</span>
               <h2>
                 Engineered for enterprise precision.<br />
                 <span>Zero guesswork in mission-critical SAP.</span>
               </h2>
               <p className="about-lead">
-                Clyptus Technologies builds domain-specialized artificial intelligence systems designed strictly for complex ERP environments. Clyptusap.ai bridges the gap between massive, distributed SAP technical documentation and immediate, grounded decision-making for enterprise architects, billing consultants, and engineering teams.
+                <strong>Clyptus Technologies</strong> builds domain-specialized artificial intelligence systems designed strictly for complex ERP environments. <strong>Clyptus.AI</strong> bridges the gap between massive, distributed SAP technical documentation and <strong>immediate, grounded decision-making</strong> for enterprise architects, billing consultants, and engineering teams.
               </p>
             </div>
 
@@ -333,7 +333,7 @@ export const LandingPage: React.FC = () => {
                 <span className="story-badge">THE CHALLENGE</span>
                 <h3>Why Generic AI Fails in SAP</h3>
                 <p>
-                  Standard large language models hallucinate non-existent transaction codes, invent fictitious SPRO customizing paths, and confuse SAP Convergent Charging rating logic with Convergent Invoicing billing plans. In high-throughput telecommunications, utilities, and subscription businesses, a single billing configuration error can delay millions in revenue recognition.
+                  Standard large language models <strong>hallucinate non-existent transaction codes</strong>, invent <strong>fictitious SPRO customizing paths</strong>, and confuse SAP Convergent Charging rating logic with Convergent Invoicing billing plans. In high-throughput telecommunications, utilities, and subscription businesses, <strong>a single billing configuration error can delay millions in revenue recognition</strong>.
                 </p>
               </div>
 
@@ -341,7 +341,7 @@ export const LandingPage: React.FC = () => {
                 <span className="story-badge">THE CLYPTUS APPROACH</span>
                 <h3>Grounding Before Generation</h3>
                 <p>
-                  Clyptusap.ai never relies on raw parametric memory for configuration paths or technical syntax. Every query triggers dense embedding retrieval combined with BM25 exact keyword matching, cross-encoder neural reranking, and mathematical grounding verification. If verified enterprise documentation doesn't back the answer, the system refuses rather than guessing.
+                  <strong>Clyptus.AI never relies on raw parametric memory</strong> for configuration paths or technical syntax. Every query triggers <strong>dense embedding retrieval</strong> combined with <strong>BM25 exact keyword matching</strong>, <strong>cross-encoder neural reranking</strong>, and <strong>mathematical grounding verification</strong>. If verified enterprise documentation doesn't back the answer, <strong>the system refuses rather than guessing</strong>.
                 </p>
               </div>
             </div>
@@ -350,25 +350,25 @@ export const LandingPage: React.FC = () => {
               <div className="pillar-item">
                 <div className="pillar-num">01</div>
                 <h4>Authoritative Ingestion</h4>
-                <p>Curated indexing of official SAP configuration guides, customizing dictionaries, master data schemas, and implementation blueprints.</p>
+                <p>Curated indexing of <strong>official SAP configuration guides</strong>, customizing dictionaries, <strong>master data schemas</strong>, and implementation blueprints.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">02</div>
                 <h4>Dual-Stage Reranking</h4>
-                <p>Cross-encoder neural models re-evaluate candidate chunks against the specific functional query before generation begins.</p>
+                <p><strong>Cross-encoder neural models</strong> re-evaluate candidate chunks against the specific functional query <strong>before generation begins</strong>.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">03</div>
                 <h4>Verifiable Citations</h4>
-                <p>Every response displays clickable citations with document names, section paths, exact page numbers, and cosine similarity scores.</p>
+                <p>Every response displays <strong>clickable citations</strong> with <strong>document names, section paths, exact page numbers</strong>, and similarity scores.</p>
               </div>
 
               <div className="pillar-item">
                 <div className="pillar-num">04</div>
                 <h4>Strict Tenant Isolation</h4>
-                <p>Enterprise-grade security with JWT token authorization, project workspace grouping, and absolute confidentiality.</p>
+                <p>Enterprise-grade security with <strong>JWT token authorization</strong>, <strong>project workspace grouping</strong>, and <strong>absolute data confidentiality</strong>.</p>
               </div>
             </div>
 
@@ -419,9 +419,9 @@ export const LandingPage: React.FC = () => {
         <section className="final-cta section-wrap">
           <div className="final-cta-inner">
             <span className="eyebrow">READY TO EXPLORE SAP?</span>
-            <h2>Have an SAP question?<br /><span>Ask Clyptusap.ai.</span></h2>
+            <h2>Have an SAP question?<br /><span>Ask Clyptus.AI.</span></h2>
             <p>
-              Get grounded answers across SAP and BRIM, backed by retrieved knowledge, sources and confidence.
+              Get <strong>grounded answers</strong> across <strong>SAP and BRIM</strong>, backed by <strong>retrieved knowledge, authoritative sources</strong>, and <strong>verified confidence</strong>.
             </p>
             <Link className="button button-brand" to="/login">
               Open Workspace <ArrowUpRight size={17} />
