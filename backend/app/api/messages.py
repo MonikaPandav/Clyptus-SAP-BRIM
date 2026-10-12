@@ -39,6 +39,8 @@ def get_messages(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if current_user.email == "consultant@clyptusap.ai":
+        return []
     verify_chat_ownership(chat_id, current_user.id, db)
     messages = (
         db.query(Message)

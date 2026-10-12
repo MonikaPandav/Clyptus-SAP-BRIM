@@ -19,6 +19,14 @@ def create_chat(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    # For demo / guest users, purge prior ephemeral chats so guest chats do not store
+    if current_user.email == "consultant@clyptusap.ai":
+        old_chats = db.query(Chat).filter(Chat.user_id == current_user.id).all()
+        for oc in old_chats:
+            db.query(Message).filter(Message.chat_id == oc.id).delete(synchronize_session=False)
+            db.delete(oc)
+        db.commit()
+
     chat = Chat(
         user_id=current_user.id,
         title=chat_in.title or "New SAP Chat"
@@ -36,6 +44,10 @@ def list_chats(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    # Never return persistent saved chats for the guest / demo user
+    if current_user.email == "consultant@clyptusap.ai":
+        return []
+
     query = (
         db.query(
             Chat.id,

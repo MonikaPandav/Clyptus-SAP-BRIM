@@ -27,9 +27,9 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // If already logged in, redirect to workspace
+  // If already logged in with a real registered account, redirect to workspace
   React.useEffect(() => {
-    if (user) {
+    if (user && !user.isGuest && user.email !== 'consultant@clyptusap.ai') {
       navigate('/app', { replace: true });
     }
   }, [user, navigate]);

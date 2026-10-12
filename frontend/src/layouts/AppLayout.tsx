@@ -65,8 +65,15 @@ export const AppLayout: React.FC = () => {
 
   const isConversation = location.pathname === '/app' || location.pathname.includes('/chat/');
 
-  // Refresh chats list
+  const isTrialUser = !user || user.isGuest || user.email === 'consultant@clyptusap.ai';
+
+  // Refresh chats list (only for authenticated registered users)
   const refreshChats = async () => {
+    if (isTrialUser) {
+      setChats([]);
+      setChatsLoading(false);
+      return;
+    }
     try {
       const data = await apiGetChats();
       setChats(data);
@@ -79,7 +86,7 @@ export const AppLayout: React.FC = () => {
 
   useEffect(() => {
     refreshChats();
-  }, [location.pathname]);
+  }, [location.pathname, isTrialUser]);
 
   useEffect(() => {
     const applyTheme = () => {
@@ -423,9 +430,18 @@ export const AppLayout: React.FC = () => {
           ))}
 
           {!chatsLoading && groupedChats.length === 0 && pinnedChats.length === 0 && (
-            <p className="sidebar-empty-state">
-              {normalizedQuery ? 'No matching conversations.' : 'Previous chats will appear here.'}
-            </p>
+            <div className="sidebar-empty-state">
+              {isTrialUser ? (
+                <div className="space-y-1 py-1">
+                  <span className="text-[11px] font-semibold text-orange-400 block">Preview Mode</span>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-normal">
+                    Guest chats are temporary and not saved. Sign in to save your conversations.
+                  </p>
+                </div>
+              ) : (
+                <p>{normalizedQuery ? 'No matching conversations.' : 'Previous chats will appear here.'}</p>
+              )}
+            </div>
           )}
 
           {/* Projects Section */}

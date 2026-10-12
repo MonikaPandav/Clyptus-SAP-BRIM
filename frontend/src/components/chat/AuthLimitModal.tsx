@@ -4,6 +4,8 @@ import { Sparkles, ArrowRight, Lock, CheckCircle2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import companyIcon from '../../assets/clyptusap-icon.png';
 
+import { useAuth } from '../../context/AuthContext';
+
 interface AuthLimitModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,11 +18,14 @@ export const AuthLimitModal: React.FC<AuthLimitModalProps> = ({
   questionCount,
 }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   if (!isOpen) return null;
 
   const handleGoToAuth = (mode: 'login' | 'register') => {
     onClose();
+    // Clear temporary guest session so user can access sign in or register
+    logout();
     navigate(`/login?mode=${mode}`);
   };
 

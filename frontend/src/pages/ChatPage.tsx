@@ -47,6 +47,7 @@ export const ChatPage: React.FC = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastUserPromptRef = useRef<string>('');
   const justCreatedChatIdRef = useRef<string | null>(null);
+  const guestChatIdRef = useRef<string | null>(null);
 
   const isAutoScrollingRef = useRef(false);
 
@@ -67,6 +68,17 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  // For guest users, do not restore previous chats on refresh or mount; keep session fresh at /app
+  useEffect(() => {
+    if (isTrialUser) {
+      if (conversationId) {
+        navigate('/app', { replace: true });
+      }
+      setMessages([]);
+      guestChatIdRef.current = null;
+    }
+  }, [isTrialUser, conversationId, navigate]);
+
   // Auto-scroll smoothly without jitter on content updates unless user has scrolled up
   useEffect(() => {
     if (!isUserScrolledUp) {
@@ -81,8 +93,12 @@ export const ChatPage: React.FC = () => {
     setIsUserScrolledUp(distanceFromBottom > 90);
   };
 
-  // Load messages when conversationId changes
+  // Load messages when conversationId changes (only for authenticated registered users)
   useEffect(() => {
+    if (isTrialUser) {
+      return;
+    }
+
     if (conversationId && justCreatedChatIdRef.current === conversationId) {
       // Don't reset state if this navigation was triggered by creating a chat for the current stream
       justCreatedChatIdRef.current = null;
@@ -109,7 +125,7 @@ export const ChatPage: React.FC = () => {
     } else {
       setMessages([]);
     }
-  }, [conversationId]);
+  }, [conversationId, isTrialUser]);
 
   const handleStopGeneration = () => {
     if (abortControllerRef.current) {
@@ -118,12 +134,12 @@ export const ChatPage: React.FC = () => {
     }
     setIsLoading(false);
 
-    // Preserve partially generated text in chat history and database
+    // Preserve partially generated text in chat history and database (registered users only)
     if (streamingContent !== null) {
       const stoppedContent = streamingContent.trim() ? streamingContent : 'Generation stopped.';
       const stoppedAssistantMsg: Message = {
         id: streamingMeta?.message_id || `stopped-${Date.now()}`,
-        chat_id: conversationId || '',
+        chat_id: conversationId || guestChatIdRef.current || '',
         role: 'assistant',
         content: stoppedContent,
         source_type: 'interrupted',
@@ -135,7 +151,7 @@ export const ChatPage: React.FC = () => {
 
       setMessages((prev) => [...prev, stoppedAssistantMsg]);
 
-      if (conversationId && stoppedContent.trim()) {
+      if (conversationId && !isTrialUser && stoppedContent.trim()) {
         apiSavePartialMessage(conversationId, stoppedContent).catch(() => {});
       }
     }
@@ -159,16 +175,21 @@ export const ChatPage: React.FC = () => {
     }
 
     lastUserPromptRef.current = content;
-    let targetChatId = conversationId;
+    let targetChatId = isTrialUser ? guestChatIdRef.current : conversationId;
 
-    // If no active chat in route, create one and navigate
+    // If no active chat in route, create one for streaming
     if (!targetChatId) {
       try {
         const title = content.length > 35 ? content.slice(0, 35) + '...' : content;
         const newChat = await apiCreateChat(title);
         targetChatId = newChat.id;
-        justCreatedChatIdRef.current = newChat.id;
-        navigate(`/app/chat/${newChat.id}`, { replace: true });
+        if (isTrialUser) {
+          // Keep guest on /app without updating URL route so refresh leaves no trace
+          guestChatIdRef.current = newChat.id;
+        } else {
+          justCreatedChatIdRef.current = newChat.id;
+          navigate(`/app/chat/${newChat.id}`, { replace: true });
+        }
       } catch (err) {
         console.error('Could not create initial chat:', err);
         return;
