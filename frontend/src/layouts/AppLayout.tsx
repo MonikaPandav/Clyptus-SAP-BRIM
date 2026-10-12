@@ -606,10 +606,6 @@ export const AppLayout: React.FC = () => {
                 <Plus size={14} strokeWidth={2.4} />
                 New chat
               </button>
-              <span className="backend-status font-semibold text-xs">
-                <i />
-                Live connected
-              </span>
               <span className="top-avatar">
                 {user?.avatar ? <img src={user.avatar} alt="" /> : userInitial}
               </span>
