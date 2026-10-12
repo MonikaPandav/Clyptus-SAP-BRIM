@@ -46,27 +46,27 @@ DOCUMENT_TIER_MAPPING: Dict[str, Dict[str, Any]] = {
     },
     "SAP CI1.pdf": {
         "tier": "official_sap",
-        "is_off_domain": True,
-        "category": "Official SAP Documentation (Cloud Integration)",
-        "reason": "SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM"
+        "is_off_domain": False,
+        "category": "Official SAP Documentation",
+        "reason": "Official SAP Convergent Invoicing documentation export Volume 1"
     },
     "SAP CI2.pdf": {
         "tier": "official_sap",
-        "is_off_domain": True,
-        "category": "Official SAP Documentation (Cloud Integration)",
-        "reason": "SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM"
+        "is_off_domain": False,
+        "category": "Official SAP Documentation",
+        "reason": "Official SAP Convergent Invoicing documentation export Volume 2"
     },
     "SAP CI3.pdf": {
         "tier": "official_sap",
-        "is_off_domain": True,
-        "category": "Official SAP Documentation (Cloud Integration)",
-        "reason": "SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM"
+        "is_off_domain": False,
+        "category": "Official SAP Documentation",
+        "reason": "Official SAP Convergent Invoicing documentation export Volume 3"
     },
     "SAP CI4.pdf": {
         "tier": "official_sap",
-        "is_off_domain": True,
-        "category": "Official SAP Documentation (Cloud Integration)",
-        "reason": "SAP Cloud Integration (CPI) documentation - off-domain for SAP BRIM"
+        "is_off_domain": False,
+        "category": "Official SAP Documentation",
+        "reason": "Official SAP Convergent Invoicing documentation export Volume 4"
     },
     "mg.pdf": {
         "tier": "official_sap",
