@@ -616,32 +616,60 @@ h1,h2,h3,p{margin-top:0}
 .dark .cta-orbit{border-color:#1c1c26}
 .dark .footer-links>a,.dark .footer-main>div:first-child p,.dark .footer-bottom{color:#94a3b8}
 
-/* About Clyptus Section */
+/* About Clyptus Section - High Contrast Dual-Theme Architecture */
 .about-clyptus-section{padding-block:85px;position:relative}
 .about-clyptus-inner{display:flex;flex-direction:column;gap:45px}
 .about-header{max-width:820px}
-.about-header h2{font:700 clamp(32px,4vw,46px)/1.15 "Manrope",sans-serif;letter-spacing:-.06em;margin:16px 0 14px}
-.about-header h2 span{color:#71717a}
-.about-lead{font-size:14px;line-height:1.8;color:#a1a1aa;margin:0}
+.about-header h2{font:700 clamp(32px,4vw,46px)/1.15 "Manrope",sans-serif;letter-spacing:-.06em;margin:16px 0 14px;color:#0f172a}
+.about-header h2 span{color:#64748b}
+.about-lead{font-size:14.5px;line-height:1.8;color:#334155;margin:0}
+.about-lead strong{color:#0f172a;font-weight:700}
 
 .about-story-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.about-story-card{background:#0a0a0e;border:1px solid #1c1c26;border-radius:14px;padding:32px 30px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s}
-.about-story-card:hover{border-color:#2a2a38}
-.about-story-card.highlight-card{background:linear-gradient(145deg,#0e0e16,#08080c);border-color:rgba(255,98,0,0.3);box-shadow:0 0 30px rgba(255,98,0,0.06)}
-.story-badge{font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--orange);text-transform:uppercase}
-.about-story-card h3{font:700 20px "Manrope",sans-serif;letter-spacing:-.03em;color:#fcfcfc;margin:0}
-.about-story-card p{font-size:12px;line-height:1.75;color:#a1a1aa;margin:0}
+.about-story-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:32px 30px;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 20px -2px rgba(0,0,0,0.06);transition:all .2s ease}
+.about-story-card:hover{border-color:#cbd5e1;transform:translateY(-2px);box-shadow:0 10px 25px -4px rgba(0,0,0,0.09)}
+.about-story-card.highlight-card{background:linear-gradient(145deg,#fffaf5,#ffffff);border:1.5px solid rgba(234,88,12,0.4);box-shadow:0 8px 30px -4px rgba(234,88,12,0.12)}
+.story-badge{font-size:10px;font-weight:800;letter-spacing:.12em;color:#ea580c;text-transform:uppercase}
+.about-story-card h3{font:700 20px "Manrope",sans-serif;letter-spacing:-.03em;color:#0f172a;margin:0}
+.about-story-card p{font-size:13px;line-height:1.75;color:#334155;margin:0}
+.about-story-card p strong{font-weight:700;color:#0f172a;background:#ffedd5;padding:2px 6px;border-radius:4px;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 
 .about-pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.pillar-item{background:#07070a;border:1px solid #161620;border-radius:12px;padding:24px 20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
-.pillar-item:hover{border-color:rgba(255,98,0,0.35)}
-.pillar-num{font-size:11px;font-weight:800;color:var(--orange);letter-spacing:.05em}
-.pillar-item h4{font:650 14px "Manrope",sans-serif;letter-spacing:-.02em;color:#fcfcfc;margin:0}
-.pillar-item p{font-size:11px;line-height:1.65;color:#858590;margin:0}
+.pillar-item{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px 20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.03);transition:all .2s ease}
+.pillar-item:hover{border-color:rgba(234,88,12,0.45);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+.pillar-num{font-size:12px;font-weight:800;color:#ea580c;letter-spacing:.06em}
+.pillar-item h4{font:700 15px "Manrope",sans-serif;letter-spacing:-.02em;color:#0f172a;margin:0}
+.pillar-item p{font-size:12px;line-height:1.7;color:#334155;margin:0}
+.pillar-item p strong{font-weight:700;color:#0f172a;background:#ffedd5;padding:2px 5px;border-radius:3px;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 
-.about-stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;background:#09090d;border:1px solid #1c1c28;border-radius:14px;padding:26px 20px;text-align:center}
-.stat-box strong{display:block;font:800 28px/1 "Manrope",sans-serif;letter-spacing:-.04em;color:var(--orange);margin-bottom:6px}
-.stat-box span{font-size:11px;color:#94a3b8;font-weight:500}
+.about-stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:26px 20px;text-align:center;box-shadow:0 4px 20px -2px rgba(0,0,0,0.06)}
+.stat-box strong{display:block;font:800 28px/1 "Manrope",sans-serif;letter-spacing:-.04em;color:#ea580c;margin-bottom:6px}
+.stat-box span{font-size:11px;color:#475569;font-weight:600}
+
+/* Dark Mode Overrides for About Clyptus Section */
+.dark .about-header h2{color:#f8fafc}
+.dark .about-header h2 span{color:#94a3b8}
+.dark .about-lead{color:#cbd5e1}
+.dark .about-lead strong{color:#ffffff}
+
+.dark .about-story-card{background:#111219;border:1px solid #232535;box-shadow:0 8px 30px rgba(0,0,0,0.45)}
+.dark .about-story-card:hover{border-color:#3b3e54;box-shadow:0 12px 35px rgba(0,0,0,0.55)}
+.dark .about-story-card.highlight-card{background:linear-gradient(145deg,#181926,#111219);border:1.5px solid rgba(251,146,60,0.45);box-shadow:0 0 35px rgba(249,115,22,0.16)}
+.dark .story-badge{color:#fb923c}
+.dark .about-story-card h3{color:#ffffff}
+.dark .about-story-card p{color:#cbd5e1}
+.dark .about-story-card p strong{color:#fed7aa;background:rgba(249,115,22,0.18);border:1px solid rgba(249,115,22,0.35);padding:2px 6px;border-radius:4px}
+
+.dark .pillar-item{background:#111219;border:1px solid #232535;box-shadow:0 4px 15px rgba(0,0,0,0.35)}
+.dark .pillar-item:hover{border-color:rgba(251,146,60,0.5);box-shadow:0 8px 24px rgba(0,0,0,0.45)}
+.dark .pillar-num{color:#fb923c}
+.dark .pillar-item h4{color:#f8fafc}
+.dark .pillar-item p{color:#cbd5e1}
+.dark .pillar-item p strong{color:#fed7aa;background:rgba(249,115,22,0.18);border:1px solid rgba(249,115,22,0.35);padding:2px 5px;border-radius:3px}
+
+.dark .about-stats-band{background:#111219;border:1px solid #232535;box-shadow:0 8px 30px rgba(0,0,0,0.45)}
+.dark .stat-box strong{color:#fb923c}
+.dark .stat-box span{color:#cbd5e1}
 
 @media(max-width:850px){
   .about-story-grid{grid-template-columns:1fr}
@@ -1136,8 +1164,6 @@ h1,h2,h3,p{margin-top:0}
 .response-copy p strong,
 .boundary-card p strong,
 .question-heading p strong,
-.about-clyptus-section p strong,
-.about-pillars-grid p strong,
 .usecase-card p strong,
 .faq-item p strong,
 .final-cta p strong {
@@ -1156,8 +1182,6 @@ h1,h2,h3,p{margin-top:0}
 .dark .response-copy p strong,
 .dark .boundary-card p strong,
 .dark .question-heading p strong,
-.dark .about-clyptus-section p strong,
-.dark .about-pillars-grid p strong,
 .dark .usecase-card p strong,
 .dark .faq-item p strong,
 .dark .final-cta p strong {
