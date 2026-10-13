@@ -50,9 +50,12 @@ VERIFIED_STANDARD_SAP_OBJECTS = {
     # CI Transactions & Tables
     "spro", "fkkbi_class", "fkkbix_class", "fkkbix_conf", "fkkbix_bit_mon", "fkkbix_cit_mon",
     "fkkbix_rate", "fkkbix_bill", "fkkbix_inv", "fkkbix_bit_disp", "fkkbix",
+    "fkkbix_bill_m", "fkkbix_inv_m",
     "dfkkbixbit0", "dfkkbixbit1", "dfkkbixbit2", "dfkkbixbit3", "dfkkbixbit4",
     "dfkkbixcit0", "dfkkbixcit1", "dfkkbixcit2", "dfkkbixcit3", "dfkkbixcit4",
     "dfkkbict", "dfkkbict_it", "dfkkbict_py", "dfkkbict_tx", "dfkkinv_ord", "dfkkinv_doc",
+    "dfkkinvdoc", "dfkkinvdoc_h", "dfkkinvdoc_i", "dfkkinvdoc_p",
+    "dfkkbilldoc", "dfkkbilldoc_h", "dfkkbilldoc_i",
 
     # FI-CA Transactions & Tables
     "fpc0", "fpc1", "fpc2", "fpc3", "fpl9", "fpma", "fprel", "fpva", "fpvb",

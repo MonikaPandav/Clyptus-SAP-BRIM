@@ -22,7 +22,70 @@ class AnswerPlanner:
     def plan_answer(query: str, is_follow_up: bool = False) -> Dict[str, Any]:
         q_lower = query.lower()
 
-        # 1. Comparison questions
+        # 1. Senior SAP BRIM Upgrade, Invoice Reconciliation & Billing Discrepancy Analysis
+        is_reconciliation = any(term in q_lower for term in [
+            "reconcil", "discrepancy", "variance", "mismatch", "billing difference",
+            "invoice difference", "differ in invoice", "invoice amount", "reconciliation matrix"
+        ])
+        is_upgrade_or_release = any(term in q_lower for term in [
+            "upgrade", "support package", "sp upgrade", "release change", "old vs new",
+            "old versus new", "migration difference", "release comparison", "ecc to s/4"
+        ])
+        is_billing_or_invoice = any(term in q_lower for term in [
+            "invoice", "invoicing", "billing", "billable item", "rating", "charge",
+            "fi-ca", "fica", "subledger", "tax", "rounding"
+        ])
+
+        if (is_reconciliation and is_billing_or_invoice) or (is_upgrade_or_release and (is_billing_or_invoice or is_reconciliation)):
+            return {
+                "question_type": "upgrade_invoice_reconciliation",
+                "title": "Senior SAP BRIM Upgrade & Invoice Reconciliation Diagnostic Analysis",
+                "instructions": (
+                    "MANDATORY SENIOR ARCHITECT STRUCTURE (SAP BRIM Upgrade & Invoice Reconciliation):\n"
+                    "You must structure your response with the following exact primary sections:\n\n"
+                    "### 1. Executive Summary\n"
+                    "- State the core finding, suspected stage of divergence, and high-level architectural assessment.\n\n"
+                    "### 2. Symptom Classification\n"
+                    "- Establish the exact symptom: identify whether the discrepancy originates in:\n"
+                    "  [a] Usage Volume / Mediation Ingestion (CDR loss, unconsumed CITs)\n"
+                    "  [b] Rating (SAP CC charge plans, pricing logic tree, allowance exhaustion, BART rate tables)\n"
+                    "  [c] Billable Items (CI BIT generation, BIT class mapping, status 0 Raw vs status 2 Billable in DFKKBIXBIT*)\n"
+                    "  [d] Invoicing Aggregation (CI billing doc aggregation, grouping variants, invoicing locks)\n"
+                    "  [e] Tax Calculation (external tax interface vs FI-CA internal tax procedure)\n"
+                    "  [f] Rounding & Currency Differences (unit price precision, rounding rules per currency)\n"
+                    "  [g] FI-CA Subledger Posting (reconciliation key, GL account assignment, clearing variants, DFKKKO/DFKKOP)\n\n"
+                    "### 3. Stage-by-Stage Reconciliation Matrix\n"
+                    "- Construct a Markdown reconciliation matrix comparing record counts and monetary totals across documented processing stages:\n"
+                    "  | Processing Stage | Source Component | Input Records | Output Records | Input Total Amount | Output Total Amount | Variance / Check |\n"
+                    "  | Consumption Items (CIT) | Convergent Mediation | ... | ... | ... | ... | ... |\n"
+                    "  | Rating / Charged Items | Convergent Charging (CC) | ... | ... | ... | ... | ... |\n"
+                    "  | Billable Items (Raw BITs) | Convergent Invoicing (CI) | ... | ... | ... | ... | ... |\n"
+                    "  | Billable Items (Billable) | Convergent Invoicing (CI) | ... | ... | ... | ... | ... |\n"
+                    "  | Billing Documents | Convergent Invoicing (CI) | ... | ... | ... | ... | ... |\n"
+                    "  | Invoicing Documents | Convergent Invoicing (CI) | ... | ... | ... | ... | ... |\n"
+                    "  | FI-CA Open Items | FI-CA Subledger | ... | ... | ... | ... | ... |\n\n"
+                    "### 4. Release and Configuration Comparison\n"
+                    "- Recommend controlled old-versus-new release testing with identical inputs and equivalent master data, configuration, effective dates, currencies, tax conditions, and processing parameters.\n"
+                    "- Compare individual business records using stable identifiers (e.g. BIT numbers, CIT IDs, Invoicing Document numbers, Contract Account VKONT), NOT ONLY aggregate totals. Detect missing records, duplicates, changed quantities, changed prices, rounding differences, and offsetting discrepancies.\n"
+                    "- Investigate SAP release changes, Support Packages, relevant SAP Notes/corrections, transports, configuration drift, master-data differences, and custom enhancements/BAdIs.\n\n"
+                    "### 5. Root-Cause Decision Tree\n"
+                    "- Provide diagnostic decision logic branching across SOM, CC, CI, FI-CA, Tax, and Rounding.\n"
+                    "- Data Model Safeguard: Do NOT assume VBRK/VBRP (classical SD billing) or any /BIC/* (BW object) is the correct source for CI or FI-CA processes. Verify the document flow and relevant BRIM data models (DFKKBIXBIT*, DFKKBILLDOC*, DFKKINVDOC*, DFKKKO/DFKKOP) first.\n\n"
+                    "### 6. Safe Validation and Remediation\n"
+                    "- Recommend replaying production inputs ONLY in a controlled test environment with duplicate-processing and financial-side-effect safeguards (e.g. reconciliation key isolation, dummy payment execution, suppressed correspondence).\n"
+                    "- Documented remediation actions: BIT reversal/adjustment, invoicing document reversal, correction billing runs, and reprocessing.\n\n"
+                    "### 7. Evidence-Based Conclusion\n"
+                    "- Explicitly categorize all findings into:\n"
+                    "  * [Verified SAP-Standard Functionality]\n"
+                    "  * [Customer-Specific Configuration or Custom Implementation]\n"
+                    "  * [General Testing Recommendations]\n"
+                    "  * [Hypotheses That Still Require Verification]\n"
+                    "- Cite precise source documents, page numbers, sections, or retrieved passages supporting each technical claim. If evidence is unavailable for a specific sub-process, explicitly state the limitation.\n"
+                    "CRITICAL: Never invent or assume SAP table names, transaction codes, item categories, APIs, report names, or configuration paths."
+                )
+            }
+
+        # 2. Comparison questions
         if any(term in q_lower for term in ["difference between", "compare", "versus", " vs ", "diff between", "comparison"]):
             return {
                 "question_type": "comparison",

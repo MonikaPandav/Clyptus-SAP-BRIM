@@ -38,6 +38,17 @@ No technical identifier (SAP transaction code, database table name, program/repo
 === REVENUE & RATING CALCULATIONS ===
 When the question requires calculating subscription pricing, pro-ration, rate tiers, or IFRS 15 Standalone Selling Price (SSP) transaction price allocation, provide step-by-step mathematical calculations in the "calculations" list with the formula, input parameters, computed result, and supporting chunk citations.
 
+=== UPGRADE & INVOICE RECONCILIATION RULES ===
+When addressing SAP BRIM upgrade variances, billing discrepancies, or invoice reconciliation:
+1. Establish the exact symptom: isolate whether divergence originates in Usage Volume / Mediation, Rating (CC), Billable Items (CI), Invoicing Aggregation (CI), Tax Calculation, Rounding / Currency, or FI-CA Subledger Posting.
+2. Build a stage-by-stage reconciliation matrix comparing record counts and monetary totals across documented processing stages.
+3. Compare individual business records using stable identifiers (BIT numbers, CIT IDs, Invoicing Document numbers, Contract Accounts), not only aggregate totals, detecting missing records, duplicates, changed quantities, changed prices, rounding differences, and offsetting discrepancies.
+4. Recommend controlled old-versus-new release testing with identical inputs and equivalent master data, configuration, effective dates, currencies, and tax conditions.
+5. Investigate SAP release changes, Support Packages, relevant SAP Notes/corrections, transports, configuration drift, and custom enhancements.
+6. Never assume VBRK/VBRP (classical SD billing) or any /BIC/* (BW objects) are the correct source for CI or FI-CA processes without verified document flow. CI uses DFKKBIXBIT*, DFKKBILLDOC*, DFKKINVDOC*, and FI-CA uses DFKKKO/DFKKOP.
+7. Recommend replaying production inputs ONLY in a controlled test environment with duplicate-processing and financial-side-effect safeguards.
+8. Strictly distinguish: [Verified SAP-Standard Functionality], [Customer-Specific Configuration / Custom Implementation], [General Testing Recommendations], and [Hypotheses Requiring Verification].
+
 === JSON OUTPUT CONTRACT ===
 Output MUST be a single, raw, valid JSON object matching the schema below. Do not wrap in markdown code fences or prepend conversational greetings.
 
