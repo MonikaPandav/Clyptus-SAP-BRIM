@@ -130,9 +130,10 @@ cp backend/.env.example backend/.env
 | `TAVILY_API_KEY` | `""` | API key for authoritative Tavily SAP web search |
 | `REPO_SOURCE_ENABLED` | `false` | **Feature Flag**: Activates GitHub repository retrieval |
 | `MULTI_SOURCE_COMPARE_ENABLED` | `false` | **Feature Flag**: Activates multi-source comparative ranking |
+| `SAP_WEB_SOURCES_ENABLED` | `false` | **Feature Flag**: Activates extended official web and community sources |
 
 > [!IMPORTANT]
-> Never commit your `backend/.env` file with actual API keys or credentials. Both repository feature flags (`REPO_SOURCE_ENABLED` and `MULTI_SOURCE_COMPARE_ENABLED`) default to `false`.
+> Never commit your `backend/.env` file with actual API keys or credentials. All extended retrieval feature flags (`REPO_SOURCE_ENABLED`, `MULTI_SOURCE_COMPARE_ENABLED`, and `SAP_WEB_SOURCES_ENABLED`) strictly default to `false`.
 
 ---
 
@@ -324,13 +325,14 @@ SAP_BRIM/
 │   │   ├── ingestion/                  # Structure-aware chunking and document ingestion
 │   │   ├── models/                     # SQLAlchemy models (DocumentChunk, GithubRepoChunk, User, Chat)
 │   │   ├── prompts/                    # System prompts, role definitions, grounding rules
-│   │   ├── retrieval/                  # Multi-source comparator, relevance gate, license auditor
+│   │   ├── retrieval/                  # Source registry, multi-source comparator, relevance gate, web doc ingest
 │   │   ├── schemas/                    # Pydantic response contracts and citation schemas
 │   │   ├── security/                   # Password hashing, JWT token generation, RBAC
 │   │   └── services/                   # RAG service, embeddings, reranking, LLM failover, grounding
 │   │
 │   ├── data/                           # Data storage
-│   │   └── github_snapshots/           # Local repository snapshots preserving upstream licenses
+│   │   ├── github_snapshots/           # Local repository snapshots preserving upstream licenses
+│   │   └── web_doc_snapshots/          # Snapshots of official SAP documentation and community chunks
 │   │
 │   ├── evaluation/                     # Evaluation benchmark suite
 │   │   ├── datasets/                   # Evaluation splits (dev_questions.jsonl & heldout_questions.jsonl)
@@ -342,11 +344,12 @@ SAP_BRIM/
 │   │   ├── calibrate_retrieval_threshold.py  # Gate threshold calibration script
 │   │   ├── discover_github_repositories.py   # GitHub organizational repository candidate discovery
 │   │   ├── ingest_github_repositories.py     # Reproducible GitHub repository ingestion pipeline
+│   │   ├── ingest_sap_web_sources.py         # Official SAP documentation & community ingestion pipeline
 │   │   ├── migrate_sqlite_to_pgvector.py     # Database vector migration script
 │   │   ├── rollback_github_retrieval.py      # Non-destructive rollback and governance audit script
 │   │   └── run_real_samples.py               # Sample query execution benchmark
 │   │
-│   └── tests/                          # Automated Pytest Suite (73 Tests)
+│   └── tests/                          # Automated Pytest Suite
 │       ├── test_auth_and_isolation.py
 │       ├── test_followup_and_greetings.py
 │       ├── test_grounded_contract_and_packing.py
@@ -354,6 +357,7 @@ SAP_BRIM/
 │       ├── test_rag_and_citations.py
 │       ├── test_rag_pipeline_v2.py
 │       ├── test_repo_retrieval_and_comparison.py
+│       ├── test_source_registry_and_web_sources.py
 │       ├── test_sap_restriction.py
 │       ├── test_security.py
 │       └── test_technical_accuracy_and_db.py

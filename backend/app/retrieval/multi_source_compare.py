@@ -28,9 +28,12 @@ logger = logging.getLogger(__name__)
 AUTHORITY_WEIGHTS = {
     "official_sap": 1.0,
     "sap_partner_or_book": 0.85,
+    "official_developer_doc": 0.85,  # developers.sap.com
+    "official_help_doc": 0.85,       # help.sap.com
     "github_repo": 0.80,
-    "official_web": 0.80,  # help.sap.com
-    "forum_web": 0.50,     # community.sap.com / blogs
+    "official_web": 0.80,            # help.sap.com / official web
+    "sap_community": 0.50,           # community.sap.com
+    "forum_web": 0.50,               # community.sap.com / blogs
     "self_authored": 0.60,
     "unknown": 0.50
 }
@@ -42,10 +45,14 @@ class MultiSourceComparator:
 
     def get_source_authority_weight(self, provenance_tier: str, domain: Optional[str] = None) -> float:
         """Determines configured authority weight based on provenance and domain."""
-        if domain and "help.sap.com" in domain:
-            return AUTHORITY_WEIGHTS.get("official_web", 0.80)
-        elif domain and any(d in domain for d in ["community.sap.com", "blogs.sap.com"]):
-            return AUTHORITY_WEIGHTS.get("forum_web", 0.50)
+        if domain:
+            dom_lower = domain.lower()
+            if "developers.sap.com" in dom_lower:
+                return AUTHORITY_WEIGHTS.get("official_developer_doc", 0.85)
+            elif "help.sap.com" in dom_lower:
+                return AUTHORITY_WEIGHTS.get("official_help_doc", 0.85)
+            elif any(d in dom_lower for d in ["community.sap.com", "blogs.sap.com"]):
+                return AUTHORITY_WEIGHTS.get("sap_community", 0.50)
         return AUTHORITY_WEIGHTS.get(provenance_tier, 0.70)
 
     def normalize_candidate(
