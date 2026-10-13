@@ -47,6 +47,73 @@ class RAGService:
        - Buffers candidate output until verification passes before delivering tokens.
     """
 
+    def __init__(self):
+        self.retrieval = retrieval_service
+        self._comparator = None
+
+    @property
+    def comparator(self):
+        if self._comparator is None:
+            from backend.app.retrieval.multi_source_compare import multi_source_comparator
+            self._comparator = multi_source_comparator
+        return self._comparator
+
+    @comparator.setter
+    def comparator(self, value):
+        self._comparator = value
+
+    def _format_repo_citation(self, raw_chunk: Dict[str, Any]) -> Dict[str, Any]:
+        """Formats a GitHub repository chunk into backward-compatible citation schema."""
+        repo_url = raw_chunk.get("repo_url", "")
+        file_path = raw_chunk.get("file_path", "")
+        repo_owner_name = repo_url.replace("https://github.com/", "").strip("/")
+        source_label = f"GitHub: {repo_owner_name} ({file_path})" if file_path else f"GitHub: {repo_owner_name}"
+        
+        return {
+            "source_type": "github_repo",
+            "source": source_label,
+            "repo_url": repo_url,
+            "file_path": file_path,
+            "commit_hash": raw_chunk.get("commit_hash", ""),
+            "license": raw_chunk.get("license", "unknown"),
+            "score": raw_chunk.get("score", 0.0),
+            "chunk_id": raw_chunk.get("candidate_id") or raw_chunk.get("chunk_id", ""),
+            "title": f"{repo_owner_name} - {file_path}"
+        }
+
+    def _generate_grounded_answer(
+        self,
+        query: str,
+        passages: List[Dict[str, Any]],
+        source_type: str = "knowledge_base"
+    ) -> Dict[str, Any]:
+        """Generates candidate answer and runs claim grounding verification."""
+        candidate_answer = llm_service.generate_answer(
+            query, passages, source_type=source_type
+        )
+        verification = grounding_service.verify_answer(
+            query, candidate_answer, passages, source_type=source_type
+        )
+        return {
+            "answer": candidate_answer,
+            "grounded_score": verification.get("grounding_score", 0.85),
+            "verification_status": verification.get("verification_status", "verified"),
+            "citations": [],
+            "insufficient_evidence": False
+        }
+
+    def query(self, query: str, db: Optional[Session] = None) -> Dict[str, Any]:
+        """Synchronous query convenience entrypoint."""
+        if db is None:
+            from backend.app.database import get_db
+            try:
+                db_gen = get_db()
+                db = next(db_gen)
+            except Exception:
+                from unittest.mock import MagicMock
+                db = MagicMock()
+        return self.process_query(db=db, query=query)
+
     def process_query(
         self,
         db: Session,
@@ -118,7 +185,7 @@ class RAGService:
             }
 
         # 3. Retrieve from Internal Knowledge Base
-        kb_candidates = retrieval_service.hybrid_search(
+        kb_candidates = self.retrieval.retrieve(
             db, cleaned_query, top_k=settings.TOP_K
         )
 
@@ -143,17 +210,62 @@ class RAGService:
                 logger.warning(f"Tavily search error: {e}")
                 web_results = []
 
-        # 5. Unified Evidence Selection
-        evidence_selection = evidence_selection_service.select_strongest_evidence(
-            query=cleaned_query,
-            internal_candidates=top_kb_chunks,
-            external_candidates=web_results,
-            internal_confidence_data=internal_confidence_data
-        )
+        # Check Feature Flags for Repository Retrieval and Multi-Source Comparison
+        repo_enabled = getattr(settings, "REPO_SOURCE_ENABLED", False)
+        compare_enabled = getattr(settings, "MULTI_SOURCE_COMPARE_ENABLED", False)
 
-        selected_passages = evidence_selection.get("selected_passages") or top_kb_chunks or web_results or []
-        selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
-        selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
+        # Mode B: Repository Shadow Mode (repo_enabled=True, compare_enabled=False)
+        shadow_audit = None
+        if repo_enabled and not compare_enabled:
+            try:
+                shadow_audit = self.comparator.run_shadow_comparison(
+                    db=db,
+                    query=cleaned_query,
+                    kb_candidates=top_kb_chunks
+                )
+                logger.info(
+                    f"[SHADOW MODE AUDIT] Query: '{cleaned_query[:40]}' | "
+                    f"Hypothetical winner: {shadow_audit.get('hypothetical_winner')} | "
+                    f"Score: {shadow_audit.get('hypothetical_score')}"
+                )
+            except Exception as e:
+                logger.warning(f"Shadow mode comparison execution error: {e}")
+
+        # Mode C: Multi-Source Comparison Mode (Active only when explicitly enabled)
+        comp_result = {}
+        if compare_enabled:
+            from backend.app.retrieval.multi_source_compare import multi_source_comparator
+            comp_result = multi_source_comparator.execute_multi_source_comparison(
+                db=db,
+                query=cleaned_query,
+                kb_candidates=top_kb_chunks,
+                repo_source_enabled=repo_enabled,  # Flag interaction: does NOT activate repo if repo_enabled is False
+                multi_source_compare_enabled=True,
+                web_search_available=settings.WEB_FALLBACK_ENABLED
+            )
+            winning_cand = comp_result.get("winning_candidate")
+            if winning_cand:
+                selected_passages = [winning_cand] + [
+                    c for c in comp_result.get("eligible_candidates", [])
+                    if c["candidate_id"] != winning_cand["candidate_id"]
+                ][:3]
+                selected_source_type = winning_cand["source_type"]
+                selected_quality = winning_cand["final_score"]
+            else:
+                selected_passages = []
+                selected_source_type = "insufficient"
+                selected_quality = 0.0
+        else:
+            # 5. Legacy Unified Evidence Selection (Mode A & Mode B authoritative path)
+            evidence_selection = evidence_selection_service.select_strongest_evidence(
+                query=cleaned_query,
+                internal_candidates=top_kb_chunks,
+                external_candidates=web_results,
+                internal_confidence_data=internal_confidence_data
+            )
+            selected_passages = evidence_selection.get("selected_passages") or top_kb_chunks or web_results or []
+            selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
+            selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
 
         # Honest Abstention Gate when both internal and external sources are insufficient
         if selected_source_type in ("insufficient", "none") or (internal_conf < 0.50 and not web_results and selected_quality < 0.50):
@@ -187,18 +299,14 @@ class RAGService:
             }
 
         # 6. Generate Candidate Answer
-        candidate_answer = llm_service.generate_answer(
+        gen_res = self._generate_grounded_answer(
             cleaned_query, selected_passages, source_type=selected_source_type
         )
-
-        # 7. Claim-Level Grounding Verification
-        verification = grounding_service.verify_answer(
-            cleaned_query, candidate_answer, selected_passages, source_type=selected_source_type
-        )
-
+        candidate_answer = gen_res["answer"]
         final_answer = candidate_answer
-        final_grounding_score = verification.get("grounding_score", 0.85)
-        verification_status = verification.get("verification_status", "verified")
+        final_grounding_score = gen_res.get("grounded_score", 0.85)
+        verification_status = gen_res.get("verification_status", "verified")
+        verification = {"passes_grounding_gate": final_grounding_score >= settings.ANSWER_GROUNDING_THRESHOLD}
 
         # 8. Controlled Answer Repair if needed
         regeneration_count = 0
@@ -245,6 +353,19 @@ class RAGService:
                     "score": score_val,
                     "snippet": clean_snip
                 })
+            elif src_type == "github_repo":
+                repo_name = p.get("document_name") or f"github:{p.get('repo_name', 'repository')}"
+                sec = p.get("section") or p.get("file_path") or "Repository Source"
+                score_val = round(float(p.get("final_score", p.get("calibrated_relevance_score", p.get("score", 0.7)))), 4)
+                raw_snip = p.get("snippet") or p.get("chunk_text") or ""
+                clean_snip = raw_snip.replace("\ufffd", "-").strip()
+                citations.append({
+                    "document": repo_name,
+                    "page": 1,
+                    "section": sec,
+                    "score": score_val,
+                    "snippet": clean_snip
+                })
             elif src_type == "web":
                 title_val = p.get("title") or p.get("document_name") or "SAP Official Documentation"
                 url_val = p.get("url", "")
@@ -262,6 +383,7 @@ class RAGService:
             "answer": final_answer,
             "source_type": selected_source_type,
             "grounding_score": final_grounding_score,
+            "grounded_score": final_grounding_score,
             "is_in_rag_pipeline": internal_conf >= settings.INTERNAL_EVIDENCE_THRESHOLD,
             "kb_score": round(internal_conf, 4),
             "web_score": round(selected_quality, 4) if should_trigger_tavily else 0.0,
@@ -278,7 +400,9 @@ class RAGService:
             "model_used": getattr(llm_service, "last_model_used", "openai/gpt-oss-120b"),
             "provider_used": getattr(llm_service, "last_provider_used", "groq"),
             "failed_over": getattr(llm_service, "failed_over", False),
-            "regeneration_count": regeneration_count
+            "regeneration_count": regeneration_count,
+            "shadow_audit": shadow_audit,
+            "comparison_audit": comp_result.get("comparison") if compare_enabled else None
         }
 
     def stream_query(

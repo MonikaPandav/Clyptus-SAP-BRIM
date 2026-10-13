@@ -1,72 +1,189 @@
-# SAP Knowledge Assistant (SAP_BRIM)
+# cClyptus.AI — SAP BRIM Enterprise Knowledge Assistant
 
-Enterprise AI Assistant with Developer-Managed RAG, strict SAP domain boundaries, hybrid retrieval (pgvector dense embeddings + lexical search + cross-encoder reranking), grounding guardrails, and authoritative SAP web fallback.
-
----
-
-## 🚀 Quick Start Guide
-
-### 1. Prerequisites
-
-- **Python**: 3.10 or higher
-- **Node.js**: 18.x or higher & **npm**
-- **Docker** *(Optional)*: Required only if running PostgreSQL with pgvector container. A pre-indexed SQLite database (`backend/sap_assistant.db`) is included as an automatic fallback with zero configuration needed.
+cClyptus.AI is an enterprise-grade Retrieval-Augmented Generation (RAG) assistant purpose-built for **SAP Billing and Revenue Innovation Management (BRIM)**. It delivers grounded, auditable technical guidance across high-volume subscription, rating, billing, and financial sub-ledger architectures while strictly enforcing domain boundaries, claim-level citation verification, and enterprise intellectual property governance.
 
 ---
 
-### 2. Backend Setup & Execution
+## 1. Project Overview & Architecture
 
-#### Step 1: Navigate to the project root
-Open your terminal in the `SAP_BRIM` directory:
-```bash
-cd SAP_BRIM
+### Core Purpose
+SAP BRIM implementations integrate multiple high-throughput components to monetize recurring and usage-based business models. cClyptus.AI provides specialized engineering assistance for SAP consultants, architects, and developers by extracting verified facts from official SAP documentation and partner publications, rejecting hallucinations, and flagging unverified technical claims.
+
+### Supported SAP BRIM Modules
+- **Subscription Order Management (SOM)**: Master data modeling, Business Partners (`BUT000`), Contract Accounts (`FKKVKP`), provider contracts (`EVER`), Order Distribution Infrastructure (ODI), and subscription lifecycles.
+- **Convergent Charging (CC)**: Real-time rating, allowance plans, charge plans, BART batch rating, subscriber accounts, Core Tool pricing trees, and partition architectures.
+- **Convergent Invoicing (CI)**: Consumption Item (CIT) and Billable Item (BIT) data models (`DFKKBIXCIT*`, `DFKKBIXBIT*`), billing processes, invoicing execution, aggregation, and reversal.
+- **Contract Accounts Receivable and Payable (FI-CA)**: High-volume sub-ledger accounting, document headers (`DFKKKO`), open items (`DFKKOP`), payments, dunning, clearing, and General Ledger reconciliation (`ACDOCA` / `BSEG`).
+- **Revenue Accounting and Reporting (RAR)**: IFRS 15 / ASC 606 revenue recognition, performance obligations (POB), contract liability, and asset posting.
+- **Convergent Mediation (CM) & Integration**: Mediation feeds, SAP Cloud Integration (CPI), SAP Process Orchestration (PO), REST/OData APIs, RFC interfaces, and asynchronous distribution.
+
+### High-Level Architecture Flow
+```
+User Query
+    │
+    ├── 1. Query Resolution & Scope Guardrail (sap_classifier.py rejects non-SAP queries)
+    │
+    ├── 2. Hybrid Retrieval (BM25 Lexical + 384-dim Dense Vector Search on document_chunks)
+    │
+    ├── 3. Cross-Encoder Reranking (reranking_service.py: ms-marco-MiniLM-L-6-v2)
+    │
+    ├── 4. Evidence Confidence & Source Comparative Selection (multi_source_compare.py)
+    │      ├── Stage 1: Official SAP Knowledge Base (Authoritative Tier 1/2)
+    │      ├── Stage 2: Isolated GitHub Repository Retrieval (Gated by REPO_SOURCE_ENABLED)
+    │      └── Stage 3: Tavily Web Search Fallback (Triggered only when internal score < 0.6761)
+    │
+    ├── 5. Answer Planning & LLM Generation (llm_service.py with automatic provider failover)
+    │
+    ├── 6. Claim Grounding Verification Gate (grounding_service.py: 80% publication threshold)
+    │      ├── Automated Claim Verification against retrieved chunks
+    │      ├── Technical Identifier Audit (SPRO paths, tables, T-codes validated)
+    │      └── Controlled Repair Loop (re-prompts LLM if ungrounded claims are detected)
+    │
+    └── 7. Streaming Response & Citation Generation (FastAPI SSE -> React 19 Frontend)
 ```
 
-#### Step 2: Configure Environment Variables
-Create or verify your `backend/.env` file (copied from `backend/.env.example`):
+---
+
+## 2. Technology Stack
+
+### Backend
+- **Runtime**: Python 3.10+ (Tested through Python 3.14)
+- **Framework**: FastAPI with Uvicorn ASGI server
+- **Database / ORM**: SQLAlchemy 2.0 with dual-engine support:
+  - **Zero-Configuration Default**: Local SQLite database with embedding BLOBs (`backend/sap_assistant.db`)
+  - **Enterprise Scale**: PostgreSQL 16 with `pgvector` extension
+- **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense vectors)
+- **Reranker Model**: `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- **LLM Engine**: Multi-tier failover orchestrator:
+  - Primary: Groq API (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`, `openai/gpt-oss-20b`)
+  - Secondary / Local: OpenAI API (`gpt-4o-mini`, `gpt-4o`)
+- **Web Retrieval**: Tavily Search API (restricted to official `*.sap.com` domains)
+
+### Frontend
+- **Framework**: React 19.2 + TypeScript (Vite 8.3 build system)
+- **Styling**: Tailwind CSS 4.3 + Lucide Icons + Framer Motion
+- **Markdown & Code Rendering**: React Markdown 10 + Remark GFM
+- **Routing**: React Router 7 (Single Page Application)
+- **Linter**: Oxlint (fast Rust-based linter)
+
+---
+
+## 3. Prerequisites
+
+Before setting up cClyptus.AI, ensure the following software is installed:
+- **Python**: Version 3.10 or higher (`python --version`)
+- **Node.js**: Version 18.x or higher (`node --version`)
+- **npm**: Version 9.x or higher (`npm --version`)
+- **Git**: Version 2.30 or higher (`git --version`)
+- **Docker** *(Optional)*: Required only if running PostgreSQL with pgvector container. The included SQLite database runs out-of-the-box without Docker.
+
+---
+
+## 4. Installation
+
+Clone the repository and install both backend and frontend dependencies:
+
+### 1. Backend Installation
+From the repository root (`SAP_BRIM`):
+```bash
+# Optional: Create and activate a Python virtual environment
+python -m venv .venv
+
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# Linux / macOS:
+source .venv/bin/activate
+
+# Install Python requirements
+pip install -r backend/requirements.txt
+```
+
+### 2. Frontend Installation
+In a separate terminal or the same environment:
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+---
+
+## 5. Environment Configuration
+
+cClyptus.AI includes a safe environment template at [`backend/.env.example`](file:///c:/Users/yuvar/OneDrive/Desktop/gen%20ai%20and%20agentic%20ai/super%20admin%20portal/SAP/SAP_BRIM/backend/.env.example). Copy it to `backend/.env`:
+
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Key environment configurations in `backend/.env`:
-```ini
-# Database (Auto-falls back to SQLite if PostgreSQL is unreachable)
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sap_assistant
+### Key Environment Variables
 
-# JWT Security
-JWT_SECRET=sap-super-secret-jwt-key-2026-production-ready
-ADMIN_API_KEY=sap-admin-dev-secret-key-999
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | `sqlite:///backend/sap_assistant.db` | Database connection string (SQLite or PostgreSQL) |
+| `JWT_SECRET` | *Random secret string* | Secret key used to sign session JWTs |
+| `ADMIN_API_KEY` | *Secret API key* | API key for administrative ingestion routes |
+| `LLM_PROVIDER` | `groq` | Primary LLM provider (`groq`, `openai`, or `local`) |
+| `GROQ_API_KEY` | `""` | API key for Groq inference (Tier 1) |
+| `OPENAI_API_KEY` | `""` | API key for OpenAI fallback (Tier 2) |
+| `WEB_FALLBACK_ENABLED` | `true` | Enables Tavily web search when internal confidence < 0.6761 |
+| `TAVILY_API_KEY` | `""` | API key for authoritative Tavily SAP web search |
+| `REPO_SOURCE_ENABLED` | `false` | **Feature Flag**: Activates GitHub repository retrieval |
+| `MULTI_SOURCE_COMPARE_ENABLED` | `false` | **Feature Flag**: Activates multi-source comparative ranking |
 
-# LLM Provider Options: 'openai', 'groq', or 'local'
-LLM_PROVIDER=openai
-LLM_API_KEY=your_openai_or_groq_api_key_here
-LLM_MODEL=gpt-4o-mini
-GROQ_API_KEY=your_groq_key_if_using_groq
+> [!IMPORTANT]
+> Never commit your `backend/.env` file with actual API keys or credentials. Both repository feature flags (`REPO_SOURCE_ENABLED` and `MULTI_SOURCE_COMPARE_ENABLED`) default to `false`.
 
-# Web Fallback (Tavily search for official SAP docs)
-WEB_FALLBACK_ENABLED=True
-WEB_SEARCH_API_KEY=your_tavily_key_here
-```
+---
 
-#### Step 3: Install Python Dependencies
-```bash
-pip install -r backend/requirements.txt
-```
+## 6. Database Setup
 
-#### Step 4: (Optional) Start PostgreSQL with pgvector via Docker
-If you wish to use PostgreSQL with vector extensions instead of the local SQLite fallback:
-```bash
-docker-compose up -d
-```
+### Local SQLite (Zero-Config Default)
+The repository includes a pre-indexed, verified SQLite vector database at [`backend/sap_assistant.db`](file:///c:/Users/yuvar/OneDrive/Desktop/gen%20ai%20and%20agentic%20ai/super%20admin%20portal/SAP/SAP_BRIM/backend/sap_assistant.db) containing **11,317 approved SAP BRIM document chunks**. No database initialization commands are required when running with SQLite.
 
-#### Step 5: (Optional) Ingest Knowledge Base Documents
-The project already includes pre-indexed embeddings in `backend/sap_assistant.db`. If you add new PDFs to `knowledge_base/documents/` or rebuild indices:
-```bash
-python -m backend.app.ingestion.ingest
-```
+### PostgreSQL with pgvector (Enterprise Docker Setup)
+If running under PostgreSQL:
+1. Start the pgvector container via Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+2. Update `DATABASE_URL` in `backend/.env`:
+   ```ini
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sap_assistant
+   ```
+3. Migrate existing vectors from SQLite to PostgreSQL:
+   ```bash
+   python backend/scripts/migrate_sqlite_to_pgvector.py
+   ```
 
-#### Step 6: Run the Backend Server
-From the `SAP_BRIM` directory, run:
+---
+
+## 7. Knowledge Base & Document Ingestion
+
+The active knowledge base contains official SAP courseware, product documentation, and SAP Press books stored in:
+- `knowledge_base/documents/` (e.g., `SAP CC.pdf`, `SAP CI1.pdf` - `SAP CI4.pdf`, `SAP FI-CA.pdf`)
+- `knowledge_base/the full rag data sap/` (e.g., `BR234_EN_SOM 2.pdf`, `BRIM_AC240_EN_Col16.pdf`)
+
+### To Re-Ingest or Add Documents:
+1. Place new PDF documents into `knowledge_base/documents/`.
+2. Run the structure-aware chunking and embedding pipeline:
+   ```bash
+   python -m backend.app.ingestion.ingest
+   ```
+The ingestion process automatically:
+- Extracts headings, hierarchy, and tables from PDFs.
+- Generates 384-dimensional embeddings via SentenceTransformers.
+- Audits technical identifiers against the 638-identifier index.
+- Commits chunks with authority tier tags to `document_chunks`.
+
+---
+
+## 8. Starting the Application
+
+Run the backend and frontend in two separate terminal windows:
+
+### Terminal 1: Backend Server (FastAPI)
+From the repository root (`SAP_BRIM`):
 ```bash
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
@@ -74,69 +191,189 @@ python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 - **Interactive Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Health Check Endpoint**: [http://localhost:8000/health](http://localhost:8000/health)
 
----
-
-### 3. Frontend Setup & Execution
-
-Open a separate terminal window:
-
-#### Step 1: Navigate to the Frontend Directory
+### Terminal 2: Frontend Client (Vite + React 19)
+From the `SAP_BRIM/frontend` directory:
 ```bash
-cd SAP_BRIM/frontend
-```
-
-#### Step 2: Install Frontend Dependencies
-```bash
-npm install
-```
-
-#### Step 3: Run the Development Server
-```bash
+cd frontend
 npm run dev
 ```
+- **Application UI**: [http://localhost:5173](http://localhost:5173)
+- All `/api/*` requests are proxied to the backend at `http://localhost:8000`.
 
-The frontend will start with Vite HMR:
-- **Application URL**: [http://localhost:5173](http://localhost:5173)
-- API requests (`/api/*`) are automatically proxied to the backend at `http://localhost:8000`.
-
-#### Step 4: Build for Production
-To build static production assets:
+### Production Frontend Build
+To create optimized static assets:
 ```bash
+cd frontend
 npm run build
 ```
 
 ---
 
-### 4. Running Backend Tests
-From the `SAP_BRIM` directory:
+## 9. Testing & Evaluation
+
+### 1. Run Complete Automated Test Suite (73 Tests)
+From the repository root:
 ```bash
-pytest backend/tests -v
+python -m pytest backend/tests -v
+```
+Runs all 10 test modules:
+- `test_auth_and_isolation.py`: User registration, JWT security, multi-tenant session isolation.
+- `test_followup_and_greetings.py`: Query rewriting, greeting detection, conversational assistant.
+- `test_grounded_contract_and_packing.py`: Context budget packing, system prompt glossary injection, rate limiting.
+- `test_phase1_corpus_and_metadata.py`: Authority tiers, 638-identifier index hash, SPDX license gates.
+- `test_rag_and_citations.py`: End-to-end RAG retrieval, citation generation.
+- `test_rag_pipeline_v2.py`: Web fallback, 80% claim grounding verification, SSE streaming stages.
+- `test_repo_retrieval_and_comparison.py`: Feature flag safety, BRIM relevance gate, multi-source comparison, citations.
+- `test_sap_restriction.py`: SAP domain classifier, rejection of out-of-scope non-SAP inquiries.
+- `test_security.py`: Admin endpoint authorization, denial of document download routes.
+- `test_technical_accuracy_and_db.py`: Real vs fabricated SAP identifiers, thread-safe caching.
+
+### 2. Run Shadow-Mode Benchmark on Development Dataset
+To evaluate the multi-source comparator across the 132-question development dataset:
+```bash
+python backend/evaluation/run_shadow_evaluation.py
+```
+*Note*: This evaluation strictly utilizes `backend/evaluation/datasets/dev_questions.jsonl`. The sealed 96-question held-out dataset (`heldout_questions.jsonl`) is protected and remains untouched.
+
+---
+
+## 10. Optional Features: GitHub Retrieval & Multi-Source Comparison
+
+cClyptus.AI includes an optional multi-source retrieval engine capable of ingesting GitHub repositories, validating source code against a BRIM-specific relevance gate, and comparing evidence across the knowledge base, repositories, and web search.
+
+### Operating Modes & Feature Flags
+Controlled via environment variables in `backend/.env`:
+
+1. **Mode A — Legacy Production Mode (Default)**:
+   ```ini
+   REPO_SOURCE_ENABLED=false
+   MULTI_SOURCE_COMPARE_ENABLED=false
+   ```
+   - Executes standard hybrid retrieval and generation unchanged.
+   - 0 repository queries, 0 multi-source comparison side-effects.
+
+2. **Mode B — Repository Shadow Mode**:
+   ```ini
+   REPO_SOURCE_ENABLED=true
+   MULTI_SOURCE_COMPARE_ENABLED=false
+   ```
+   - Legacy knowledge base remains the authoritative response path.
+   - Retrieves repository candidates in a separate shadow branch for logging and audit.
+   - Zero output mutation, zero user-visible changes.
+
+3. **Mode C — Multi-Source Comparison Mode**:
+   ```ini
+   REPO_SOURCE_ENABLED=true
+   MULTI_SOURCE_COMPARE_ENABLED=true
+   ```
+   - Compares evidence across Knowledge Base, GitHub Repositories, and Web Search.
+   - Evaluates evidence using the score-based authority model:
+     $$\text{final\_score} = \text{calibrated\_relevance\_score} \times \text{source\_authority\_weight}$$
+   - Clears candidates through the mandatory BRIM relevance gate and acceptance threshold ($0.6761$).
+
+### Repository Ingestion Command
+To scan and ingest configured repositories:
+```bash
+python backend/scripts/ingest_github_repositories.py
+```
+
+### Automated Rollback & Verification Command
+To verify system health or safely restore legacy behavior:
+```bash
+python backend/scripts/rollback_github_retrieval.py
+```
+To purge repository records from `github_repo_chunks` while leaving the 11,317 knowledge-base chunks intact:
+```bash
+python backend/scripts/rollback_github_retrieval.py --purge-repo-chunks
 ```
 
 ---
 
-## 🛠️ Summary of Running Commands
+## 11. Troubleshooting
 
-| Component | Working Directory | Command | URL |
-| :--- | :--- | :--- | :--- |
-| **Backend API** | `SAP_BRIM` | `python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload` | [http://localhost:8000](http://localhost:8000) |
-| **Backend Docs** | `SAP_BRIM` | *(Included with backend)* | [http://localhost:8000/docs](http://localhost:8000/docs) |
-| **Frontend Dev** | `SAP_BRIM/frontend` | `npm run dev` | [http://localhost:5173](http://localhost:5173) |
-| **Ingestion Pipeline** | `SAP_BRIM` | `python -m backend.app.ingestion.ingest` | - |
-| **Postgres (Docker)**| `SAP_BRIM` | `docker-compose up -d` | `localhost:5434` |
-| **Run Unit Tests** | `SAP_BRIM` | `pytest backend/tests` | - |
+| Issue | Root Cause | Solution |
+| :--- | :--- | :--- |
+| **`Unauthorized: missing or invalid API key`** | Missing or expired `GROQ_API_KEY` or `OPENAI_API_KEY` | Provide a valid API key in `backend/.env`. |
+| **Database connection fails** | PostgreSQL server not running when `DATABASE_URL` is set to Postgres | Start Docker container with `docker-compose up -d`, or switch `DATABASE_URL=sqlite:///backend/sap_assistant.db`. |
+| **`429 Rate Limit Reached` on LLM** | Primary LLM provider rate limit reached | The built-in failover mechanism automatically retries across configured secondary models in `llm_service.py`. |
+| **`Port 8000 already in use`** | A lingering Uvicorn process is occupying port 8000 | Terminate the existing process or run Uvicorn on another port with `--port 8001`. |
+| **Query rejected as "out of scope"** | Query is non-SAP or conversational | By design, cClyptus.AI rejects general-knowledge questions to prevent hallucinations outside SAP BRIM. |
+| **Frontend fails to connect to backend** | Backend server is not running at `http://localhost:8000` | Start the backend server with `uvicorn backend.app.main:app --port 8000`. |
 
 ---
 
-## 🏛️ System Architecture
+## 12. Project Structure
 
-- **Backend Framework**: FastAPI (Async Python)
-- **Database**: PostgreSQL with `pgvector` extension + SQLite zero-config fallback
-- **RAG Pipeline**:
-  - Embedding Model: `sentence-transformers/all-MiniLM-L6-v2`
-  - Hybrid Search: Dense Vector Retrieval + BM25 Lexical Retrieval
-  - Re-ranking: Cross-Encoder reranker
-  - Grounding Guardrails: Strict relevance & hallucination score checks
-  - SAP Restriction: Pre-flight domain intent classifier
-- **Web Fallback**: Authoritative SAP documentation retrieval via Tavily (`help.sap.com`, `community.sap.com`)
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS, Lucide Icons, React Markdown
+```text
+SAP_BRIM/
+├── README.md                           # Master setup, architectural, and operational documentation
+├── docker-compose.yml                  # Optional PostgreSQL + pgvector container definition
+├── pytest.ini                          # Pytest configuration and path settings
+│
+├── backend/                            # FastAPI Backend Application
+│   ├── .env.example                    # Safe environment template
+│   ├── requirements.txt                # Python package dependencies
+│   ├── sap_assistant.db                # SQLite database with 11,317 pre-indexed SAP BRIM chunks
+│   │
+│   ├── app/                            # Application Core
+│   │   ├── main.py                     # FastAPI entrypoint, middleware, and route mounting
+│   │   ├── config.py                   # Pydantic application settings & feature flags
+│   │   ├── database.py                 # SQLAlchemy engine, session management, dual-dialect support
+│   │   ├── api/                        # REST and SSE API endpoints (chat, auth, health, ingestion)
+│   │   ├── corpus/                     # Tier definitions (official_sap, partner) and 638-ID index
+│   │   ├── ingestion/                  # Structure-aware chunking and document ingestion
+│   │   ├── models/                     # SQLAlchemy models (DocumentChunk, GithubRepoChunk, User, Chat)
+│   │   ├── prompts/                    # System prompts, role definitions, grounding rules
+│   │   ├── retrieval/                  # Multi-source comparator, relevance gate, license auditor
+│   │   ├── schemas/                    # Pydantic response contracts and citation schemas
+│   │   ├── security/                   # Password hashing, JWT token generation, RBAC
+│   │   └── services/                   # RAG service, embeddings, reranking, LLM failover, grounding
+│   │
+│   ├── data/                           # Data storage
+│   │   └── github_snapshots/           # Local repository snapshots preserving upstream licenses
+│   │
+│   ├── evaluation/                     # Evaluation benchmark suite
+│   │   ├── datasets/                   # Evaluation splits (dev_questions.jsonl & heldout_questions.jsonl)
+│   │   ├── results/                    # Machine-readable evaluation benchmarks and summaries
+│   │   ├── run_evaluation.py           # Evaluation runner
+│   │   └── run_shadow_evaluation.py    # Shadow-mode evaluation on 132 dev questions
+│   │
+│   ├── scripts/                        # Management & Migration Scripts
+│   │   ├── calibrate_retrieval_threshold.py  # Gate threshold calibration script
+│   │   ├── discover_github_repositories.py   # GitHub organizational repository candidate discovery
+│   │   ├── ingest_github_repositories.py     # Reproducible GitHub repository ingestion pipeline
+│   │   ├── migrate_sqlite_to_pgvector.py     # Database vector migration script
+│   │   ├── rollback_github_retrieval.py      # Non-destructive rollback and governance audit script
+│   │   └── run_real_samples.py               # Sample query execution benchmark
+│   │
+│   └── tests/                          # Automated Pytest Suite (73 Tests)
+│       ├── test_auth_and_isolation.py
+│       ├── test_followup_and_greetings.py
+│       ├── test_grounded_contract_and_packing.py
+│       ├── test_phase1_corpus_and_metadata.py
+│       ├── test_rag_and_citations.py
+│       ├── test_rag_pipeline_v2.py
+│       ├── test_repo_retrieval_and_comparison.py
+│       ├── test_sap_restriction.py
+│       ├── test_security.py
+│       └── test_technical_accuracy_and_db.py
+│
+├── frontend/                           # React 19 + TypeScript + Vite Web Client
+│   ├── package.json                    # Frontend package dependencies and build scripts
+│   ├── package-lock.json               # Locked dependency tree
+│   ├── vite.config.ts                  # Vite build and proxy configuration
+│   ├── tailwind.config.js              # Tailwind styling configuration
+│   ├── index.html                      # HTML application template
+│   └── src/                            # Application source code
+│       ├── main.tsx                    # React client entrypoint
+│       ├── App.tsx                     # Main application layout and routes
+│       ├── components/                 # UI components (chat, citations, markdown, follow-ups)
+│       ├── context/                    # Auth and session context providers
+│       ├── layouts/                    # Navigation and app layout wrappers
+│       ├── pages/                      # Page views (ChatPage, LoginPage, RegisterPage, AdminPage)
+│       └── services/                   # SSE streaming client and REST API service calls
+│
+└── knowledge_base/                     # SAP BRIM Source Documents
+    ├── documents/                      # Official manuals and cookbooks (16 PDFs)
+    └── the full rag data sap/          # Courseware and SAP Press publications (14 PDFs)
+```

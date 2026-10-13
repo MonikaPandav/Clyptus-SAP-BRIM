@@ -71,7 +71,7 @@ def get_db() -> Generator:
         db.close()
 
 def init_db():
-    from backend.app.models import user, chat, message, document, chunk, citation, web_source  # noqa: F401
+    from backend.app.models import user, chat, message, document, chunk, citation, web_source, repo_chunk  # noqa: F401
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables initialized successfully.")
 

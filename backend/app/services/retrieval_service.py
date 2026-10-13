@@ -335,5 +335,9 @@ class RetrievalService:
             self._query_result_cache[cache_key] = results
         return results
 
+    def retrieve(self, db: Session, query: str, top_k: int = 15) -> List[Dict[str, Any]]:
+        """Standard retrieval interface delegating to hybrid search."""
+        return self.hybrid_search(db, query, top_k=top_k)
+
 
 retrieval_service = RetrievalService()

@@ -17,3 +17,10 @@ backend/sap_assistant.db
 
 # Large raw training PDF dataset (360MB)
 knowledge_base/the full rag data sap/
+
+# Cloned GitHub repository snapshots (>500MB)
+backend/data/github_snapshots/
+
+# Scratch & test outputs
+scratch/
+scratch_validation_output.json
