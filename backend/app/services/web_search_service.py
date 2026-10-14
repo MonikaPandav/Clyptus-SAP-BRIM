@@ -43,8 +43,11 @@ class WebSearchService:
     @staticmethod
     def _is_approved_sap_domain(url: str) -> bool:
         """Enforces hard domain restriction on approved SAP domains."""
-        url_lower = url.lower()
-        return any(domain in url_lower for domain in APPROVED_SAP_DOMAINS)
+        try:
+            hostname = (urllib.parse.urlsplit(url).hostname or "").lower().rstrip(".")
+        except ValueError:
+            return False
+        return any(hostname == domain or hostname.endswith("." + domain) for domain in APPROVED_SAP_DOMAINS)
 
     @staticmethod
     def _extract_authority_tier(url: str, domain: str) -> int:
@@ -80,7 +83,7 @@ class WebSearchService:
         Direct fallback search querying official SAP documentation (help.sap.com).
         Guarantees authoritative external evidence if Tavily is unavailable.
         """
-        clean_q = f"SAP {query} help.sap.com" if not query.lower().startswith("sap") else f"{query} help.sap.com"
+        clean_q = f"site:help.sap.com SAP {query}" if not query.lower().startswith("sap") else f"site:help.sap.com {query}"
         try:
             data = urllib.parse.urlencode({"q": clean_q}).encode("utf-8")
             req = urllib.request.Request(
@@ -152,9 +155,21 @@ class WebSearchService:
                     max_results=limit * 2,  # request extra to allow filtering
                     include_answer=False,
                     include_raw_content=False,
-                    include_domains=APPROVED_SAP_DOMAINS,
+                    include_domains=["help.sap.com"],
                 )
                 raw_results = response.get("results", []) if isinstance(response, dict) else []
+                # The Help Portal is authoritative and preferred. Only broaden to other
+                # official SAP properties when that portal search returned nothing.
+                if not raw_results:
+                    response = self.client.search(
+                        query=search_query,
+                        search_depth="basic",
+                        max_results=limit * 2,
+                        include_answer=False,
+                        include_raw_content=False,
+                        include_domains=APPROVED_SAP_DOMAINS,
+                    )
+                    raw_results = response.get("results", []) if isinstance(response, dict) else []
             except Exception as exc:
                 logger.warning(f"[Tavily] Search API failed for query '{query[:40]}': {exc}. Engaging SAP documentation fallback engine.")
                 raw_results = []

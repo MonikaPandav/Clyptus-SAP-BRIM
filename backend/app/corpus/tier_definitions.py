@@ -1,6 +1,7 @@
 """
 Corpus Tier and Domain Definitions for SAP BRIM Knowledge Base.
-Contains exact mapping of all 40 indexed documents to authority tiers and domain status.
+Contains authority metadata for the 40 historical indexed documents. Ten records are
+currently index-only; see KNOWLEDGE_BASE_RECONCILIATION.md before rebuilding.
 """
 
 from typing import Dict, Any, List

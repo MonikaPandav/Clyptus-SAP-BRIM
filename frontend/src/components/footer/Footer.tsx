@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
     <footer className="footer">
       <div className="footer-main">
         <div>
-          <BrandLogo />
+          <BrandLogo size="lg" />
           <p>
             SAP knowledge, retrieved<br />for clearer answers.
           </p>

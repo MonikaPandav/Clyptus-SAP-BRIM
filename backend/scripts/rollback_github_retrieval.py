@@ -4,7 +4,7 @@ Restores legacy pipeline state and safeguards knowledge-base integrity.
 
 Actions performed:
 1. Verifies/enforces REPO_SOURCE_ENABLED=false and MULTI_SOURCE_COMPARE_ENABLED=false.
-2. Safeguards production knowledge base (ensures 11,317 chunks in document_chunks are untouched).
+2. Safeguards production knowledge base by verifying its chunk count is unchanged.
 3. Optionally purges isolated github_repo_chunks table if requested via --purge-repo-chunks.
 4. Verifies that legacy hybrid retrieval and baseline responses are 100% functional.
 """
@@ -48,13 +48,11 @@ def execute_rollback(purge_repo_records: bool = False) -> bool:
     logger.info("Step 2: Auditing production knowledge base integrity...")
     db = SessionLocal()
     try:
-        kb_count = db.query(DocumentChunk).count()
-        logger.info(f"Production document_chunks count: {kb_count}")
-        if kb_count < 11300:
-            logger.error(f"CRITICAL: Production chunk count ({kb_count}) is below expected ~11,317 chunks!")
+        kb_count_before = db.query(DocumentChunk).count()
+        logger.info(f"Production document_chunks count before rollback actions: {kb_count_before}")
+        if kb_count_before == 0:
+            logger.error("CRITICAL: Production knowledge base contains no document chunks.")
             return False
-        else:
-            logger.info("Production knowledge base is intact and untouched.")
 
         # 3. Repository Record Management
         repo_count = db.query(GitHubRepoChunk).count()
@@ -67,6 +65,16 @@ def execute_rollback(purge_repo_records: bool = False) -> bool:
             logger.info(f"Safely purged {deleted} records from github_repo_chunks.")
         else:
             logger.info("Preserving github_repo_chunks table for audit (table remains isolated and inactive).")
+
+        kb_count_after = db.query(DocumentChunk).count()
+        if kb_count_after != kb_count_before:
+            logger.error(
+                "CRITICAL: Knowledge-base chunk count changed during repository rollback (%s -> %s).",
+                kb_count_before,
+                kb_count_after,
+            )
+            return False
+        logger.info("Production knowledge base is intact and untouched.")
 
         # 4. Smoke Test Legacy Retrieval
         logger.info("Step 3: Running smoke test on legacy retrieval pipeline...")

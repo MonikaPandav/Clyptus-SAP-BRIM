@@ -15,8 +15,9 @@ build/
 *.db.bak
 backend/sap_assistant.db
 
-# Large raw training PDF dataset (360MB)
-knowledge_base/the full rag data sap/
+# Large local source PDFs are intentionally not committed. Existing tracked PDFs
+# remain tracked; newly consolidated local PDFs stay available to ingestion.
+knowledge_base/documents/*.pdf
 
 # Cloned GitHub repository snapshots (>500MB)
 backend/data/github_snapshots/

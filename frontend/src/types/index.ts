@@ -13,6 +13,8 @@ export interface User {
 
 export interface Citation {
   id?: string;
+  chunk_id?: string;
+  source_type?: string;
   document: string;
   page: number;
   section?: string;
@@ -33,7 +35,7 @@ export interface Message {
   chat_id: string;
   role: 'user' | 'assistant';
   content: string;
-  source_type?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
+  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
   grounding_score?: number;
   confidence?: number;
   grounding?: string;
@@ -43,6 +45,7 @@ export interface Message {
   kb_score?: number;
   web_score?: number;
   winning_score?: number;
+  source_scores?: Record<string, number>;
   is_in_rag_pipeline?: boolean;
   external_search_used?: boolean;
   follow_up_questions?: string[];

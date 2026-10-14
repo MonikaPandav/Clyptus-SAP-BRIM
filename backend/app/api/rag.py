@@ -110,6 +110,8 @@ def query_rag(
         kb_score=result.get("kb_score"),
         web_score=result.get("web_score"),
         winning_score=result.get("winning_score"),
+        source_scores=result.get("source_scores", {}),
+        comparison_audit=result.get("comparison_audit"),
         selected_source=result.get("selected_source"),
         verification_status=result.get("verification_status", "verified"),
         internal_evidence_confidence=result.get("internal_evidence_confidence"),

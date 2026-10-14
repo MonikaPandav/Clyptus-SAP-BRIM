@@ -214,6 +214,7 @@ class GroundingService:
         unsupported_claims = []
         contradicted_claims = []
         critical_unsupported = []
+        uncited_standard_ids = []
 
         for stmt in sentences:
             stmt_lower = stmt.lower()
@@ -222,12 +223,17 @@ class GroundingService:
 
             # Check technical identifiers in this statement
             stmt_tech_ids = self._extract_technical_identifiers(stmt)
-            unsupported_stmt_tech = [
-                tid for tid in stmt_tech_ids
-                if tid not in evidence_tech_ids
-                and tid not in VERIFIED_STANDARD_SAP_OBJECTS
+            # A standard object name proves only that the identifier is plausible;
+            # it does not prove the generated configuration or lifecycle claim.  A
+            # technical instruction is publishable only when the exact identifier
+            # also appears in the selected evidence for this answer.
+            unsupported_stmt_tech = [tid for tid in stmt_tech_ids if tid not in evidence_tech_ids]
+            fabricated_stmt_tech = [
+                tid for tid in unsupported_stmt_tech
+                if tid not in VERIFIED_STANDARD_SAP_OBJECTS
                 and not sap_entity_service.is_known_sap_identifier(tid)
             ]
+            uncited_stmt_tech = [tid for tid in unsupported_stmt_tech if tid not in fabricated_stmt_tech]
 
             # Calculate overlap with evidence
             if stmt_terms:
@@ -246,10 +252,13 @@ class GroundingService:
             # Determine Claim Status
             if unsupported_stmt_tech:
                 status = "unsupported"
-                reason = f"Contains unverified SAP technical identifier(s): {', '.join(unsupported_stmt_tech)}"
-                for ut in unsupported_stmt_tech:
+                reason = f"Technical identifier(s) are absent from the selected evidence: {', '.join(unsupported_stmt_tech)}"
+                for ut in fabricated_stmt_tech:
                     if ut not in critical_unsupported:
                         critical_unsupported.append(ut)
+                for ut in uncited_stmt_tech:
+                    if ut not in uncited_standard_ids:
+                        uncited_standard_ids.append(ut)
                 unsupported_claims.append(stmt)
             elif overlap_ratio >= 0.25:
                 status = "supported"
@@ -288,8 +297,9 @@ class GroundingService:
             raw_grounding = 0.50
 
         # Penalize if fabricated identifiers or completely unsupported claims are present
-        if critical_unsupported:
-            penalty = min(0.30, len(critical_unsupported) * 0.10)
+        technical_evidence_gaps = critical_unsupported + uncited_standard_ids
+        if technical_evidence_gaps:
+            penalty = min(0.30, len(technical_evidence_gaps) * 0.10)
             final_grounding_score = max(0.20, raw_grounding - penalty)
         elif len(unsupported_claims) > len(supported_claims):
             final_grounding_score = min(raw_grounding, 0.45)
@@ -300,30 +310,20 @@ class GroundingService:
 
         # Publication Rule:
         # 1. Grounding score >= ANSWER_GROUNDING_THRESHOLD (0.80)
-        # 2. Zero critical unverified SAP technical identifiers (T-codes, tables)
+        # 2. Every SAP technical identifier is present in selected evidence.
         # 3. Zero contradicted claims
         # 4. Material claim support consistency (unsupported claims <= 25% of total claims)
         passes_gate = bool(
             final_grounding_score >= self.grounding_threshold
             and len(critical_unsupported) == 0
+            and len(uncited_standard_ids) == 0
             and len(contradicted_claims) == 0
             and len(unsupported_claims) <= max(1, int(total_claims * 0.25))
         )
 
-        # Check for explicit boundary / abstention markers in answer
-        ans_lower = answer.lower()
-        if any(marker in ans_lower for marker in [
-            "couldn't find sufficient", "could not find sufficient", "unable to provide a fully verified",
-            "not available in the", "cannot be answered", "information was not found",
-            "does not exist in standard sap", "not documented in the available",
-            "outside the scope", "confidential", "personal phone number", "unable to answer"
-        ]):
-            passes_gate = False
-            verification_status = "abstention"
-            final_grounding_score = 0.0
-            summary = "Assistant correctly identified lack of verifiable evidence and abstained."
-        # Verification Status Categorization
-        elif passes_gate:
+        # Do not turn a localized evidence limitation into a whole-answer abstention;
+        # source_type='abstention' is handled at the start of this verifier.
+        if passes_gate:
             verification_status = "verified"
             summary = f"Verified answer with {final_grounding_score*100:.0f}% grounding across {len(supported_claims)}/{total_claims} claims."
         elif final_grounding_score >= 0.50:
@@ -331,6 +331,7 @@ class GroundingService:
             summary = (
                 f"Partially supported answer ({final_grounding_score*100:.0f}% grounding). "
                 + (f"Unsupported technical identifiers: {', '.join(critical_unsupported)}." if critical_unsupported else "")
+                + (f" Standard identifiers absent from selected evidence: {', '.join(uncited_standard_ids)}." if uncited_standard_ids else "")
             )
         else:
             verification_status = "unverified"
@@ -344,6 +345,7 @@ class GroundingService:
             "unsupported_claims": unsupported_claims,
             "contradicted_claims": contradicted_claims,
             "critical_unsupported_claims": critical_unsupported,
+            "uncited_standard_ids": uncited_standard_ids,
             "all_material_claims_cited": len(supported_claims) == total_claims and total_claims > 0,
             "verification_status": verification_status,
             "summary": summary

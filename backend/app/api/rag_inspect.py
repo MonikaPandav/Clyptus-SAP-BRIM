@@ -110,11 +110,16 @@ def get_document_status(
     total_chunks = db.query(DocumentChunk).count()
     total_embedded = db.query(DocumentChunk).filter(DocumentChunk.embedding != None).count()
 
+    source_documents = [d for d in documents if d["status"] != "orphaned"]
+    orphaned_documents = [d for d in documents if d["status"] == "orphaned"]
+
     return {
         "summary": {
             "total_files_discovered": len(discovered_files),
-            "total_files_indexed": sum(1 for d in documents if d["is_indexed"]),
-            "total_files_not_indexed": sum(1 for d in documents if not d["is_indexed"]),
+            "source_files_indexed": sum(1 for d in source_documents if d["is_indexed"]),
+            "source_files_not_indexed": sum(1 for d in source_documents if not d["is_indexed"]),
+            "indexed_documents_total": len(indexed_docs),
+            "orphaned_indexed_documents": len(orphaned_documents),
             "total_chunks": total_chunks,
             "total_embedded_chunks": total_embedded,
             "overall_embedding_coverage": round(total_embedded / total_chunks, 4) if total_chunks > 0 else 0.0,

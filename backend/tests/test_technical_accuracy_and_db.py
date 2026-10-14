@@ -54,6 +54,17 @@ def test_grounding_evaluator_distinguishes_real_vs_fabricated():
     assert "xyz_nonexistent_table" not in fab_tables
 
 
+def test_standard_identifier_must_be_present_in_selected_evidence():
+    """A plausible SAP object is not enough to support a technical instruction."""
+    result = grounding_service.verify_answer(
+        query="How do I inspect FI-CA account balance?",
+        answer="Use FPL9 to inspect the FI-CA account balance.",
+        evidence_passages=[{"source_id": "ci-overview", "chunk_text": "Convergent Invoicing creates billable items."}],
+    )
+    assert result["passes_grounding_gate"] is False
+    assert "fpl9" in result["uncited_standard_ids"]
+
+
 def test_passes_gate_calibration():
     """Verify that answers with <= 25% unsupported claims pass while fabricated identifiers fail."""
     # Scenario A: Real SAP answer with 1 natural transition sentence (passes gate)

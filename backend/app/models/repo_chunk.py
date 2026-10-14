@@ -9,7 +9,7 @@ from backend.app.models.chunk import EmbeddingVector
 class GithubRepoChunk(Base):
     """
     Dedicated isolated vector storage for ingested GitHub repository chunks.
-    Ensures existing 10,661 knowledge-base chunks in `document_chunks` remain completely untouched.
+    Ensures existing knowledge-base chunks in `document_chunks` remain completely untouched.
     """
     __tablename__ = "github_repo_chunks"
 

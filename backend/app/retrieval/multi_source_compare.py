@@ -68,8 +68,11 @@ class MultiSourceComparator:
         """
         cid = str(raw_candidate.get("chunk_id") or raw_candidate.get("id") or uuid.uuid4())
         orig_score = float(raw_candidate.get("vector_score", raw_candidate.get("score", 0.5)))
-        calibrated_relevance = float(raw_candidate.get("calibrated_relevance_score", raw_candidate.get("score", 0.5)))
+        calibrated_relevance = float(
+            raw_candidate.get("calibrated_relevance_score", raw_candidate.get("score", raw_candidate.get("rerank_score", 0.5)))
+        )
         rerank_score = float(raw_candidate.get("rerank_score", calibrated_relevance))
+        document_fields: Dict[str, Any] = {}
 
         if source_type == "knowledge_base":
             prov_tier = raw_candidate.get("provenance_tier")
@@ -87,6 +90,12 @@ class MultiSourceComparator:
                 "section": raw_candidate.get("section", ""),
                 "snippet": raw_candidate.get("chunk_text", "")[:300]
             }
+            document_fields = {
+                "document_name": raw_candidate.get("document_name", citation_meta["document"]),
+                "page_number": raw_candidate.get("page_number", citation_meta["page"]),
+                "section": raw_candidate.get("section", ""),
+                "snippet": citation_meta["snippet"],
+            }
 
         elif source_type == "github_repo":
             prov_tier = raw_candidate.get("provenance_tier", "github_repo")
@@ -98,6 +107,15 @@ class MultiSourceComparator:
                 "page": 1,
                 "section": raw_candidate.get("file_path", ""),
                 "snippet": raw_candidate.get("chunk_text", "")[:300]
+            }
+            document_fields = {
+                "document_name": raw_candidate.get("document_name", citation_meta["document"]),
+                "page_number": 1,
+                "section": raw_candidate.get("file_path", ""),
+                "repo_url": raw_candidate.get("repo_url", ""),
+                "file_path": raw_candidate.get("file_path", ""),
+                "commit_hash": raw_candidate.get("commit_hash", ""),
+                "snippet": citation_meta["snippet"],
             }
 
         elif source_type == "web":
@@ -112,6 +130,15 @@ class MultiSourceComparator:
                 "section": domain,
                 "url": raw_candidate.get("url", ""),
                 "snippet": raw_candidate.get("snippet", raw_candidate.get("chunk_text", ""))[:300]
+            }
+            document_fields = {
+                "document_name": raw_candidate.get("title", citation_meta["document"]),
+                "page_number": 1,
+                "section": domain,
+                "title": raw_candidate.get("title", "SAP Web Documentation"),
+                "url": raw_candidate.get("url", ""),
+                "domain": domain,
+                "snippet": citation_meta["snippet"],
             }
 
         else:
@@ -144,9 +171,11 @@ class MultiSourceComparator:
             "license_status": lic_status,
             "BRIM_gate_status": gate_status,
             "provenance": prov_tier,
+            "question_aspect": raw_candidate.get("question_aspect", query),
             "citation_metadata": citation_meta,
             "chunk_text": raw_candidate.get("chunk_text", citation_meta.get("snippet", "")),
-            "raw_candidate": raw_candidate
+            "raw_candidate": raw_candidate,
+            **document_fields,
         }
 
     def execute_multi_source_comparison(
@@ -156,7 +185,9 @@ class MultiSourceComparator:
         kb_candidates: List[Dict[str, Any]],
         repo_source_enabled: bool,
         multi_source_compare_enabled: bool,
-        web_search_available: bool = True
+        web_search_available: bool = True,
+        force_web_search: bool = False,
+        query_aspects: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Executes multi-source candidate collection, normalization, score-based selection,
@@ -166,8 +197,9 @@ class MultiSourceComparator:
         sources_compared = ["knowledge_base"]
 
         # Stage 1: Knowledge Base normalization
+        aspects = [a for a in (query_aspects or [query]) if a] or [query]
         norm_kb_candidates = [
-            self.normalize_candidate(c, "knowledge_base", query)
+            self.normalize_candidate(c, "knowledge_base", c.get("question_aspect", query))
             for c in kb_candidates
         ]
 
@@ -175,13 +207,17 @@ class MultiSourceComparator:
         norm_repo_candidates: List[Dict[str, Any]] = []
         if repo_source_enabled:
             sources_compared.append("github_repo")
-            raw_repo_candidates = repo_store.search_repo_chunks(
-                db, query, top_k=5, threshold=self.acceptance_threshold
-            )
-            for rc in raw_repo_candidates:
-                norm_repo_candidates.append(
-                    self.normalize_candidate(rc, "github_repo", query)
+            seen_repo_ids = set()
+            for aspect in aspects:
+                raw_repo_candidates = repo_store.search_repo_chunks(
+                    db, aspect, top_k=5, threshold=self.acceptance_threshold
                 )
+                for rc in raw_repo_candidates:
+                    rc["question_aspect"] = aspect
+                    candidate = self.normalize_candidate(rc, "github_repo", aspect)
+                    if candidate["candidate_id"] not in seen_repo_ids:
+                        norm_repo_candidates.append(candidate)
+                        seen_repo_ids.add(candidate["candidate_id"])
 
         # Stage 3: Tavily Web Fallback
         # Condition: best_score < 0.6761 OR multi_source_compare_enabled is True
@@ -189,7 +225,7 @@ class MultiSourceComparator:
             [c["calibrated_relevance_score"] for c in norm_kb_candidates + norm_repo_candidates] or [0.0]
         )
         should_fetch_web = (
-            (best_internal_score < self.acceptance_threshold or multi_source_compare_enabled)
+            (force_web_search or best_internal_score < self.acceptance_threshold or multi_source_compare_enabled)
             and web_search_available
             and settings.WEB_FALLBACK_ENABLED
         )
@@ -198,11 +234,16 @@ class MultiSourceComparator:
         if should_fetch_web:
             sources_compared.append("web")
             try:
-                raw_web = web_search_service.search_sap_authoritative(query)
-                for w in raw_web:
-                    norm_web_candidates.append(
-                        self.normalize_candidate(w, "web", query)
-                    )
+                seen_urls = set()
+                for aspect in aspects:
+                    raw_web = web_search_service.search_sap_authoritative(aspect)
+                    ranked_web, _ = reranking_service.rerank_web(aspect, raw_web, top_n=5)
+                    for w in ranked_web:
+                        w["question_aspect"] = aspect
+                        candidate = self.normalize_candidate(w, "web", aspect)
+                        if candidate.get("url") not in seen_urls:
+                            norm_web_candidates.append(candidate)
+                            seen_urls.add(candidate.get("url"))
             except Exception as e:
                 logger.warning(f"Web retrieval exception: {e}")
 

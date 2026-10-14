@@ -8,7 +8,7 @@ from backend.app.models.chunk import EmbeddingVector
 class WebDocChunk(Base):
     """
     Dedicated isolated vector storage for ingested Official SAP Documentation and SAP Community chunks.
-    Ensures existing 11,317 knowledge-base chunks in `document_chunks` and `github_repo_chunks`
+    Ensures existing knowledge-base chunks in `document_chunks` and `github_repo_chunks`
     remain completely untouched and isolated.
     """
     __tablename__ = "web_doc_chunks"

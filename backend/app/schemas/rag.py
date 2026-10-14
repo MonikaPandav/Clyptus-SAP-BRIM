@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from backend.app.schemas.citation import CitationResponse, WebSourceResponse
 
 class RAGQueryRequest(BaseModel):
@@ -14,6 +14,8 @@ class RAGQueryResponse(BaseModel):
     kb_score: Optional[float] = None
     web_score: Optional[float] = None
     winning_score: Optional[float] = None
+    source_scores: dict[str, float] = Field(default_factory=dict)
+    comparison_audit: Optional[dict] = None
     selected_source: Optional[str] = None
     verification_status: Optional[str] = "verified"
     internal_evidence_confidence: Optional[float] = None

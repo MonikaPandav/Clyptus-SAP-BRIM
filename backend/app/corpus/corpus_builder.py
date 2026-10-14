@@ -1,6 +1,6 @@
 """
 Corpus Builder and Metadata Generator for Phase 1.
-Processes all 40 documents and 10,661 chunks in sap_assistant.db:
+Processes the live document and chunk inventory in sap_assistant.db:
 - Creates new SQLite tables without modifying existing ones
 - Generates document->tier table
 - Tags chunk modules (multiple allowed)

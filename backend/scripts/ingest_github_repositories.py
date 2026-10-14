@@ -414,7 +414,7 @@ def generate_ingestion_markdown_report(summary: Dict[str, Any]):
         "",
         "## Governance and Isolation Verification",
         "- **Vector Store Partitioning**: Retained chunks are isolated exclusively in `github_repo_chunks` table.",
-        "- **Knowledge Base Integrity**: The 10,661 existing production chunks in `document_chunks` remain 100% untouched.",
+        "- **Knowledge Base Integrity**: Existing chunks in `document_chunks` remain 100% untouched.",
         "- **Low Yield Enforcement**: Every repository yielding < 10 chunks was marked `skipped_low_yield` and bypassed from indexing."
     ])
 

@@ -19,22 +19,22 @@ class DocumentService:
             "product": "SAP Convergent Charging"
         },
         "SAP CI1.pdf": {
-            "title": "SAP Cloud Integration & Convergent Invoicing Guide (Part 1)",
+            "title": "SAP Convergent Invoicing Documentation (Part 1)",
             "module": "CI / BRIM",
             "product": "SAP Convergent Invoicing"
         },
         "SAP CI2.pdf": {
-            "title": "SAP Cloud Integration & Convergent Invoicing Guide (Part 2)",
+            "title": "SAP Convergent Invoicing Documentation (Part 2)",
             "module": "CI / BRIM",
             "product": "SAP Convergent Invoicing"
         },
         "SAP CI3.pdf": {
-            "title": "SAP Cloud Integration & Convergent Invoicing Guide (Part 3)",
+            "title": "SAP Convergent Invoicing Documentation (Part 3)",
             "module": "CI / BRIM",
             "product": "SAP Convergent Invoicing"
         },
         "SAP CI4.pdf": {
-            "title": "SAP Cloud Integration & Convergent Invoicing Guide (Part 4)",
+            "title": "SAP Convergent Invoicing Documentation (Part 4)",
             "module": "CI / BRIM",
             "product": "SAP Convergent Invoicing"
         },

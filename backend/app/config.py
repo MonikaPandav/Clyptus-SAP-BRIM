@@ -45,6 +45,10 @@ class Settings(BaseSettings):
 
     # Evidence Confidence & Grounding Verification Settings (v2)
     INTERNAL_EVIDENCE_THRESHOLD: float = float(os.getenv("INTERNAL_EVIDENCE_THRESHOLD", "0.70"))
+    # Search GitHub and approved SAP web sources whenever the best document match
+    # falls below this calibrated relevance score.
+    DOCUMENT_MATCH_THRESHOLD: float = float(os.getenv("DOCUMENT_MATCH_THRESHOLD", "0.80"))
+    AUTO_MULTI_SOURCE_FALLBACK: bool = os.getenv("AUTO_MULTI_SOURCE_FALLBACK", "True").lower() in ("true", "1")
     ANSWER_GROUNDING_THRESHOLD: float = float(os.getenv("ANSWER_GROUNDING_THRESHOLD", "0.80"))
     MAX_GROUNDING_REPAIR_ATTEMPTS: int = int(os.getenv("MAX_GROUNDING_REPAIR_ATTEMPTS", "1"))
     FOLLOWUP_QUESTION_COUNT: int = int(os.getenv("FOLLOWUP_QUESTION_COUNT", "3"))
@@ -54,6 +58,7 @@ class Settings(BaseSettings):
     GROUNDED_CONTRACT_ENABLED: bool = os.getenv("GROUNDED_CONTRACT_ENABLED", "True").lower() in ("true", "1")
     GROUNDED_GENERATOR_MODEL: str = os.getenv("GROUNDED_GENERATOR_MODEL", "qwen/qwen3.8-27b")
     GROUNDED_TEMPERATURE: float = float(os.getenv("GROUNDED_TEMPERATURE", "0.15"))
+    ANSWER_TEMPERATURE: float = float(os.getenv("ANSWER_TEMPERATURE", "0.10"))
     CONTEXT_PACKING_TOKEN_LIMIT: int = int(os.getenv("CONTEXT_PACKING_TOKEN_LIMIT", "3000"))
     CONTEXT_BASE_TOKEN_BUDGET: int = int(os.getenv("CONTEXT_BASE_TOKEN_BUDGET", "1500"))
     CONTEXT_PER_MODULE_TOKEN_BUDGET: int = int(os.getenv("CONTEXT_PER_MODULE_TOKEN_BUDGET", "600"))
@@ -97,11 +102,11 @@ class Settings(BaseSettings):
     WEB_FALLBACK_ENABLED: bool = os.getenv("WEB_FALLBACK_ENABLED", "True").lower() in ("true", "1")
     WEB_SEARCH_API_KEY: str = os.getenv("WEB_SEARCH_API_KEY", "")
 
-    # Canonical Knowledge Base Paths (at repo root if exists, otherwise backend)
+    # Canonical knowledge-base source directory (at repo root if present).
+    # Keep exactly one source location so ingestion results can be reconciled with
+    # the on-disk inventory and an operator never has to guess which folder is live.
     KNOWLEDGE_BASE_DIR: Path = (ROOT_DIR / "knowledge_base") if (ROOT_DIR / "knowledge_base").exists() else (BASE_DIR / "knowledge_base")
     DOCUMENTS_DIR: Path = (ROOT_DIR / "knowledge_base" / "documents") if (ROOT_DIR / "knowledge_base" / "documents").exists() else (BASE_DIR / "knowledge_base" / "documents")
-    # "The full rag data sap" directory with all 14 PDF documents
-    FULL_RAG_DATA_DIR: Path = (ROOT_DIR / "knowledge_base" / "the full rag data sap") if (ROOT_DIR / "knowledge_base" / "the full rag data sap").exists() else (BASE_DIR / "knowledge_base" / "the full rag data sap")
 
     model_config = SettingsConfigDict(
         env_file=(

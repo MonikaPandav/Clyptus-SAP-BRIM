@@ -156,7 +156,7 @@ export interface StreamStatus {
 
 export interface StreamMetadata {
   message_id?: string;
-  source_type?: 'knowledge_base' | 'web' | 'combined' | 'refusal' | 'error' | 'interrupted';
+  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted';
   grounding_score?: number;
   citations?: Citation[];
   web_sources?: WebSource[];
@@ -164,6 +164,8 @@ export interface StreamMetadata {
   kb_score?: number;
   web_score?: number;
   winning_score?: number;
+  source_scores?: Record<string, number>;
+  comparison_audit?: Record<string, unknown>;
   verification_status?: 'verified' | 'partial' | 'unverified' | 'abstention';
   internal_evidence_confidence?: number;
   selected_evidence_quality?: number;

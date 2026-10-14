@@ -76,42 +76,23 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                           score={message.grounding_score}
                           verificationStatus={message.verification_status}
                         />
-                        {/* KB Score vs Web Score comparison - shown when web was used */}
                         {message.external_search_used && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-100 dark:bg-cyan-950/80 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800/40">
-                            🌐 Web: Used
+                            🌐 External sources checked
                           </span>
                         )}
-                        {/* Inline score comparison: KB vs Web score + winner */}
-                        {(message.kb_score !== undefined || message.internal_evidence_confidence !== undefined || message.web_score !== undefined || message.selected_evidence_quality !== undefined) && (() => {
-                          const kbVal = message.kb_score ?? message.internal_evidence_confidence ?? 0;
-                          const webVal = message.web_score ?? message.selected_evidence_quality ?? 0;
-                          const kbPct = Math.round(kbVal * 100);
-                          const webPct = Math.round(webVal * 100);
-                          const hasWeb = message.external_search_used || (message.web_score !== undefined && message.web_score > 0);
-                          const kbWon = kbVal >= webVal;
-
-                          return (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-900/90 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700/60 shadow-sm">
-                              <span className="text-orange-600 dark:text-orange-400 font-semibold">KB:</span>
-                              <span className="font-mono font-bold text-orange-600 dark:text-orange-300">{kbPct}%</span>
-                              {hasWeb && (
-                                <>
-                                  <span className="text-slate-400 dark:text-slate-500 font-bold">vs</span>
-                                  <span className="text-cyan-600 dark:text-cyan-400 font-semibold">Web:</span>
-                                  <span className="font-mono font-bold text-cyan-700 dark:text-cyan-300">{webPct}%</span>
-                                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
-                                    kbWon 
-                                      ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700/50' 
-                                      : 'bg-cyan-100 dark:bg-cyan-950/80 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700/50'
-                                  }`}>
-                                    {kbWon ? '🏆 KB Wins' : '🏆 Web Wins'}
-                                  </span>
-                                </>
-                              )}
-                            </span>
-                          );
-                        })()}
+                        {message.source_scores && Object.keys(message.source_scores).length > 0 && (
+                          <span className="inline-flex items-center gap-2 flex-wrap px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-900/90 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700/60 shadow-sm">
+                            {Object.entries(message.source_scores).map(([source, score]) => (
+                              <span key={source} className={source === message.source_type ? 'font-bold text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400'}>
+                                {source === message.source_type ? '🏆 ' : ''}{source.replaceAll('_', ' ')} {Math.round(score * 100)}%
+                              </span>
+                            ))}
+                            {message.winning_score !== undefined && (
+                              <span className="border-l border-slate-300 dark:border-slate-700 pl-2 font-semibold">selected score {Math.round(message.winning_score * 100)}%</span>
+                            )}
+                          </span>
+                        )}
                       </>
                     )}
                   </>

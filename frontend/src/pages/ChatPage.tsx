@@ -257,6 +257,7 @@ export const ChatPage: React.FC = () => {
             kb_score: effectiveMeta.kb_score,
             web_score: effectiveMeta.web_score,
             winning_score: effectiveMeta.winning_score,
+            source_scores: effectiveMeta.source_scores,
             is_in_rag_pipeline: effectiveMeta.is_in_rag_pipeline,
             external_search_used: effectiveMeta.external_search_used,
             follow_up_questions: effectiveMeta.follow_up_questions || [],

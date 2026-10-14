@@ -9,7 +9,7 @@ export const PublicNav: React.FC = () => {
   return (
     <header className="public-nav">
       <div className="nav-inner">
-        <BrandLogo />
+        <BrandLogo size="xl" highlighted />
         <button
           className="icon-button mobile-menu-toggle"
           aria-label={open ? 'Close navigation' : 'Open navigation'}

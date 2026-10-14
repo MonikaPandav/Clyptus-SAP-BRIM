@@ -26,17 +26,24 @@ CORE ARCHITECTURAL AND GROUNDING PRINCIPLES:
      * [General Testing Recommendations]
      * [Hypotheses That Still Require Verification]
 
-3. SAP BRIM Data Model Integrity:
-   - Do NOT assume that VBRK/VBRP (classical Sales and Distribution SD billing) or any /BIC/* (BW objects) is the correct source for a particular Convergent Invoicing (CI) or FI-CA process. Verify the document flow and relevant BRIM data model first (CI uses Billable Items DFKKBIXBIT*, Invoicing Documents DFKKINVDOC*, and FI-CA uses DFKKKO/DFKKOP).
-
-4. Senior Upgrade & Invoice Reconciliation Methodology:
-   - Symptom Classification: Always establish the exact symptom early—whether discrepancies originate in Usage Volume / Mediation, Rating (CC), Billable Items (CI), Invoicing Aggregation (CI), Tax Calculation, Rounding / Currency, or FI-CA Subledger Posting.
-   - Stage-by-Stage Reconciliation Matrix: Reconcile record counts and monetary totals across each documented processing stage (CIT -> Rated Item -> Raw BIT -> Billable BIT -> Billing Doc -> Invoicing Doc -> FI-CA Item).
-   - Granular Record Matching: Compare individual business records using stable identifiers (BIT numbers, CIT IDs, Invoicing Doc numbers, Contract Accounts), not only aggregate totals, to detect missing records, duplicates, changed quantities, changed prices, rounding differences, and offsetting discrepancies.
-   - Release & Configuration Comparison: Recommend controlled old-versus-new release testing with identical inputs and equivalent master data, effective dates, currencies, and tax conditions. Investigate Support Packages, SAP Notes, transports, configuration drift, and custom enhancements.
-   - Safe Validation & Remediation: Recommend replaying production inputs ONLY in a controlled test environment with duplicate-processing and financial-side-effect safeguards (e.g. reconciliation key isolation, dummy payment clearing, suppressed output).
-
-5. Professional Senior Architecture Structure:
+3. Multi-Part Questions and Partial Answers:
+   - Treat every explicit subquestion/requested deliverable as a separate evidence obligation. Answer each part independently; evidence for one part does not establish another.
+   - Preserve verified calculations and user-stated assumptions even if SAP-specific implementation details are unresolved. Label calculations and assumptions as illustrative, not SAP-standard behavior.
+   - Separate verified SAP-standard behavior, customer-specific configuration/customization, illustrative calculations, and unresolved details.
+   - Never infer a complete end-to-end sequence from evidence that documents only isolated components. State only demonstrated connections.
+4. Product, Release, and Evidence Boundaries:
+   - Prefer official SAP Help Portal material matching the product and release identified by the user. State the product/release shown by the source; do not silently transfer behavior across releases.
+   - Distinguish “not found in the internal knowledge base” from “not located in official SAP documentation.” Claim the latter only if an adequate authoritative search was actually performed; otherwise report search limits/results.
+   - Missing retrieval evidence is not proof that a feature is unsupported. Describe the exact gap (missing source, release mismatch, insufficient snippet, or failed search).
+5. BRIM Billing Vocabulary:
+   - Keep service period, charge period, billable item, billing document, invoicing document, and FI-CA posting document distinct. Do not collapse their lifecycle or assert connections not directly established in evidence.
+6. Senior Upgrade & Invoice Reconciliation Methodology:
+   - Symptom Classification: classify the reported issue only to the stage or component supported by the question/evidence.
+   - Stage-by-Stage Reconciliation Matrix: show only processing stages and connections directly established for the identified product/release; do not present an assumed universal sequence.
+   - Granular Record Matching: use stable business identifiers only when the source establishes them for this process.
+   - Never assume VBRK/VBRP or /BIC/* are the relevant objects for a BRIM process; name technical objects only when retrieved evidence supports the exact use.
+   - Testing recommendations must include financial-side-effect safeguards appropriate to the evidenced process and environment.
+7. Professional Senior Architecture Structure:
    - Maintain an authoritative, senior consultant tone with clean Markdown formatting, structured tables, diagnostic decision trees, and clear separation between verified standard behavior and customer-specific configuration."""
 
 
@@ -107,6 +114,9 @@ class LLMService:
         # Legacy compatibility attribute
         self.api_key = self.groq_api_key or self.gemini_api_key or self.openrouter_api_key
         self.provider = "tiered"
+        self.generation_temperature = max(
+            0.0, min(0.3, float(getattr(settings, "ANSWER_TEMPERATURE", 0.10)))
+        )
         self.last_model_used = self.GROQ_MODELS[0]
         self.last_provider_used = "groq"
         self.failed_over = False
@@ -511,6 +521,37 @@ class LLMService:
     # MAIN ANSWER GENERATION
     # =========================================================
 
+    @staticmethod
+    def _format_evidence_context(evidence: List[Dict[str, Any]], limit: int = 12) -> str:
+        """Render provenance for document, GitHub, and web evidence consistently."""
+        blocks = []
+        for item in (evidence or [])[:limit]:
+            metadata = item.get("citation_metadata") or {}
+            source_type = item.get("source_type", "knowledge_base")
+            content = item.get("chunk_text") or item.get("snippet") or metadata.get("snippet") or ""
+            aspect = item.get("question_aspect")
+            if source_type == "retrieval_gap" or item.get("retrieval_gap"):
+                blocks.append(f"[RETRIEVAL LIMITATION — NOT A SOURCE; do not cite as documentation. Question part: {aspect}]\n{content}")
+                continue
+            release = item.get("release") or item.get("product_release") or metadata.get("release") or "not specified by source"
+            if source_type == "web" or item.get("url"):
+                label = f"Web: {item.get('title') or item.get('document_name') or metadata.get('document')} | {item.get('domain') or metadata.get('section')} | {item.get('url') or metadata.get('url')} | product/release: {release}"
+                content = (item.get("snippet") or content)[:900]
+            elif source_type == "github_repo" or item.get("repo_url"):
+                label = f"GitHub: {item.get('repo_url')} | {item.get('file_path') or item.get('section')} | commit {item.get('commit_hash') or 'unknown'} | product/release: {release}"
+                content = content[:1200]
+            else:
+                label = (
+                    f"Document: {item.get('document_name') or metadata.get('document')} | "
+                    f"Page: {item.get('page_number', metadata.get('page', 1))} | "
+                    f"Section: {item.get('section') or metadata.get('section')} | product/release: {release}"
+                )
+                content = content[:1200]
+            if aspect:
+                label = f"Evidence for question part: {aspect} | {label}"
+            blocks.append(f"[{label}]\n{content}")
+        return "\n\n".join(blocks)
+
     def generate_answer(
         self,
         query: str,
@@ -518,35 +559,10 @@ class LLMService:
         source_type: str = "knowledge_base"
     ) -> str:
 
-        evidence_context = ""
-        budgeted_evidence = (evidence or [])[:4]
+        evidence_context = self._format_evidence_context(evidence)
 
-        if source_type in ("knowledge_base", "combined"):
-            evidence_context = "\n\n".join(
-                [
-                    (
-                        f"[Document: {c.get('document_name')}, "
-                        f"Page: {c.get('page_number')}, "
-                        f"Section: {c.get('section')}]\n"
-                        f"{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
-                    )
-                    for c in budgeted_evidence
-                ]
-            )
-        elif source_type == "web":
-            evidence_context = "\n\n".join(
-                [
-                    (
-                        f"[Source: {w.get('title')} "
-                        f"- {w.get('domain')}]\n"
-                        f"{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
-                    )
-                    for w in budgeted_evidence
-                ]
-            )
-
-        if len(evidence_context) > 4500:
-            evidence_context = evidence_context[:4500] + "..."
+        if len(evidence_context) > 9000:
+            evidence_context = evidence_context[:9000] + "..."
 
         plan = answer_planner.plan_answer(query)
         structure_guidance = plan.get("instructions", "")
@@ -569,11 +585,14 @@ TASK:
 Answer the user's question thoroughly, completely, and helpfully.
 
 Instructions:
-1. Provide a comprehensive, full explanation answering all aspects of the user's question.
-2. If evidence from documents or web sources is provided above, incorporate it accurately with relevant technical details, transaction codes, steps, tables, and architecture definitions.
-3. If specific documents are not present in the snippets, draw upon your deep technical knowledge to provide a complete, clear, and accurate answer.
-4. Organize the answer cleanly with clear headings, bullet points, or markdown tables for maximum readability.
-5. Never refuse to answer, and never state that you cannot generate text.
+1. First enumerate the distinct requests in the question; assess and answer each separately using evidence tagged for that part. Do not let strong evidence for one part imply support for another.
+2. Answer calculations that follow from the user's explicit assumptions, show the arithmetic, and label them illustrative. Separate these from SAP-standard behavior and customer-specific configuration.
+3. Use only retrieved evidence for SAP-specific claims. Cite every material claim inline with its actual document/page/section or title/URL. Never invent identifiers, citations, lifecycle links, or implementation steps.
+4. Prefer matching product/release official SAP Help Portal evidence. If the source omits release metadata, say it is unspecified. When sources conflict, describe the conflict and scope claims to each source/release.
+5. Distinguish “not found in the internal knowledge base” from “not located in official SAP documentation.” Make the latter claim only when the actual search evidence demonstrates an adequate authoritative search; otherwise report that search was limited or inconclusive.
+6. Missing evidence is not proof that functionality is unsupported. Give supported parts, then list unresolved technical questions and the actual retrieval limitation.
+7. For billing, distinguish service period, charge period, billable item, billing document, invoicing document, and FI-CA posting document. Explain connections only where directly supported.
+8. Do not construct an end-to-end implementation sequence from evidence that establishes only individual components. Use concise headings that make verified, configured, illustrative, and unresolved statements explicit.
 """
 
         # Tier 1: Groq
@@ -620,21 +639,10 @@ Instructions:
             logger.warning(f"Failed to initialize Groq client for primary retry: {e}")
             return None
 
-        evidence_context = ""
-        budgeted_evidence = (evidence or [])[:4]
-        if source_type in ("knowledge_base", "combined"):
-            evidence_context = "\n\n".join([
-                f"[Document: {c.get('document_name')}, Page: {c.get('page_number')}, Section: {c.get('section')}]\n{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
-                for c in budgeted_evidence
-            ])
-        elif source_type == "web":
-            evidence_context = "\n\n".join([
-                f"[Source: {w.get('title')} - {w.get('domain')}]\n{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
-                for w in budgeted_evidence
-            ])
+        evidence_context = self._format_evidence_context(evidence)
 
         plan = answer_planner.plan_answer(query)
-        user_prompt = f"USER QUERY:\n{query}\n\nQUESTION ARCHETYPE:\n{plan.get('title', 'Technical Inquiry')}\n\nSOURCE TYPE:\n{source_type.upper()}\n\nRETRIEVED EVIDENCE:\n{evidence_context}\n\nTASK:\nAnswer the user's question thoroughly, completely, and helpfully."
+        user_prompt = f"""USER QUERY:\n{query}\n\nQUESTION ARCHETYPE:\n{plan.get('title', 'Technical Inquiry')}\n\nSOURCE TYPE:\n{source_type.upper()}\n\nRETRIEVED EVIDENCE:\n{evidence_context}\n\nTASK:\nAnswer each distinct request separately from its matching evidence. Preserve calculations based on explicit user assumptions and label them illustrative. Cite every material SAP claim using only the source labels above. Distinguish SAP standard, customer-specific configuration, calculations, and unresolved details. State retrieval limitations precisely; missing evidence does not prove unsupported functionality. Do not invent release behavior, citations, identifiers, or end-to-end sequences."""
 
         primary_model = self.GROQ_MODELS[0]
         try:
@@ -645,7 +653,7 @@ Instructions:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.1,
+                temperature=self.generation_temperature,
                 max_tokens=4096,
                 timeout=8.0
             )
@@ -687,7 +695,7 @@ Instructions:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.1,
+                    temperature=self.generation_temperature,
                     max_tokens=4096,
                     timeout=8.0
                 )
@@ -738,7 +746,7 @@ Instructions:
                 response = model.generate_content(
                     prompt,
                     generation_config=genai.types.GenerationConfig(
-                        temperature=0.1,
+                        temperature=self.generation_temperature,
                         max_output_tokens=4096
                     ),
                     request_options={"timeout": 10.0}
@@ -787,7 +795,7 @@ Instructions:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.1,
+                    temperature=self.generation_temperature,
                     max_tokens=4096,
                     timeout=12.0
                 )
@@ -819,21 +827,7 @@ Instructions:
         Executes a single evidence-based answer repair attempt when verification fails.
         Eliminates unsupported claims and fabricated SAP technical identifiers.
         """
-        evidence_context = ""
-        if source_type in ("knowledge_base", "combined"):
-            evidence_context = "\n\n".join(
-                [
-                    f"[Source: {c.get('document_name')}, Page: {c.get('page_number', 1)}, Section: {c.get('section', '')}]\n{c.get('chunk_text') or c.get('snippet') or ''}"
-                    for c in evidence
-                ]
-            )
-        else:
-            evidence_context = "\n\n".join(
-                [
-                    f"[Source: {w.get('title')} ({w.get('domain', '')})]\n{w.get('snippet') or w.get('chunk_text') or ''}"
-                    for w in evidence
-                ]
-            )
+        evidence_context = self._format_evidence_context(evidence, limit=12)
 
         unsupported_bullets = "\n".join(f"- {c}" for c in unsupported_claims[:6]) or "None specified."
         critical_bullets = ", ".join(critical_unsupported_ids) or "None."
@@ -854,11 +848,7 @@ VERIFIED RETRIEVED EVIDENCE:
 {evidence_context}
 
 TASK:
-Review and refine the answer to ensure rigorous alignment with the verified evidence above.
-1. Retain the full, complete, and thorough technical explanation answering the user's question in depth.
-2. Ensure all referenced SAP transactions, database tables, and configuration steps align accurately with official SAP BRIM standards.
-3. Preserve all factually supported explanations, architecture details, tables, and step-by-step procedures in full without cutting them short.
-4. Do not truncate, omit, or prematurely shorten any sections.
+Repair claim by claim. Preserve every supported answer part and independently verifiable calculation from explicit assumptions. Remove or qualify unsupported SAP-specific details; do not turn missing retrieval evidence into a claim that SAP does not support a feature. Cite every material SAP-specific claim only with the source labels above. Separate SAP standard, customer configuration, illustrative calculation, and unresolved details. Do not invent technical identifiers, citations, release behavior, billing lifecycle links, or implementation sequences.
 """
 
         try:
@@ -1020,7 +1010,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.1,
+                    temperature=self.generation_temperature,
                     max_tokens=4096,
                     stream=True,
                     timeout=8.0
@@ -1065,7 +1055,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                 stream_resp = model.generate_content(
                     prompt,
                     generation_config=genai.types.GenerationConfig(
-                        temperature=0.1,
+                        temperature=self.generation_temperature,
                         max_output_tokens=4096
                     ),
                     request_options={"timeout": 10.0},
@@ -1113,7 +1103,7 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.1,
+                    temperature=self.generation_temperature,
                     max_tokens=4096,
                     stream=True
                 )
@@ -1136,35 +1126,10 @@ Review and refine the answer to ensure rigorous alignment with the verified evid
         source_type: str = "knowledge_base"
     ) -> Generator[str, None, None]:
 
-        evidence_context = ""
-        budgeted_evidence = (evidence or [])[:4]
+        evidence_context = self._format_evidence_context(evidence)
 
-        if source_type in ("knowledge_base", "combined"):
-            evidence_context = "\n\n".join(
-                [
-                    (
-                        f"[Document: {c.get('document_name')}, "
-                        f"Page: {c.get('page_number')}, "
-                        f"Section: {c.get('section')}]\n"
-                        f"{(c.get('chunk_text') or c.get('snippet') or '')[:1200]}"
-                    )
-                    for c in budgeted_evidence
-                ]
-            )
-        elif source_type == "web":
-            evidence_context = "\n\n".join(
-                [
-                    (
-                        f"[Source: {w.get('title')} "
-                        f"- {w.get('domain')}]\n"
-                        f"{(w.get('snippet') or w.get('chunk_text') or '')[:800]}"
-                    )
-                    for w in budgeted_evidence
-                ]
-            )
-
-        if len(evidence_context) > 4500:
-            evidence_context = evidence_context[:4500] + "..."
+        if len(evidence_context) > 9000:
+            evidence_context = evidence_context[:9000] + "..."
 
         user_prompt = f"""USER QUERY:
 {query}
@@ -1176,15 +1141,16 @@ RETRIEVED EVIDENCE:
 {evidence_context}
 
 TASK:
-Answer the user's question thoroughly, completely, and accurately using ONLY the retrieved evidence above.
+Answer each distinct request separately from its matching evidence. Preserve calculations based on explicit assumptions and label them illustrative. Use only retrieved sources for SAP-specific claims and cite each material claim with its actual source metadata. Separate SAP standard, customer-specific configuration, calculations, and unresolved details. Missing evidence does not prove unsupported functionality. Do not invent identifiers, citations, release behavior, billing lifecycle links, or implementation sequences.
 
 Instructions:
-1. Provide a comprehensive, full explanation covering all aspects of the user's question based on the evidence.
-2. Do not cut off, truncate, or prematurely shorten the explanation; present all relevant details, transaction codes, steps, and module definitions in full.
-3. Organize the answer cleanly with clear headings, bullet points, or markdown tables for readability.
-4. Do not invent facts or extrapolate beyond the provided evidence.
-5. If the evidence came from web sources, synthesize a complete answer from the web snippets.
-6. If the evidence is insufficient, state clearly that sufficient information was not available.
+1. Enumerate each request and assess its evidence independently; answer supported parts even when another part is unresolved.
+2. Preserve arithmetic derivable from explicit assumptions and label it illustrative, separate from SAP-standard functionality or customer configuration.
+3. Cite every material SAP-specific claim with the exact provided source title/page/section/URL. Never invent identifiers, citations, or document-flow connections.
+4. Prefer product/release-matched SAP Help Portal sources. If release is unspecified by a source, say so.
+5. Distinguish not found in the internal knowledge base from not located in official SAP documentation; claim the latter only after an adequate authoritative search. Otherwise report actual search limits/results.
+6. Missing evidence is not proof of unsupported functionality. State specific unresolved questions and retrieval limitations.
+7. For billing, distinguish service period, charge period, billable item, billing document, invoicing document, and FI-CA posting document. Do not invent an end-to-end sequence from isolated components.
 """
 
         streamed = False

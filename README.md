@@ -126,21 +126,24 @@ cp backend/.env.example backend/.env
 | `LLM_PROVIDER` | `groq` | Primary LLM provider (`groq`, `openai`, or `local`) |
 | `GROQ_API_KEY` | `""` | API key for Groq inference (Tier 1) |
 | `OPENAI_API_KEY` | `""` | API key for OpenAI fallback (Tier 2) |
-| `WEB_FALLBACK_ENABLED` | `true` | Enables Tavily web search when internal confidence < 0.6761 |
+| `WEB_FALLBACK_ENABLED` | `true` | Enables approved SAP web search when document or evidence confidence is weak |
+| `DOCUMENT_MATCH_THRESHOLD` | `0.80` | Triggers GitHub and SAP web comparison when the best document rerank score is below 80% |
+| `AUTO_MULTI_SOURCE_FALLBACK` | `true` | Automatically compares eligible document, GitHub, and web evidence when document confidence is weak |
+| `ANSWER_TEMPERATURE` | `0.10` | Low generation temperature for factual answers; runtime caps this setting at `0.30` |
 | `TAVILY_API_KEY` | `""` | API key for authoritative Tavily SAP web search |
 | `REPO_SOURCE_ENABLED` | `false` | **Feature Flag**: Activates GitHub repository retrieval |
 | `MULTI_SOURCE_COMPARE_ENABLED` | `false` | **Feature Flag**: Activates multi-source comparative ranking |
 | `SAP_WEB_SOURCES_ENABLED` | `false` | **Feature Flag**: Activates extended official web and community sources |
 
 > [!IMPORTANT]
-> Never commit your `backend/.env` file with actual API keys or credentials. All extended retrieval feature flags (`REPO_SOURCE_ENABLED`, `MULTI_SOURCE_COMPARE_ENABLED`, and `SAP_WEB_SOURCES_ENABLED`) strictly default to `false`.
+> Never commit your `backend/.env` file with actual API keys or credentials. The legacy repository and comparison flags remain off by default; automatic multi-source fallback is controlled separately by `AUTO_MULTI_SOURCE_FALLBACK`.
 
 ---
 
 ## 6. Database Setup
 
 ### Local SQLite (Zero-Config Default)
-The repository includes a pre-indexed, verified SQLite vector database at [`backend/sap_assistant.db`](file:///c:/Users/yuvar/OneDrive/Desktop/gen%20ai%20and%20agentic%20ai/super%20admin%20portal/SAP/SAP_BRIM/backend/sap_assistant.db) containing **11,317 approved SAP BRIM document chunks**. No database initialization commands are required when running with SQLite.
+The repository includes a pre-indexed SQLite vector database at [`backend/sap_assistant.db`](file:///c:/Users/yuvar/OneDrive/Desktop/gen%20ai%20and%20agentic%20ai/super%20admin%20portal/SAP/SAP_BRIM/backend/sap_assistant.db). At the consolidation audit it contained **11,317 chunks across 40 historical document records**; the current source inventory contains 30 PDFs. Use the authenticated `GET /api/rag-inspect/documents` endpoint for the live source/index reconciliation before an ingestion run. No database initialization commands are required when running with SQLite.
 
 ### PostgreSQL with pgvector (Enterprise Docker Setup)
 If running under PostgreSQL:
@@ -161,9 +164,7 @@ If running under PostgreSQL:
 
 ## 7. Knowledge Base & Document Ingestion
 
-The active knowledge base contains official SAP courseware, product documentation, and SAP Press books stored in:
-- `knowledge_base/documents/` (e.g., `SAP CC.pdf`, `SAP CI1.pdf` - `SAP CI4.pdf`, `SAP FI-CA.pdf`)
-- `knowledge_base/the full rag data sap/` (e.g., `BR234_EN_SOM 2.pdf`, `BRIM_AC240_EN_Col16.pdf`)
+The active knowledge base has one canonical source location: `knowledge_base/documents/`. It contains the SAP courseware, product documentation, SAP Press books, and the locally authored guides used by the ingestion pipeline.
 
 ### To Re-Ingest or Add Documents:
 1. Place new PDF documents into `knowledge_base/documents/`.
@@ -238,20 +239,28 @@ python backend/evaluation/run_shadow_evaluation.py
 
 ---
 
-## 10. Optional Features: GitHub Retrieval & Multi-Source Comparison
+## 10. GitHub Retrieval & Multi-Source Comparison
 
-cClyptus.AI includes an optional multi-source retrieval engine capable of ingesting GitHub repositories, validating source code against a BRIM-specific relevance gate, and comparing evidence across the knowledge base, repositories, and web search.
+cClyptus.AI compares retrieved document evidence with approved GitHub repository chunks and SAP web results when the best document rerank score is below 0.80 (or the evidence-confidence gate requests fallback). It selects the eligible candidate with the highest relevance score after source-authority weighting. GitHub candidates are limited to repository chunks already ingested with an approved license and passed BRIM relevance checks.
+
+### Multipart SAP questions and evidence boundaries
+
+Clear multi-part requests are retrieved and reranked part by part. Each part is carried with its own evidence label; a part with no internal match receives a non-citable retrieval-gap marker, and low-scoring parts can trigger GitHub and SAP web fallback independently. The web search prefers `help.sap.com`, broadening to other approved SAP properties only when Help Portal search returns no results. Product/release metadata is used when supplied by the question or present in a source; the system does not infer a source release when metadata is absent.
+
+Answers should preserve supported parts and calculations based on explicit assumptions, while separating verified SAP-standard behavior, customer-specific configuration, illustrative calculations, and unresolved details. A missing retrieval match is not proof that SAP lacks a feature. For billing, service period, charge period, billable item, billing document, invoicing document, and FI-CA posting document remain distinct; no end-to-end connection is asserted unless retrieved evidence establishes it. Material SAP-specific claims must cite retrieved source metadata, and the system must not fabricate identifiers, citations, or implementation sequences.
+
+Set `AUTO_MULTI_SOURCE_FALLBACK=false` to disable automatic comparison. `WEB_FALLBACK_ENABLED=false` disables live SAP web search. GitHub lookup requires previously ingested, approved repository chunks in the repository index.
 
 ### Operating Modes & Feature Flags
 Controlled via environment variables in `backend/.env`:
 
-1. **Mode A — Legacy Production Mode (Default)**:
+1. **Mode A — Legacy Feature Flags (Default)**:
    ```ini
    REPO_SOURCE_ENABLED=false
    MULTI_SOURCE_COMPARE_ENABLED=false
    ```
-   - Executes standard hybrid retrieval and generation unchanged.
-   - 0 repository queries, 0 multi-source comparison side-effects.
+   - Explicit shadow/comparison flags are disabled.
+   - Automatic low-confidence fallback remains enabled unless `AUTO_MULTI_SOURCE_FALLBACK=false`.
 
 2. **Mode B — Repository Shadow Mode**:
    ```ini
@@ -283,7 +292,7 @@ To verify system health or safely restore legacy behavior:
 ```bash
 python backend/scripts/rollback_github_retrieval.py
 ```
-To purge repository records from `github_repo_chunks` while leaving the 11,317 knowledge-base chunks intact:
+To purge repository records from `github_repo_chunks` while leaving the knowledge-base chunks intact:
 ```bash
 python backend/scripts/rollback_github_retrieval.py --purge-repo-chunks
 ```
@@ -314,7 +323,7 @@ SAP_BRIM/
 ├── backend/                            # FastAPI Backend Application
 │   ├── .env.example                    # Safe environment template
 │   ├── requirements.txt                # Python package dependencies
-│   ├── sap_assistant.db                # SQLite database with 11,317 pre-indexed SAP BRIM chunks
+│   ├── sap_assistant.db                # Pre-indexed SQLite corpus; inspect endpoint reports live counts
 │   │
 │   ├── app/                            # Application Core
 │   │   ├── main.py                     # FastAPI entrypoint, middleware, and route mounting
@@ -377,7 +386,6 @@ SAP_BRIM/
 │       ├── pages/                      # Page views (ChatPage, LoginPage, RegisterPage, AdminPage)
 │       └── services/                   # SSE streaming client and REST API service calls
 │
-└── knowledge_base/                     # SAP BRIM Source Documents
-    ├── documents/                      # Official manuals and cookbooks (16 PDFs)
-    └── the full rag data sap/          # Courseware and SAP Press publications (14 PDFs)
+└── knowledge_base/                     # SAP BRIM source documents
+    └── documents/                      # Canonical source folder (30 PDFs at consolidation audit)
 ```

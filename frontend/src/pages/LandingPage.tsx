@@ -21,6 +21,7 @@ import { VideoShowcase } from '../components/landing/VideoShowcase';
 import { Footer } from '../components/footer/Footer';
 import { PublicNav } from '../components/navbar/PublicNav';
 import { PageMeta } from '../components/ui/PageMeta';
+import iconOnly from '../assets/clyptusap-icon.png';
 
 const brimAreas = [
   { abbreviation: 'CM', title: 'Convergent Mediation', icon: Workflow },
@@ -106,7 +107,10 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.55 }}
           >
             <div className="hero-kicker">
-              <span className="kicker-mark">C</span> <strong>SAP + BRIM</strong> ENTERPRISE ASSISTANT
+              <span className="kicker-brand-mark">
+                <img src={iconOnly} alt="Clyptus.AI" className="h-4 w-4 object-contain" />
+              </span>
+              <strong>SAP + BRIM</strong> ENTERPRISE ASSISTANT
             </div>
             <h1>
               Your SAP questions.<br />

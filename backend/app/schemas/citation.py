@@ -3,6 +3,8 @@ from typing import Optional
 
 class CitationResponse(BaseModel):
     id: Optional[str] = None
+    chunk_id: Optional[str] = None
+    source_type: Optional[str] = None
     document: str
     page: int
     section: Optional[str] = None

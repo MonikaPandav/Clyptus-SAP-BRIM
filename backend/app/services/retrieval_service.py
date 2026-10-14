@@ -203,7 +203,9 @@ class RetrievalService:
 
         # CHANNEL 1: INDEPENDENT DENSE VECTOR RETRIEVAL
         sims = cached_matrix @ query_vector
-        normalized_sims = np.clip((sims + 1.0) / 2.0, 0.0, 1.0)
+        # Cosine similarity already has a meaningful zero point. Mapping it to
+        # (cosine + 1) / 2 gives unrelated vectors a misleading 0.50 baseline.
+        normalized_sims = np.clip(sims, 0.0, 1.0)
         top_vec_indices = np.argsort(-normalized_sims)[:CANDIDATES_PER_CHANNEL]
 
         vec_rank_map: Dict[int, int] = {}
@@ -308,7 +310,16 @@ class RetrievalService:
 
             seen_passages.append(c_words)
 
-            calibrated_score = round(min(0.99, max(0.40, (v_score * 0.50 + min(1.0, b_score / 5.0) * 0.35 + (0.15 if idx in tech_rank_map else 0.0)))), 4)
+            token_coverage = (
+                sum(1 for token in query_tokens if token in c_text.lower()) / len(query_tokens)
+                if query_tokens else 0.5
+            )
+            identifier_match = 1.0 if query_tech_ids and idx in tech_rank_map else 0.0
+            phrase_match = 1.0 if len(query_tokens) > 1 and " ".join(query_tokens[:3]) in c_text.lower() else 0.0
+            calibrated_score = round(min(0.99, max(0.0, (
+                0.60 * v_score + 0.25 * token_coverage +
+                0.10 * identifier_match + 0.05 * phrase_match
+            ))), 4)
 
             results.append({
                 "chunk_id": meta["chunk_id"],

@@ -191,7 +191,7 @@ class RepoStore:
 
         sims = cached_matrix @ q_vec
         # Normalized similarity in [0, 1]
-        norm_sims = np.clip((sims + 1.0) / 2.0, 0.0, 1.0)
+        norm_sims = np.clip(sims, 0.0, 1.0)
 
         # Lexical term matching
         q_tokens = [t for t in re.findall(r"\b[a-z0-9_\-]+\b", query.lower()) if t not in STOP_WORDS and len(t) > 1]
@@ -208,7 +208,7 @@ class RepoStore:
             term_ratio = (term_hits / len(q_tokens)) if q_tokens else 0.5
 
             # Calibrated score combining vector similarity and lexical term coverage
-            calibrated_score = round(min(0.99, max(0.40, 0.65 * v_sim + 0.35 * term_ratio)), 4)
+            calibrated_score = round(min(0.99, max(0.0, 0.65 * v_sim + 0.35 * term_ratio)), 4)
 
             if calibrated_score >= active_thresh:
                 item = dict(meta)

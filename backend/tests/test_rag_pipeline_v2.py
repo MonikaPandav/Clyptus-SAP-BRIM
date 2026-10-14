@@ -262,7 +262,7 @@ def test_10_sse_streaming_stages(db_session):
 # ==============================================================================
 def test_11_database_retrieval_stability(db_session):
     """
-    Ensures hybrid search returns chunk records from the 10,661 chunks database
+    Ensures hybrid search returns chunk records from the indexed database
     without errors or empty responses for standard queries.
     """
     results = retrieval_service.hybrid_search(db_session, "billable item", top_k=5)

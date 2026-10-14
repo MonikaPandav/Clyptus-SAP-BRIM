@@ -27,32 +27,22 @@ SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md", ".markdown"}
 
 def discover_knowledge_base_files() -> List[Path]:
     """
-    Recursively scans the knowledge base directories to find all supported documents.
-    Covers KNOWLEDGE_BASE_DIR, DOCUMENTS_DIR, and FULL_RAG_DATA_DIR (14 SAP PDFs).
+    Recursively scans the one canonical knowledge-base source directory.
+
+    Documents must live in ``knowledge_base/documents``.  Keeping a single source
+    location prevents a document from being indexed from an obsolete folder and
+    makes the inspector's source inventory reproducible.
     """
-    search_dirs = []
-    if hasattr(settings, "KNOWLEDGE_BASE_DIR") and settings.KNOWLEDGE_BASE_DIR.exists():
-        search_dirs.append(settings.KNOWLEDGE_BASE_DIR)
-    if hasattr(settings, "DOCUMENTS_DIR") and settings.DOCUMENTS_DIR.exists():
-        if settings.DOCUMENTS_DIR not in search_dirs:
-            search_dirs.append(settings.DOCUMENTS_DIR)
-    # Include the "the full rag data sap" directory with all 14 SAP PDF documents
-    if hasattr(settings, "FULL_RAG_DATA_DIR") and settings.FULL_RAG_DATA_DIR.exists():
-        if settings.FULL_RAG_DATA_DIR not in search_dirs:
-            search_dirs.append(settings.FULL_RAG_DATA_DIR)
-            logger.info(f"Including FULL_RAG_DATA_DIR: {settings.FULL_RAG_DATA_DIR}")
+    source_dir = settings.DOCUMENTS_DIR
+    if not source_dir.exists():
+        logger.warning("Canonical knowledge-base directory does not exist: %s", source_dir)
+        return []
 
-    discovered_files: Dict[str, Path] = {}
-
-    for s_dir in search_dirs:
-        logger.info(f"Scanning directory recursively: {s_dir}")
-        for path in s_dir.rglob("*"):
-            if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS:
-                # Key by filename to prevent duplicates across symlinks or overlapping paths
-                if path.name not in discovered_files:
-                    discovered_files[path.name] = path
-
-    file_list = sorted(list(discovered_files.values()), key=lambda p: p.name.lower())
+    logger.info("Scanning canonical knowledge-base directory recursively: %s", source_dir)
+    file_list = sorted(
+        (path for path in source_dir.rglob("*") if path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS),
+        key=lambda path: (path.name.lower(), str(path).lower()),
+    )
     logger.info(f"Total supported documents discovered: {len(file_list)}")
     return file_list
 
