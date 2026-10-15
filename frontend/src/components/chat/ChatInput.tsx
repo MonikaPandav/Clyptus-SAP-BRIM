@@ -1,13 +1,44 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Mic, MicOff, Square } from 'lucide-react';
+import {
+  Send,
+  Mic,
+  MicOff,
+  Square,
+  Plus,
+  X,
+  FileText,
+  FileSpreadsheet,
+  FileCode,
+  Image as ImageIcon,
+  FolderOpen,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react';
+import { apiExtractDocument } from '../../services/api';
+import type { DocumentAttachment } from '../../types';
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, attachments?: DocumentAttachment[]) => void;
   onStop?: () => void;
   isLoading: boolean;
 }
 
-// Extend the Window interface for SpeechRecognition browser API
+interface LocalAttachment {
+  id: string;
+  file: File;
+  name: string;
+  size: number;
+  file_type: string;
+  status: 'extracting' | 'ready' | 'error';
+  page_count?: number;
+  char_count?: number;
+  text?: string;
+  preview?: string;
+  errorMessage?: string;
+}
+
+// Extend Window interface for SpeechRecognition browser API
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,6 +50,9 @@ declare global {
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isLoading }) => {
   const [input, setInput] = useState('');
+  const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -26,6 +60,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
   const interimRef = useRef('');
+  const menuRef = useRef<HTMLDivElement>(null);
+  const attachButtonRef = useRef<HTMLButtonElement>(null);
+
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const docxInputRef = useRef<HTMLInputElement>(null);
+  const dataInputRef = useRef<HTMLInputElement>(null);
+  const allInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Close attachment dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        attachButtonRef.current &&
+        !attachButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowAttachMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Detect browser support for SpeechRecognition
   useEffect(() => {
@@ -39,7 +97,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
     }
-  }, [input]);
+  }, [input, attachments]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -115,13 +173,121 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const getFileBadgeColor = (ext: string) => {
+    switch (ext) {
+      case 'pdf':
+        return 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30';
+      case 'docx':
+      case 'doc':
+        return 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30';
+      case 'png':
+        return 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/30';
+      case 'csv':
+      case 'xlsx':
+      case 'xls':
+        return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
+      case 'json':
+      case 'xml':
+      case 'sql':
+        return 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30';
+      default:
+        return 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30';
+    }
+  };
+
+  const handleFilesSelected = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+    setShowAttachMenu(false);
+
+    const newItems: LocalAttachment[] = fileArray.map((f) => ({
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      file: f,
+      name: f.name,
+      size: f.size,
+      file_type: f.name.split('.').pop()?.toLowerCase() || 'txt',
+      status: 'extracting',
+    }));
+
+    setAttachments((prev) => [...prev, ...newItems]);
+
+    for (const item of newItems) {
+      try {
+        const res = await apiExtractDocument(item.file);
+        setAttachments((prev) =>
+          prev.map((a) =>
+            a.id === item.id
+              ? {
+                  ...a,
+                  status: 'ready',
+                  page_count: res.page_count,
+                  char_count: res.char_count,
+                  text: res.text,
+                  preview: res.preview,
+                }
+              : a
+          )
+        );
+      } catch (err: any) {
+        setAttachments((prev) =>
+          prev.map((a) =>
+            a.id === item.id
+              ? {
+                  ...a,
+                  status: 'error',
+                  errorMessage: err.message || 'Could not extract text',
+                }
+              : a
+          )
+        );
+      }
+    }
+  };
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = event.currentTarget.files;
+    if (selected) void handleFilesSelected(selected);
+    // Allow selecting the same file again after removing it or correcting an extraction issue.
+    event.currentTarget.value = '';
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  const isExtracting = attachments.some((a) => a.status === 'extracting');
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (isLoading || isExtracting) return;
+
+    const readyAttachments: DocumentAttachment[] = attachments
+      .filter((a) => a.status === 'ready' && a.text)
+      .map((a) => ({
+        name: a.name,
+        file_type: a.file_type,
+        size_bytes: a.size,
+        page_count: a.page_count,
+        text: a.text!,
+        preview: a.preview,
+      }));
+
+    const trimmedInput = input.trim();
+    if (!trimmedInput && readyAttachments.length === 0) return;
+
     if (isListening) stopListening();
 
-    onSendMessage(input.trim());
+    const finalQuery = trimmedInput || 'Please analyze the attached document(s), summarizing key sections and explaining core findings.';
+
+    onSendMessage(finalQuery, readyAttachments);
     setInput('');
+    setAttachments([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -134,8 +300,68 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFilesSelected(e.dataTransfer.files);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 pb-4 pt-2">
+      {/* Hidden File Inputs */}
+      <input
+        type="file"
+        ref={pdfInputRef}
+        accept=".pdf"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+      <input
+        type="file"
+        ref={docxInputRef}
+        accept=".docx"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+      <input
+        type="file"
+        ref={dataInputRef}
+        accept=".txt,.md,.csv,.json,.log,.tsv,.xml,.sql,.yaml,.yml"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+      <input
+        type="file"
+        ref={imageInputRef}
+        accept=".png,image/png"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+      <input
+        type="file"
+        ref={allInputRef}
+        accept=".pdf,.docx,.png,image/png,.txt,.md,.csv,.json,.log,.tsv,.xml,.sql,.yaml,.yml"
+        multiple
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+
       {/* Voice error toast */}
       {voiceError && (
         <div className="mb-2 px-3 py-2 rounded-xl bg-rose-950/60 border border-rose-700/50 text-xs text-rose-300 flex items-center justify-between gap-2">
@@ -144,37 +370,254 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
         </div>
       )}
 
+      {/* Main Input Form with Drag & Drop */}
       <form
         onSubmit={handleSubmit}
-        className={`relative bg-white dark:bg-[#09090e] border rounded-2xl shadow-sm dark:shadow-2xl transition-all duration-200 ${
-          isListening
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`relative bg-white dark:bg-[#09090e] border rounded-2xl shadow-sm dark:shadow-2xl transition-all duration-200 flex flex-col ${
+          isDragging
+            ? 'border-orange-500 ring-2 ring-orange-500/30 bg-orange-50/20 dark:bg-orange-950/10'
+            : isListening
             ? 'border-rose-500/70 ring-2 ring-rose-500/25'
             : 'border-slate-300 dark:border-[#1f1f2c] focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:shadow-md'
         }`}
       >
+        {/* Drag Overlay indicator */}
+        {isDragging && (
+          <div className="absolute inset-0 z-30 bg-orange-500/10 dark:bg-orange-500/15 backdrop-blur-[2px] rounded-2xl flex items-center justify-center border-2 border-dashed border-orange-500 pointer-events-none">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#0c0c14] border border-orange-500/40 text-orange-600 dark:text-orange-400 text-xs font-semibold shadow-lg">
+              <Plus className="w-4 h-4" />
+              <span>Drop documents here to attach</span>
+            </div>
+          </div>
+        )}
+
+        {/* Attachment Preview Chips inside the input container */}
+        {attachments.length > 0 && (
+          <div className="px-3 pt-3 pb-1 flex flex-wrap gap-2 items-center border-b border-slate-100 dark:border-[#161622]">
+            {attachments.map((att) => {
+              const isPdf = att.file_type === 'pdf';
+              const isDoc = att.file_type === 'docx' || att.file_type === 'doc';
+              const isData = ['csv', 'json', 'xlsx'].includes(att.file_type);
+
+              return (
+                <div
+                  key={att.id}
+                  className="group relative flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#12121a] border border-slate-200 dark:border-[#222230] text-xs transition-all hover:border-orange-400 dark:hover:border-orange-500/40 shadow-xs max-w-xs"
+                >
+                  {/* File Format Icon */}
+                  <div className={`p-1 rounded-md border shrink-0 ${getFileBadgeColor(att.file_type)}`}>
+                    {isPdf ? (
+                      <FileText className="w-3.5 h-3.5" />
+                    ) : isDoc ? (
+                      <FileText className="w-3.5 h-3.5" />
+                    ) : isData ? (
+                      <FileSpreadsheet className="w-3.5 h-3.5" />
+                    ) : att.file_type === 'png' ? (
+                      <ImageIcon className="w-3.5 h-3.5" />
+                    ) : (
+                      <FileCode className="w-3.5 h-3.5" />
+                    )}
+                  </div>
+
+                  {/* Name and extraction status */}
+                  <div className="flex flex-col min-w-0 pr-1">
+                    <span className="font-semibold text-slate-800 dark:text-slate-100 truncate max-w-[170px]" title={att.name}>
+                      {att.name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                      {att.status === 'extracting' && (
+                        <>
+                          <Loader2 className="w-2.5 h-2.5 text-orange-500 animate-spin" />
+                          <span>Extracting content...</span>
+                        </>
+                      )}
+                      {att.status === 'ready' && (
+                        <>
+                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                          <span>
+                            {att.page_count ? `${att.page_count} ${att.page_count === 1 ? 'page' : 'pages'} · ` : ''}
+                            {formatFileSize(att.size)}
+                          </span>
+                        </>
+                      )}
+                      {att.status === 'error' && (
+                        <>
+                          <AlertCircle className="w-2.5 h-2.5 text-rose-500" />
+                          <span className="text-rose-500 truncate max-w-[130px]">{att.errorMessage || 'Failed'}</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Remove attachment button */}
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(att.id)}
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer"
+                    title="Remove file"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Text Input */}
         <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={isListening ? 'Listening... speak now' : 'Ask anything about SAP...'}
+          placeholder={
+            isListening
+              ? 'Listening... speak now'
+              : attachments.length > 0
+              ? 'Ask any question about the attached document(s)...'
+              : 'Ask anything about SAP or attach documents with +'
+          }
           rows={1}
           disabled={isLoading}
           className="w-full bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm px-4 pt-3.5 pb-12 focus:outline-none resize-none max-h-48 min-h-[52px]"
         />
 
-        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
-          {/* Left side: mic status indicator */}
-          <div className="flex items-center gap-2">
+        {/* Bottom Actions Bar */}
+        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between pointer-events-auto">
+          {/* Left side: ChatGPT-Style '+' Button & Mic Status */}
+          <div className="relative flex items-center gap-2">
+            {/* '+' Add Button */}
+            <div className="relative">
+              <button
+                ref={attachButtonRef}
+                type="button"
+                onClick={() => setShowAttachMenu((prev) => !prev)}
+                disabled={isLoading}
+                title="Add attachments (PDF, Word, PNG, Text, Data)"
+                className={`flex items-center justify-center w-8 h-8 rounded-xl transition duration-150 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  showAttachMenu
+                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 ring-2 ring-orange-500/30'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Plus className={`w-4 h-4 transition-transform duration-200 ${showAttachMenu ? 'rotate-45' : ''}`} />
+              </button>
+
+              {/* ChatGPT-style Attachment Popup Menu */}
+              {showAttachMenu && (
+                <div
+                  ref={menuRef}
+                  className="absolute bottom-11 left-0 z-40 w-72 bg-white dark:bg-[#0c0c14] border border-slate-200 dark:border-[#222234] rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-md"
+                >
+                  <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-[#1a1a26] mb-1">
+                    Attach Documents & Content
+                  </div>
+
+                  {/* Option 1: PDF Document */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAttachMenu(false);
+                      pdfInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-orange-50/80 dark:hover:bg-[#161622] text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/25 group-hover:scale-105 transition-transform">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">Upload PDF Document</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Extracts pages, text & tables (.pdf)</span>
+                    </div>
+                  </button>
+
+                  {/* Option 2: Word Document */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAttachMenu(false);
+                      docxInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-blue-50/80 dark:hover:bg-[#161622] text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/25 group-hover:scale-105 transition-transform">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">Upload Word Document</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Functional specs & guides (.docx)</span>
+                    </div>
+                  </button>
+
+                  {/* Option 3: Text & Data */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAttachMenu(false);
+                      dataInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-emerald-50/80 dark:hover:bg-[#161622] text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/25 group-hover:scale-105 transition-transform">
+                      <FileSpreadsheet className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">Upload Text & Data</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Notes, CSV, JSON, logs & markdown</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAttachMenu(false);
+                      imageInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-violet-50/80 dark:hover:bg-[#161622] text-slate-800 dark:text-slate-200 hover:text-violet-600 dark:hover:text-violet-400 transition cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-500/25 group-hover:scale-105 transition-transform">
+                      <ImageIcon className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">Upload PNG Image</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Reads visible text with OCR (.png)</span>
+                    </div>
+                  </button>
+
+                  {/* Option 4: Browse All Files */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAttachMenu(false);
+                      allInputRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-[#161622] text-slate-800 dark:text-slate-200 transition cursor-pointer group border-t border-slate-100 dark:border-[#1a1a26] mt-1 pt-2"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-slate-500/10 dark:bg-slate-500/20 text-slate-600 dark:text-slate-400 flex items-center justify-center border border-slate-500/25 group-hover:scale-105 transition-transform">
+                      <FolderOpen className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">Upload from Computer</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">Browse any supported document</span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Listening status */}
             {isListening && (
-              <span className="flex items-center gap-1.5 text-[11px] text-rose-400 font-medium animate-pulse">
+              <span className="flex items-center gap-1.5 text-[11px] text-rose-500 font-medium animate-pulse">
                 <span className="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse" />
                 Listening...
               </span>
             )}
           </div>
 
-          {/* Right side: voice + send buttons */}
+          {/* Right side: Voice + Send Buttons */}
           <div className="flex items-center gap-1.5">
             {/* Mic Button */}
             {voiceSupported && (
@@ -189,11 +632,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
                     : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
-                {isListening ? (
-                  <MicOff className="w-4 h-4" />
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
             )}
 
@@ -210,23 +649,26 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, onStop, isL
             ) : (
               <button
                 type="submit"
-                disabled={!input.trim()}
-                title="Send message"
+                disabled={(!input.trim() && !attachments.some((a) => a.status === 'ready' && !!a.text)) || isExtracting}
+                title={isExtracting ? 'Extracting document text...' : 'Send message'}
                 className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 disabled:opacity-40 disabled:hover:from-orange-600 disabled:hover:to-orange-500 text-white shadow-md shadow-orange-500/30 transition duration-150 disabled:cursor-not-allowed cursor-pointer"
               >
-                <Send className="w-4 h-4" />
+                {isExtracting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </button>
             )}
           </div>
         </div>
       </form>
 
-      <div className="text-center mt-2">
+      <div className="text-center mt-2 flex items-center justify-center gap-1.5 flex-wrap">
         <span className="text-[11px] text-slate-400 dark:text-slate-500">
-          SAP Knowledge Assistant grounded in verified enterprise documentation. Non-SAP queries are rejected.
+          Click <strong className="text-orange-500 font-semibold">+</strong> to upload PDFs, documents, or PNG images. Clyptus.AI extracts content for grounded answers.
         </span>
       </div>
-
     </div>
   );
 };

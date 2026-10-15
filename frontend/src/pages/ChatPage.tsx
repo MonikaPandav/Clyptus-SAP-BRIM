@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Lock } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { Message } from '../types';
+import type { Message, DocumentAttachment } from '../types';
 import { ChatMessage } from '../components/chat/ChatMessage';
 import { ChatInput } from '../components/chat/ChatInput';
 import { WelcomeScreen } from '../components/chat/WelcomeScreen';
@@ -79,6 +79,19 @@ export const ChatPage: React.FC = () => {
     }
   }, [isTrialUser, conversationId, navigate]);
 
+  // Prevent browser from navigating to file/folder when dropped outside the dropzone
+  useEffect(() => {
+    const handleWindowDragOver = (e: DragEvent) => e.preventDefault();
+    const handleWindowDrop = (e: DragEvent) => e.preventDefault();
+
+    window.addEventListener('dragover', handleWindowDragOver);
+    window.addEventListener('drop', handleWindowDrop);
+    return () => {
+      window.removeEventListener('dragover', handleWindowDragOver);
+      window.removeEventListener('drop', handleWindowDrop);
+    };
+  }, []);
+
   // Auto-scroll smoothly without jitter on content updates unless user has scrolled up
   useEffect(() => {
     if (!isUserScrolledUp) {
@@ -127,7 +140,32 @@ export const ChatPage: React.FC = () => {
     }
   }, [conversationId, isTrialUser]);
 
+  const accumulatedTargetRef = useRef<string>('');
+  const displayedTextRef = useRef<string>('');
+  const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pendingDoneRef = useRef<{
+    meta: StreamMetadata;
+    finalText?: string;
+    targetChatId: string;
+  } | null>(null);
+
+  // Clean up streaming ticker interval on unmount
+  useEffect(() => {
+    return () => {
+      if (tickerRef.current) {
+        clearInterval(tickerRef.current);
+        tickerRef.current = null;
+      }
+    };
+  }, []);
+
   const handleStopGeneration = () => {
+    if (tickerRef.current) {
+      clearInterval(tickerRef.current);
+      tickerRef.current = null;
+    }
+    pendingDoneRef.current = null;
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
@@ -135,8 +173,9 @@ export const ChatPage: React.FC = () => {
     setIsLoading(false);
 
     // Preserve partially generated text in chat history and database (registered users only)
-    if (streamingContent !== null) {
-      const stoppedContent = streamingContent.trim() ? streamingContent : 'Generation stopped.';
+    const currentStream = displayedTextRef.current || streamingContent;
+    if (currentStream !== null) {
+      const stoppedContent = currentStream.trim() ? currentStream : 'Generation stopped.';
       const stoppedAssistantMsg: Message = {
         id: streamingMeta?.message_id || `stopped-${Date.now()}`,
         chat_id: conversationId || guestChatIdRef.current || '',
@@ -147,6 +186,7 @@ export const ChatPage: React.FC = () => {
         created_at: new Date().toISOString(),
         citations: streamingMeta?.citations || [],
         web_sources: streamingMeta?.web_sources || [],
+        images: streamingMeta?.images || [],
       };
 
       setMessages((prev) => [...prev, stoppedAssistantMsg]);
@@ -161,7 +201,7 @@ export const ChatPage: React.FC = () => {
     setStreamingMeta(null);
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, attachments?: DocumentAttachment[]) => {
     // Check trial limit for free preview users
     if (isTrialUser && trialCount >= GUEST_QUERY_LIMIT) {
       setShowAuthModal(true);
@@ -196,12 +236,18 @@ export const ChatPage: React.FC = () => {
       }
     }
 
+    const displayContent =
+      attachments && attachments.length > 0 && !content.startsWith('[Attached')
+        ? `[Attached: ${attachments.map((a) => `${a.name} (${a.page_count || 1} pages)`).join(', ')}]\n\n${content}`
+        : content;
+
     // Optimistically add user message to UI
     const tempUserMsg: Message = {
       id: `user-${Date.now()}`,
       chat_id: targetChatId,
       role: 'user',
-      content,
+      content: displayContent,
+      attachments,
       created_at: new Date().toISOString(),
       citations: [],
       web_sources: [],
@@ -210,14 +256,86 @@ export const ChatPage: React.FC = () => {
     setMessages((prev) => [...prev, tempUserMsg]);
     setIsLoading(true);
     setStreamingContent('');
-    setStreamingStage('Thinking...');
+    setStreamingStage(attachments && attachments.length > 0 ? 'Analyzing attached document(s)...' : 'Thinking...');
     setStreamingMeta(null);
     setIsUserScrolledUp(false);
+
+    accumulatedTargetRef.current = '';
+    displayedTextRef.current = '';
+    pendingDoneRef.current = null;
+    if (tickerRef.current) {
+      clearInterval(tickerRef.current);
+      tickerRef.current = null;
+    }
+
+    // Smooth progressive typewriter / token reveal ticker (ChatGPT feel)
+    tickerRef.current = setInterval(() => {
+      const target = accumulatedTargetRef.current;
+      const current = displayedTextRef.current;
+
+      if (current.length < target.length) {
+        const diff = target.length - current.length;
+        // Dynamic pacing: smooth character/word reveal without stalling
+        const step = diff > 120 ? Math.ceil(diff / 4) : diff > 40 ? 6 : diff > 15 ? 3 : diff > 4 ? 2 : 1;
+        const nextText = target.slice(0, current.length + step);
+        displayedTextRef.current = nextText;
+        setStreamingContent(nextText);
+      } else if (pendingDoneRef.current) {
+        // Stream completed from backend and all characters have smoothly appeared
+        if (tickerRef.current) {
+          clearInterval(tickerRef.current);
+          tickerRef.current = null;
+        }
+
+        const { meta, finalText, targetChatId: finalChatId } = pendingDoneRef.current;
+        pendingDoneRef.current = null;
+        setIsLoading(false);
+        abortControllerRef.current = null;
+
+        const resolvedContent =
+          finalText && finalText.trim().length > 0
+            ? finalText
+            : displayedTextRef.current || target || '';
+
+        const finalAssistantMsg: Message = {
+          id: meta.message_id || `msg-${Date.now()}`,
+          chat_id: finalChatId,
+          role: 'assistant',
+          content: resolvedContent,
+          source_type: meta.source_type || 'knowledge_base',
+          grounding_score: meta.grounding_score,
+          verification_status: meta.verification_status,
+          internal_evidence_confidence: meta.internal_evidence_confidence,
+          selected_evidence_quality: meta.selected_evidence_quality,
+          kb_score: meta.kb_score,
+          web_score: meta.web_score,
+          winning_score: meta.winning_score,
+          source_scores: meta.source_scores,
+          is_in_rag_pipeline: meta.is_in_rag_pipeline,
+          external_search_used: meta.external_search_used,
+          follow_up_questions: meta.follow_up_questions || [],
+          created_at: new Date().toISOString(),
+          citations: meta.citations || [],
+          web_sources: meta.web_sources || [],
+          images: meta.images || [],
+        };
+
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === finalAssistantMsg.id)) {
+            return prev.map((m) => (m.id === finalAssistantMsg.id ? finalAssistantMsg : m));
+          }
+          return [...prev, finalAssistantMsg];
+        });
+
+        setStreamingContent(null);
+        setStreamingStage(null);
+        setStreamingMeta(null);
+      }
+    }, 20);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    let accumulatedText = '';
     let streamMetaRef: StreamMetadata = {};
 
     await apiStreamMessage(
@@ -232,59 +350,33 @@ export const ChatPage: React.FC = () => {
           setStreamingMeta(streamMetaRef);
         },
         onToken: (token: string) => {
-          accumulatedText += token;
-          setStreamingContent(accumulatedText);
+          accumulatedTargetRef.current += token;
         },
         onDone: (doneMeta: StreamMetadata, finalText?: string) => {
-          setIsLoading(false);
-          abortControllerRef.current = null;
           const effectiveMeta = { ...streamMetaRef, ...doneMeta };
-          const resolvedContent =
-            finalText && finalText.trim().length > 0
-              ? finalText
-              : accumulatedText || '';
-
-          const finalAssistantMsg: Message = {
-            id: effectiveMeta.message_id || `msg-${Date.now()}`,
-            chat_id: targetChatId!,
-            role: 'assistant',
-            content: resolvedContent,
-            source_type: effectiveMeta.source_type || 'knowledge_base',
-            grounding_score: effectiveMeta.grounding_score,
-            verification_status: effectiveMeta.verification_status,
-            internal_evidence_confidence: effectiveMeta.internal_evidence_confidence,
-            selected_evidence_quality: effectiveMeta.selected_evidence_quality,
-            kb_score: effectiveMeta.kb_score,
-            web_score: effectiveMeta.web_score,
-            winning_score: effectiveMeta.winning_score,
-            source_scores: effectiveMeta.source_scores,
-            is_in_rag_pipeline: effectiveMeta.is_in_rag_pipeline,
-            external_search_used: effectiveMeta.external_search_used,
-            follow_up_questions: effectiveMeta.follow_up_questions || [],
-            created_at: new Date().toISOString(),
-            citations: effectiveMeta.citations || [],
-            web_sources: effectiveMeta.web_sources || [],
+          if (finalText && finalText.length > accumulatedTargetRef.current.length) {
+            accumulatedTargetRef.current = finalText;
+          }
+          pendingDoneRef.current = {
+            meta: effectiveMeta,
+            finalText,
+            targetChatId: targetChatId!,
           };
-
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === finalAssistantMsg.id)) {
-              return prev.map((m) => (m.id === finalAssistantMsg.id ? finalAssistantMsg : m));
-            }
-            return [...prev, finalAssistantMsg];
-          });
-
-          setStreamingContent(null);
-          setStreamingStage(null);
-          setStreamingMeta(null);
         },
         onError: (err: any) => {
           console.error('Stream error:', err);
+          if (tickerRef.current) {
+            clearInterval(tickerRef.current);
+            tickerRef.current = null;
+          }
+          pendingDoneRef.current = null;
           setIsLoading(false);
           abortControllerRef.current = null;
 
-          const resolvedContent = accumulatedText.trim()
-            ? accumulatedText
-            : 'Generation interrupted. Please try again.';
+          const resolvedContent =
+            displayedTextRef.current.trim() ||
+            accumulatedTargetRef.current.trim() ||
+            'Generation interrupted. Please try again.';
 
           const errorMsg: Message = {
             id: `err-${Date.now()}`,
@@ -296,6 +388,7 @@ export const ChatPage: React.FC = () => {
             created_at: new Date().toISOString(),
             citations: streamMetaRef.citations || [],
             web_sources: streamMetaRef.web_sources || [],
+            images: streamMetaRef.images || [],
           };
 
           setMessages((prev) => [...prev, errorMsg]);
@@ -304,7 +397,8 @@ export const ChatPage: React.FC = () => {
           setStreamingMeta(null);
         },
       },
-      controller.signal
+      controller.signal,
+      attachments
     );
   };
 
@@ -350,6 +444,7 @@ export const ChatPage: React.FC = () => {
                   created_at: new Date().toISOString(),
                   citations: streamingMeta?.citations || [],
                   web_sources: streamingMeta?.web_sources || [],
+                  images: streamingMeta?.images || [],
                 }}
                 isStreaming={true}
                 streamingStage={streamingStage}

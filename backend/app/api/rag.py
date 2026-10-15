@@ -119,6 +119,7 @@ def query_rag(
         external_search_used=result.get("external_search_used", False),
         citations=result["citations"],
         web_sources=result["web_sources"],
+        images=result.get("images", []),
         follow_up_questions=result.get("follow_up_questions", []),
         selection_summary=result.get("selection_summary"),
         chat_id=chat.id if chat else None,

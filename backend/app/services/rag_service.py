@@ -53,6 +53,85 @@ class RAGService:
         self._comparator = None
 
     @staticmethod
+    def _attachment_passages(query: str, attachments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Select query-relevant windows from uploads so long files are not silently truncated."""
+        stop_words = {
+            "the", "and", "for", "with", "from", "that", "this", "what", "which", "when",
+            "where", "does", "have", "has", "about", "based", "file", "document", "image",
+            "please", "could", "would", "explain", "summarize", "tell", "show", "using",
+        }
+        query_terms = {
+            token.lower() for token in re.findall(r"[A-Za-z0-9][A-Za-z0-9_-]{2,}", query)
+            if token.lower() not in stop_words
+        }
+        candidates = []
+        per_file = []
+        max_window = 2600
+
+        for file_index, attachment in enumerate(attachments):
+            name = str(attachment.get("name") or "Attached Document")[:500]
+            text = str(attachment.get("text") or "")[:150000]
+            if not text.strip():
+                continue
+            chunks = []
+            offset = 0
+            while offset < len(text):
+                end = min(offset + max_window, len(text))
+                if end < len(text):
+                    boundary = text.rfind("\n", offset + max_window // 2, end)
+                    if boundary < offset:
+                        boundary = text.rfind(" ", offset + max_window // 2, end)
+                    if boundary > offset:
+                        end = boundary
+                chunk = text[offset:end].strip()
+                if chunk:
+                    lowered = chunk.lower()
+                    score = sum(1 for term in query_terms if re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])", lowered))
+                    page_matches = re.findall(r"--- Page (\d+) ---", text[:offset])
+                    page_number = int(page_matches[-1]) if page_matches else 1
+                    entry = (score, file_index, len(chunks), name, chunk, len(text), page_number)
+                    chunks.append(entry)
+                    candidates.append(entry)
+                offset = max(end, offset + 1)
+            if chunks:
+                per_file.append(max(chunks, key=lambda row: row[0]))
+
+        # Keep one best passage from each selected file, then fill remaining context
+        # slots by query overlap. Sorting back to source order preserves reading flow.
+        selected = list(per_file[:8])
+        selected_keys = {(row[1], row[2]) for row in selected}
+        for entry in sorted(candidates, key=lambda row: row[0], reverse=True):
+            key = (entry[1], entry[2])
+            if key not in selected_keys:
+                selected.append(entry)
+                selected_keys.add(key)
+            if len(selected) >= 8:
+                break
+        selected.sort(key=lambda row: (row[1], row[2]))
+
+        passages = []
+        for _score, file_index, chunk_index, name, chunk, full_length, page_number in selected:
+            page_count = attachments[file_index].get("page_count") or 1
+            passages.append({
+                "source_type": "attached_document",
+                "source_id": f"attachment_{file_index + 1}_{chunk_index + 1}",
+                "document": name,
+                "document_name": name,
+                "title": f"Attached File: {name}",
+                "page": page_number,
+                "page_number": page_number,
+                "page_count": page_count,
+                "section": f"Uploaded content segment {chunk_index + 1} ({full_length} characters total)",
+                "score": 1.0,
+                "final_score": 1.0,
+                "rerank_score": 1.0,
+                "chunk_text": chunk,
+                "snippet": chunk[:350] + ("..." if len(chunk) > 350 else ""),
+                "authority_tier": "tier_user_attachment",
+            })
+        return passages
+
+    @staticmethod
     def split_question_aspects(query: str) -> List[str]:
         """Split only clear, independently answerable asks; keep ordinary prose intact."""
         pieces = re.split(
@@ -252,15 +331,17 @@ class RAGService:
         query: str,
         chat_history: Optional[List[Dict[str, Any]]] = None,
         user: Optional[Any] = None,
+        attachments: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         """Synchronous execution of the verified RAG pipeline with enterprise security enforcement."""
         # 0. Resolve user identity and role
         user_role = getattr(user, "role", "consultant") if user else "consultant"
         user_id = getattr(user, "id", None) if user else None
         user_email = getattr(user, "email", None) if user else None
+        has_attachments = bool(attachments)
 
         # 1. Conversational & Sentimental Inquiries (Routed to Dedicated Key)
-        if sap_classifier.is_conversational_or_greeting(query):
+        if not has_attachments and sap_classifier.is_conversational_or_greeting(query):
             logger.info(f"Routing conversational query '{query}' to dedicated conversational LLM tier.")
             conversational_reply = llm_service.generate_conversational_reply(query, chat_history=chat_history)
             follow_ups = followup_service.generate_starter_followups()
@@ -288,33 +369,36 @@ class RAGService:
         is_follow_up = resolution.get("is_follow_up", False)
         resolved_query = resolution.get("resolved_query", query).strip()
         cleaned_query = resolved_query
+        visual_requested = web_search_service.wants_visuals(query)
+        visual_context = " ".join(
+            str(item.get("content", "")) for item in (chat_history or [])[-4:]
+        )
 
         # 3. Strict SAP Domain Classifier Enforcement
-        # If it's a verified follow-up to an existing SAP topic, evaluate resolved_query;
-        # otherwise evaluate the raw query. Unrelated non-SAP queries are rejected automatically.
+        # If user provided attachments, bypass scope rejection: query is analyzed against the uploaded documents.
         target_check_query = cleaned_query if is_follow_up else query.strip()
-        is_sap, refusal_msg = sap_classifier.classify(target_check_query)
-
-        if not is_sap:
-            logger.info(f"Query rejected by SAP classifier: '{query}' -> {refusal_msg}")
-            return {
-                "answer": refusal_msg,
-                "source_type": "refusal",
-                "grounding_score": 0.0,
-                "is_in_rag_pipeline": False,
-                "kb_score": 0.0,
-                "web_score": 0.0,
-                "winning_score": 0.0,
-                "selected_source": "refusal",
-                "verification_status": "rejected",
-                "internal_evidence_confidence": 0.0,
-                "selected_evidence_quality": 0.0,
-                "external_search_used": False,
-                "citations": [],
-                "web_sources": [],
-                "follow_up_questions": [],
-                "selection_summary": "Query rejected as outside SAP scope."
-            }
+        if not has_attachments:
+            is_sap, refusal_msg = sap_classifier.classify(target_check_query)
+            if not is_sap:
+                logger.info(f"Query rejected by SAP classifier: '{query}' -> {refusal_msg}")
+                return {
+                    "answer": refusal_msg,
+                    "source_type": "refusal",
+                    "grounding_score": 0.0,
+                    "is_in_rag_pipeline": False,
+                    "kb_score": 0.0,
+                    "web_score": 0.0,
+                    "winning_score": 0.0,
+                    "selected_source": "refusal",
+                    "verification_status": "rejected",
+                    "internal_evidence_confidence": 0.0,
+                    "selected_evidence_quality": 0.0,
+                    "external_search_used": False,
+                    "citations": [],
+                    "web_sources": [],
+                    "follow_up_questions": [],
+                    "selection_summary": "Query rejected as outside SAP scope."
+                }
 
         # 3. Retrieve from Internal Knowledge Base
         # Retrieve independently for clear subquestions, then merge/deduplicate evidence.
@@ -424,6 +508,11 @@ class RAGService:
 
         selected_passages = self._ensure_aspect_coverage(selected_passages, top_kb_chunks, aspect_results)
 
+        if has_attachments:
+            attachment_passages = self._attachment_passages(cleaned_query, attachments)
+            selected_passages = attachment_passages + selected_passages
+            selected_source_type = "attached_document"
+
         # Do not discard supported subparts/calculations because another aspect is weak.
         if selected_source_type in ("insufficient", "none"):
             selected_passages = top_kb_chunks or web_results
@@ -482,7 +571,17 @@ class RAGService:
         web_sources = []
         for p in selected_passages:
             src_type = p.get("source_type") or ("web" if p.get("url") else "knowledge_base")
-            if src_type == "knowledge_base":
+            if src_type == "attached_document":
+                citations.append({
+                    "source_type": "attached_document",
+                    "chunk_id": "att-doc",
+                    "document": p.get("document_name") or p.get("document") or "Attached Document",
+                    "page": 1,
+                    "section": p.get("section") or "Attached Document Content",
+                    "score": 1.0,
+                    "snippet": (p.get("snippet") or p.get("chunk_text") or "")[:350],
+                })
+            elif src_type == "knowledge_base":
                 citations.append(self._format_kb_citation(p))
             elif src_type == "github_repo":
                 repo_name = p.get("document_name") or f"github:{p.get('repo_name', 'repository')}"
@@ -514,6 +613,15 @@ class RAGService:
 
         citations = self._dedupe_citations(citations)
 
+        # Visual retrieval is deliberately independent from textual evidence selection and
+        # grounding: an image can illustrate an answer but never proves a technical claim.
+        images = []
+        if visual_requested:
+            try:
+                images = web_search_service.search_sap_images(cleaned_query, visual_context)
+            except Exception as exc:
+                logger.warning("Tavily image retrieval failed without affecting answer delivery: %s", exc)
+
         comparison_summary = self._comparison_summary(comp_result) if comp_result else {
             "source_scores": {"knowledge_base": round(float(document_match_score), 4)},
             "comparison_audit": None,
@@ -533,9 +641,10 @@ class RAGService:
             "verification_status": verification_status,
             "internal_evidence_confidence": internal_conf,
             "selected_evidence_quality": selected_quality,
-            "external_search_used": should_trigger_tavily,
+            "external_search_used": should_trigger_tavily or bool(images),
             "citations": citations,
             "web_sources": web_sources,
+            "images": images,
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
             "model_used": getattr(llm_service, "last_model_used", "openai/gpt-oss-120b"),
@@ -552,6 +661,7 @@ class RAGService:
         query: str,
         chat_history: Optional[List[Dict[str, Any]]] = None,
         user: Optional[Any] = None,
+        attachments: Optional[List[Dict[str, Any]]] = None,
     ) -> Generator[Dict[str, Any], None, None]:
         """
         Progressive Streaming Pipeline for SAP BRIM Knowledge Assistant with Security Enforcement.
@@ -565,9 +675,10 @@ class RAGService:
         user_role = getattr(user, "role", "consultant") if user else "consultant"
         user_id = getattr(user, "id", None) if user else None
         user_email = getattr(user, "email", None) if user else None
+        has_attachments = bool(attachments)
 
         # STAGE 0: Conversational & Sentimental Inquiries (Dedicated Key)
-        if sap_classifier.is_conversational_or_greeting(query):
+        if not has_attachments and sap_classifier.is_conversational_or_greeting(query):
             logger.info(f"Stream routing conversational query '{query}' to dedicated conversational LLM tier.")
             yield {
                 "type": "status",
@@ -615,43 +726,55 @@ class RAGService:
         is_follow_up = resolution.get("is_follow_up", False)
         resolved_query = resolution.get("resolved_query", query).strip()
         cleaned_query = resolved_query
+        visual_requested = web_search_service.wants_visuals(query)
+        visual_context = " ".join(
+            str(item.get("content", "")) for item in (chat_history or [])[-4:]
+        )
 
         # Scope Verification via SAPClassifier
+        # If user uploaded attachments, bypass refusal gate: user is querying their uploaded documents
         target_check_query = cleaned_query if is_follow_up else query.strip()
-        is_sap, refusal_msg = sap_classifier.classify(target_check_query)
+        if not has_attachments:
+            is_sap, refusal_msg = sap_classifier.classify(target_check_query)
+            if not is_sap:
+                logger.info(f"Stream query rejected by SAP classifier: '{query}' -> {refusal_msg}")
+                yield {
+                    "type": "token",
+                    "content": refusal_msg
+                }
+                yield {
+                    "type": "done",
+                    "answer": refusal_msg,
+                    "source_type": "refusal",
+                    "grounding_score": 0.0,
+                    "is_in_rag_pipeline": False,
+                    "kb_score": 0.0,
+                    "web_score": 0.0,
+                    "winning_score": 0.0,
+                    "selected_source": "refusal",
+                    "verification_status": "rejected",
+                    "internal_evidence_confidence": 0.0,
+                    "selected_evidence_quality": 0.0,
+                    "external_search_used": False,
+                    "citations": [],
+                    "web_sources": [],
+                    "follow_up_questions": [],
+                    "selection_summary": "Query rejected as outside SAP scope."
+                }
+                return
 
-        if not is_sap:
-            logger.info(f"Stream query rejected by SAP classifier: '{query}' -> {refusal_msg}")
+        if has_attachments:
             yield {
-                "type": "token",
-                "content": refusal_msg
+                "type": "status",
+                "stage": "document_analysis",
+                "message": f"Analyzing {len(attachments)} attached document(s)..."
             }
-            yield {
-                "type": "done",
-                "answer": refusal_msg,
-                "source_type": "refusal",
-                "grounding_score": 0.0,
-                "is_in_rag_pipeline": False,
-                "kb_score": 0.0,
-                "web_score": 0.0,
-                "winning_score": 0.0,
-                "selected_source": "refusal",
-                "verification_status": "rejected",
-                "internal_evidence_confidence": 0.0,
-                "selected_evidence_quality": 0.0,
-                "external_search_used": False,
-                "citations": [],
-                "web_sources": [],
-                "follow_up_questions": [],
-                "selection_summary": "Query rejected as outside SAP scope."
-            }
-            return
 
         # STAGE 2: Internal Retrieval
         yield {
             "type": "status",
             "stage": "retrieval",
-            "message": "Searching internal SAP documentation..."
+            "message": "Thinking..."
         }
 
         top_kb_chunks, document_match_score, aspect_results = self._retrieve_aspect_evidence(
@@ -662,7 +785,7 @@ class RAGService:
         yield {
             "type": "status",
             "stage": "assessing_evidence",
-            "message": "Assessing internal evidence confidence..."
+            "message": "Thinking..."
         }
 
         internal_confidence_data = evidence_selection_service.compute_internal_confidence(
@@ -687,11 +810,11 @@ class RAGService:
 
         web_results = []
         if should_trigger_tavily and settings.WEB_FALLBACK_ENABLED and not auto_compare_trigger:
-            # Emit web search progress event ONLY if Tavily was triggered
+            # Emit progress event ONLY if Tavily was triggered
             yield {
                 "type": "status",
                 "stage": "web_search",
-                "message": "Searching approved SAP sources (help.sap.com)..."
+                "message": "Thinking..."
             }
             try:
                 web_results = web_search_service.search_sap_authoritative(cleaned_query)
@@ -703,7 +826,7 @@ class RAGService:
         yield {
             "type": "status",
             "stage": "evidence_selection",
-            "message": "Comparing and selecting strongest evidence..."
+            "message": "Thinking..."
         }
 
         comp_result = {}
@@ -713,7 +836,7 @@ class RAGService:
             yield {
                 "type": "status",
                 "stage": "multi_source_search",
-                "message": "Comparing document, approved GitHub repository, and SAP web evidence..."
+                "message": "Thinking..."
             }
             from backend.app.retrieval.multi_source_compare import multi_source_comparator
             comp_result = multi_source_comparator.execute_multi_source_comparison(
@@ -756,6 +879,11 @@ class RAGService:
 
         selected_passages = self._ensure_aspect_coverage(selected_passages, top_kb_chunks, aspect_results)
 
+        if has_attachments:
+            attachment_passages = self._attachment_passages(cleaned_query, attachments)
+            selected_passages = attachment_passages + selected_passages
+            selected_source_type = "attached_document"
+
         if selected_source_type in ("insufficient", "none"):
             selected_passages = top_kb_chunks or web_results
             selected_source_type = selected_passages[0].get("source_type", "knowledge_base") if selected_passages else "insufficient"
@@ -769,15 +897,16 @@ class RAGService:
         yield {
             "type": "status",
             "stage": "generating",
-            "message": "Generating technical response..."
+            "message": "Generating response..."
         }
 
-        # Stream answer tokens live from LLM directly to client
+        # Stream answer tokens live from LLM directly to client as they are generated
         token_buffer = []
         for token in llm_service.stream_answer(
             cleaned_query, selected_passages, source_type=selected_source_type
         ):
             token_buffer.append(token)
+            yield {"type": "token", "content": token}
 
         final_answer = "".join(token_buffer).strip()
         if not final_answer:
@@ -785,12 +914,14 @@ class RAGService:
             final_answer = llm_service.generate_answer(
                 cleaned_query, selected_passages, source_type=selected_source_type
             )
+            if final_answer:
+                yield {"type": "token", "content": final_answer}
 
         # STAGE 6: Instant Claim-Level Grounding Verification
         yield {
             "type": "status",
             "stage": "verifying_claims",
-            "message": "Verifying technical claims against evidence..."
+            "message": "Finalizing response..."
         }
         verification = grounding_service.verify_answer(
             cleaned_query, final_answer, selected_passages, source_type=selected_source_type
@@ -817,11 +948,6 @@ class RAGService:
                 final_grounding_score = repaired_verification.get("grounding_score", final_grounding_score)
                 verification_status = repaired_verification.get("verification_status", "partial")
 
-        # Stream only after evidence verification/repair so unsupported first-draft
-        # tokens cannot escape before the grounded answer is finalized.
-        for start in range(0, len(final_answer), 96):
-            yield {"type": "token", "content": final_answer[start:start + 96]}
-
         # STAGE 7: Recommend Exactly 3 Follow-Up Questions (instant, <1ms)
         follow_ups = followup_service.generate_followup_questions(
             cleaned_query, final_answer, selected_passages
@@ -832,7 +958,17 @@ class RAGService:
         web_sources = []
         for p in selected_passages:
             src_type = p.get("source_type") or ("web" if p.get("url") else "knowledge_base")
-            if src_type == "knowledge_base":
+            if src_type == "attached_document":
+                citations.append({
+                    "source_type": "attached_document",
+                    "chunk_id": "att-doc",
+                    "document": p.get("document_name") or p.get("document") or "Attached Document",
+                    "page": 1,
+                    "section": p.get("section") or "Attached Document Content",
+                    "score": 1.0,
+                    "snippet": (p.get("snippet") or p.get("chunk_text") or "")[:350],
+                })
+            elif src_type == "knowledge_base":
                 citations.append(self._format_kb_citation(p))
             elif src_type == "github_repo":
                 citations.append({
@@ -859,6 +995,18 @@ class RAGService:
 
         citations = self._dedupe_citations(citations)
 
+        images = []
+        if visual_requested:
+            yield {
+                "type": "status",
+                "stage": "image_search",
+                "message": "Finding relevant SAP technical visuals..."
+            }
+            try:
+                images = web_search_service.search_sap_images(cleaned_query, visual_context)
+            except Exception as exc:
+                logger.warning("Tavily image retrieval failed without affecting answer delivery: %s", exc)
+
         comparison_summary = self._comparison_summary(comp_result) if comp_result else {
             "source_scores": {"knowledge_base": round(float(document_match_score), 4)},
             "comparison_audit": None,
@@ -879,9 +1027,10 @@ class RAGService:
             "verification_status": verification_status,
             "internal_evidence_confidence": internal_conf,
             "selected_evidence_quality": selected_quality,
-            "external_search_used": should_trigger_tavily,
+            "external_search_used": should_trigger_tavily or bool(images),
             "citations": citations,
             "web_sources": web_sources,
+            "images": images,
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
             "comparison_audit": comparison_summary["comparison_audit"]

@@ -10,7 +10,7 @@ const steps = [
   [Search, 'Retrieve', 'Dense vector similarity (MiniLM-L6) and BM25 lexical search run in parallel over pre-indexed document chunks.', 'Hybrid dense & lexical retrieval.'],
   [Boxes, 'Context & Rerank', 'A cross-encoder model scores candidate chunks, elevating the most contextually relevant technical excerpts.', 'Precision reranking.'],
   [Sparkles, 'Generate & Stream', 'The LLM streams tokens via SSE with ChatGPT-style thinking and bouncing animation indicators.', 'Real-time interactive streaming.'],
-  [ShieldCheck, 'Ground & Cite', 'The response is checked for hallucination, assigned a grounding score, and annotated with exact document sources.', 'Enterprise verification.'],
+  [ShieldCheck, 'Ground & Verify', 'The response is checked for hallucination against enterprise domain boundaries with automated quality validation.', 'Enterprise verification.'],
 ] as const;
 
 export const HowItWorksPage: React.FC = () => {
@@ -29,7 +29,7 @@ export const HowItWorksPage: React.FC = () => {
             to <span>grounded answer.</span>
           </h1>
           <p>
-            Clyptusap.ai searches its indexed SAP knowledge base for relevant technical documentation, uses that context to generate answers, and presents verifiable sources.
+            Clyptusap.ai searches its indexed SAP knowledge base for relevant technical documentation and uses that context to generate grounded enterprise answers under strict administrative control.
           </p>
           <a className="scroll-hint inner-scroll" href="#process">
             FOLLOW THE ARCHITECTURE <ArrowDown size={14} />
@@ -39,9 +39,10 @@ export const HowItWorksPage: React.FC = () => {
             <ArrowUpRight size={16} />
             <span><Search size={17} /> Hybrid Retrieval</span>
             <ArrowUpRight size={16} />
-            <span><Sparkles size={17} /> Answer + Citations</span>
+            <span><Sparkles size={17} /> Verified Answer</span>
           </div>
         </section>
+
 
         <section className="section section-wrap how-process" id="process">
           <span className="eyebrow">FROM QUESTION TO RESPONSE</span>

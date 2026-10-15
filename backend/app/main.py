@@ -14,6 +14,7 @@ from backend.app.api.messages import router as messages_router
 from backend.app.api.rag import router as rag_router
 from backend.app.api.admin import router as admin_router
 from backend.app.api.rag_inspect import router as rag_inspect_router
+from backend.app.api.documents import router as documents_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("main")
@@ -58,6 +59,7 @@ app.include_router(messages_router, prefix=settings.API_V1_STR)
 app.include_router(rag_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(rag_inspect_router, prefix=settings.API_V1_STR)
+app.include_router(documents_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Info"])
 def root():

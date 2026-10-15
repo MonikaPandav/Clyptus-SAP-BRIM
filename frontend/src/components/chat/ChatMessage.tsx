@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Copy, Check, Eye, RotateCcw, Sparkles, ArrowRight } from 'lucide-react';
+import { User, Copy, Check, Eye, RotateCcw, Sparkles, ArrowRight, Image as ImageIcon, ExternalLink, FileText } from 'lucide-react';
 import type { Message } from '../../types';
 import { GroundingScoreBadge } from './GroundingScoreBadge';
 import { SourceTypeBadge } from './SourceTypeBadge';
 import { CitationModal } from './CitationModal';
+import { useAuth } from '../../context/AuthContext';
 import iconOnly from '../../assets/clyptusap-icon.png';
 
 interface ChatMessageProps {
@@ -16,6 +17,22 @@ interface ChatMessageProps {
   onSelectFollowUp?: (question: string) => void;
 }
 
+const parseUserMessageContent = (content: string) => {
+  const match = content.match(/^\[Attached:\s*(.+?)\]\n\n([\s\S]*)$/);
+  if (match) {
+    const rawList = match[1].split(', ');
+    const attachments = rawList.map((item) => {
+      const pageMatch = item.match(/^(.*?)\s*\((\d+)\s*pages?\)$/i);
+      if (pageMatch) {
+        return { name: pageMatch[1].trim(), details: `${pageMatch[2]} pages` };
+      }
+      return { name: item.trim(), details: '' };
+    });
+    return { attachments, text: match[2] };
+  }
+  return { attachments: null, text: content };
+};
+
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   isStreaming = false,
@@ -25,12 +42,26 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showSourcesModal, setShowSourcesModal] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+  const { user } = useAuth();
+  const isAdmin = Boolean(user?.is_admin);
 
   const isUser = message.role === 'user';
+  const { attachments: parsedAttachments, text: cleanUserContent } = isUser
+    ? parseUserMessageContent(message.content)
+    : { attachments: null, text: message.content };
+
+  const effectiveAttachments = message.attachments && message.attachments.length > 0
+    ? message.attachments.map((a) => ({ name: a.name, details: a.page_count ? `${a.page_count} pages` : '' }))
+    : parsedAttachments;
+
+  const displayContent = isUser ? cleanUserContent : message.content;
+
   const hasCitations = !!(message.citations && message.citations.length > 0);
   const hasWebSources = !!(message.web_sources && message.web_sources.length > 0);
   const hasSources = !isUser && (hasCitations || hasWebSources);
   const sourceCount = (message.citations?.length || 0) + (message.web_sources?.length || 0);
+  const images = (message.images || []).filter((image) => !failedImages.has(image.url));
 
   const handleCopy = () => {
     if (!message.content) return;
@@ -67,7 +98,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   {isUser ? 'You' : 'Clyptus.AI'}
                 </span>
 
-                {!isUser && !isStreaming && (
+                {!isUser && !isStreaming && isAdmin && (
                   <>
                     <SourceTypeBadge sourceType={message.source_type} />
                     {message.source_type !== 'refusal' && message.source_type !== 'conversational' && (
@@ -118,7 +149,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               /* Pipeline Status Indicator with Company Logo Orange Accents */
               <div className="flex items-center gap-2.5 py-1.5 text-slate-600 dark:text-slate-300 text-sm select-none">
                 <span className="font-medium text-orange-500 dark:text-orange-400 animate-pulse">
-                  {streamingStage || 'Thinking...'}
+                  {isAdmin ? (streamingStage || 'Thinking...') : 'Thinking...'}
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <span
@@ -137,6 +168,23 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             ) : (
               <div className="prose-sap text-sm text-slate-800 dark:text-slate-200 leading-relaxed break-words">
+                {isUser && effectiveAttachments && effectiveAttachments.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3 not-prose">
+                    {effectiveAttachments.map((att, idx) => (
+                      <div
+                        key={idx}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-50/90 dark:bg-[#13131d] border border-orange-200 dark:border-orange-500/30 text-xs text-orange-950 dark:text-orange-200 shadow-xs"
+                      >
+                        <span className="p-1 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+                          <FileText className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="font-semibold">{att.name}</span>
+                        {att.details && <span className="text-[10px] text-slate-500 dark:text-slate-400">({att.details})</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -170,7 +218,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     },
                   }}
                 >
-                  {message.content}
+                  {displayContent}
                 </ReactMarkdown>
 
                 {/* Streaming Cursor */}
@@ -178,6 +226,47 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   <span className="inline-block w-1.5 h-4 ml-0.5 bg-orange-500 animate-pulse align-middle rounded-xs" />
                 )}
               </div>
+            )}
+
+            {!isUser && !isStreaming && images.length > 0 && (
+              <section className="mt-5 pt-4 border-t border-slate-200 dark:border-[#181824]" aria-label="Relevant images">
+                <div className="mb-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <ImageIcon className="h-3.5 w-3.5 text-orange-500" />
+                  <span>Relevant images</span>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {images.map((image) => (
+                    <figure key={image.url} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm dark:border-[#242434] dark:bg-[#0b0b12]">
+                      <a
+                        href={image.source_url || image.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open source for ${image.alt_text || image.description || 'image'}`}
+                        className="block bg-slate-100 dark:bg-[#08080c]"
+                      >
+                        <img
+                          src={image.url}
+                          alt={image.alt_text || image.description || 'Relevant SAP technical visual'}
+                          loading="lazy"
+                          onError={() => setFailedImages((previous) => new Set(previous).add(image.url))}
+                          className="h-48 w-full object-contain transition-opacity hover:opacity-90"
+                        />
+                      </a>
+                      {(image.description || (isAdmin && (image.source_title || image.source_url))) && (
+                        <figcaption className="space-y-1.5 p-3 text-xs text-slate-600 dark:text-slate-300">
+                          {image.description && <p>{image.description}</p>}
+                          {isAdmin && image.source_url && (
+                            <a href={image.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-orange-600 hover:underline dark:text-orange-400">
+                              <span>{image.source_title || 'View image source'}</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
+                </div>
+              </section>
             )}
 
             {/* Interrupted / Error retry banner */}
@@ -198,8 +287,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             )}
 
-            {/* Sources button below content */}
-            {!isUser && !isStreaming && message.source_type !== 'refusal' && (
+            {/* Sources button below content - strictly restricted to administrator */}
+            {!isUser && !isStreaming && isAdmin && message.source_type !== 'refusal' && (
               <div className="mt-3.5 pt-2 flex items-center gap-2">
                 <button
                   onClick={() => setShowSourcesModal(true)}
@@ -208,7 +297,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                       ? 'bg-orange-50/90 dark:bg-[#12121e] hover:bg-orange-100 dark:hover:bg-[#1a1a2c] text-orange-950 dark:text-orange-200 border border-orange-200 dark:border-orange-500/35 hover:border-orange-400 dark:hover:border-orange-500/60'
                       : 'bg-slate-100 dark:bg-slate-900/70 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                   }`}
-                  title="Click to view all verified sources & citations"
+                  title="Admin Only: View internal sources & citations"
                 >
                   <Eye className="w-3.5 h-3.5 text-orange-500 group-hover:scale-110 transition-transform" />
                   <span className="font-semibold">Sources ({sourceCount})</span>
@@ -252,13 +341,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         </div>
       </div>
 
-      {/* Citation Detail Modal */}
-      <CitationModal
-        citations={message.citations}
-        webSources={message.web_sources}
-        isOpen={showSourcesModal}
-        onClose={() => setShowSourcesModal(false)}
-      />
+      {/* Citation Detail Modal - only rendered for admin */}
+      {isAdmin && (
+        <CitationModal
+          citations={message.citations}
+          webSources={message.web_sources}
+          isOpen={showSourcesModal}
+          onClose={() => setShowSourcesModal(false)}
+        />
+      )}
     </>
   );
 };

@@ -78,6 +78,111 @@ class WebSearchService:
         """Normalizes query for deterministic caching."""
         return re.sub(r"[^a-zA-Z0-9\s]", "", query.lower()).strip()
 
+    @staticmethod
+    def wants_visuals(query: str) -> bool:
+        """Return true only when the user has explicitly asked for visual material."""
+        return bool(re.search(
+            r"\b(image|images|diagram|architecture\s+diagram|visual|illustration|"
+            r"screenshot|screen\s*shot|process\s*flow|flowchart|workflow\s+diagram)\b",
+            query or "",
+            flags=re.IGNORECASE,
+        ))
+
+    def build_image_query(self, query: str, conversation_context: Optional[str] = None) -> str:
+        """Build a focused Tavily query without asking the model to invent search terms."""
+        base = self._clean_text(query)
+        context = self._clean_text(conversation_context or "")
+        # Keep relevant prior SAP terms, but cap the request so an entire chat is never sent to Tavily.
+        context_terms = " ".join(re.findall(r"\b(?:SAP|BRIM|SOM|FI-CA|CI|Convergent\s+\w+|billable\s+item)\b", context, re.I))
+        if "sap" not in base.lower():
+            base = f"SAP BRIM {base}"
+        visual_hint = "diagram" if re.search(r"diagram|architecture|flow|workflow", base, re.I) else "technical illustration"
+        return f"{base} {context_terms} {visual_hint}".strip()[:500]
+
+    @staticmethod
+    def _safe_http_url(value: Any) -> str:
+        """Only return absolute HTTP(S) URLs to clients; never pass executable schemes through."""
+        try:
+            url = str(value or "").strip()
+            parts = urllib.parse.urlsplit(url)
+            if parts.scheme.lower() not in {"http", "https"} or not parts.netloc:
+                return ""
+            return url
+        except (TypeError, ValueError):
+            return ""
+
+    def _normalize_images(self, response: Any, query: str, limit: int) -> List[Dict[str, Any]]:
+        """Normalize Tavily's top-level and result-attached image shapes defensively."""
+        if not isinstance(response, dict):
+            return []
+        candidates: List[tuple[Any, Dict[str, Any]]] = []
+        for image in response.get("images") or response.get("image_results") or []:
+            candidates.append((image, {}))
+        for result in response.get("results") or []:
+            if not isinstance(result, dict):
+                continue
+            for image in result.get("images") or result.get("image_results") or []:
+                candidates.append((image, result))
+
+        terms = {t for t in re.findall(r"[a-z0-9]{3,}", query.lower()) if t not in {"with", "show", "explain", "image", "images", "diagram", "technical"}}
+        images: List[Dict[str, Any]] = []
+        seen = set()
+        for raw, parent in candidates:
+            raw = {"url": raw} if isinstance(raw, str) else raw
+            if not isinstance(raw, dict):
+                continue
+            url = self._safe_http_url(raw.get("url") or raw.get("image_url") or raw.get("src"))
+            if not url or url in seen:
+                continue
+            source_url = self._safe_http_url(raw.get("source_url") or raw.get("source") or raw.get("page_url") or parent.get("url"))
+            title = self._clean_text(raw.get("source_title") or raw.get("title") or parent.get("title"))
+            description = self._clean_text(raw.get("description") or raw.get("image_description") or raw.get("alt") or parent.get("content"))
+            alt_text = self._clean_text(raw.get("alt") or raw.get("alt_text") or description or title)
+            context = f"{title} {description} {source_url}".lower()
+            # Reject obvious unrelated assets but do not require descriptions, which Tavily may omit.
+            if terms and context and not any(term in context for term in terms) and "sap" not in context and "brim" not in context:
+                continue
+            seen.add(url)
+            images.append({
+                "url": url,
+                "description": description or None,
+                "alt_text": alt_text or "Relevant SAP technical visual",
+                "source_url": source_url or None,
+                "source_title": title or None,
+                "relevance_score": None,
+            })
+            if len(images) >= limit:
+                break
+        return images
+
+    def search_sap_images(self, query: str, conversation_context: Optional[str] = None, max_images: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Retrieve relevant visuals without changing evidence selection or grounding scores."""
+        if not settings.WEB_FALLBACK_ENABLED or not self.client or not self.wants_visuals(query):
+            return []
+        limit = max(1, min(max_images or settings.TAVILY_MAX_IMAGES, 8))
+        image_query = self.build_image_query(query, conversation_context)
+        cache_key = f"images:{self._normalize_query(image_query)}"
+        cached = self._cache.get(cache_key)
+        if cached and time.time() - cached["timestamp"] < self._cache_ttl:
+            return cached["results"][:limit]
+        try:
+            response = self.client.search(
+                query=image_query,
+                search_depth="basic",
+                max_results=max(limit * 2, settings.TAVILY_MAX_RESULTS),
+                include_answer=False,
+                include_raw_content=False,
+                include_images=True,
+                include_image_descriptions=True,
+                include_domains=APPROVED_SAP_DOMAINS,
+            )
+            images = self._normalize_images(response, image_query, limit)
+        except Exception as exc:
+            logger.warning("[Tavily] Image search failed: %s", exc)
+            images = []
+        self._cache[cache_key] = {"timestamp": time.time(), "results": images}
+        return images
+
     def _fallback_sap_search(self, query: str, limit: int) -> List[Dict[str, Any]]:
         """
         Direct fallback search querying official SAP documentation (help.sap.com).

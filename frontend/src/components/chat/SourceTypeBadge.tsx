@@ -1,12 +1,21 @@
 import React from 'react';
-import { Database, Globe, Layers, AlertCircle, Sparkles, GitBranch } from 'lucide-react';
+import { Database, Globe, Layers, AlertCircle, Sparkles, GitBranch, FileText } from 'lucide-react';
 
 interface SourceTypeBadgeProps {
-  sourceType?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
+  sourceType?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational' | 'attached_document';
 }
 
 export const SourceTypeBadge: React.FC<SourceTypeBadgeProps> = ({ sourceType }) => {
   if (!sourceType) return null;
+
+  if (sourceType === 'attached_document') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30">
+        <FileText className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+        <span>Attached Document Analysis</span>
+      </span>
+    );
+  }
 
   if (sourceType === 'conversational') {
     return (

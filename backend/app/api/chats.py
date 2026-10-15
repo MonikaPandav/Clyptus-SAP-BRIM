@@ -1,15 +1,21 @@
+import logging
 from typing import List, Optional
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from starlette.concurrency import run_in_threadpool
 
 from backend.app.database import get_db
 from backend.app.models.user import User
 from backend.app.models.chat import Chat
 from backend.app.models.message import Message
 from backend.app.schemas.chat import ChatCreate, ChatUpdate, ChatResponse, ChatListItem
-from backend.app.security.auth import get_current_user
+from backend.app.schemas.message import DocumentExtractResponse
+from backend.app.services.document_extractor import extract_document
+from backend.app.security.auth import get_current_user, get_optional_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
 
@@ -148,3 +154,36 @@ def delete_chat(
     db.delete(chat)
     db.commit()
     return None
+
+@router.post("/extract-document", response_model=DocumentExtractResponse)
+async def extract_chat_document(
+    file: UploadFile = File(...),
+    current_user: Optional[User] = Depends(get_optional_current_user),
+):
+    """
+    Extracts text and page metadata from uploaded PDF, Word (DOCX), PNG, or plain text documents.
+    Enforces maximum file size limit of 25MB and returns structured content for question answering.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No file uploaded")
+
+    content = await file.read()
+    if len(content) > 25 * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size exceeds the 25MB limit."
+        )
+
+    try:
+        extracted = await run_in_threadpool(extract_document, file.filename, content)
+        if not extracted.get("text", "").strip():
+            raise ValueError(f"No readable text could be extracted from '{file.filename}'.")
+        return DocumentExtractResponse(**extracted)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error processing document {file.filename}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to extract document contents. Please try another supported file."
+        )

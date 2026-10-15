@@ -18,3 +18,5 @@ class Message(Base):
     chat = relationship("Chat", back_populates="messages")
     citations = relationship("Citation", back_populates="message", cascade="all, delete-orphan")
     web_sources = relationship("WebSource", back_populates="message", cascade="all, delete-orphan")
+    images = relationship("WebImage", back_populates="message", cascade="all, delete-orphan")
+    uploaded_attachments = relationship("UploadedAttachment", back_populates="message", cascade="all, delete-orphan")

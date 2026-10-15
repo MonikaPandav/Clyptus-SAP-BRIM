@@ -1,10 +1,46 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, Field, ConfigDict
-from backend.app.schemas.citation import CitationResponse, WebSourceResponse
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from backend.app.schemas.citation import CitationResponse, WebSourceResponse, WebImageResponse
+
+
+class DocumentAttachment(BaseModel):
+    name: str = Field(..., min_length=1, max_length=500)
+    file_type: Optional[str] = Field(default="pdf", max_length=32)
+    size_bytes: Optional[int] = 0
+    page_count: Optional[int] = None
+    text: str = Field(..., min_length=1, max_length=150000)
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        value = value.replace("\\", "/").split("/")[-1].strip()
+        if not value:
+            raise ValueError("Attachment filename cannot be empty.")
+        return value
+
+
+class DocumentExtractResponse(BaseModel):
+    filename: str
+    file_type: str
+    size_bytes: int
+    page_count: int
+    char_count: int
+    preview: str
+    text: str
+
+
+class UploadedAttachmentInfo(BaseModel):
+    name: str
+    file_type: str
+    page_count: Optional[int] = None
+    size_bytes: Optional[int] = None
+
 
 class MessageCreate(BaseModel):
-    content: str = Field(..., min_length=1, max_length=10000)
+    content: str = Field(..., min_length=1, max_length=200000)
+    attachments: Optional[List[DocumentAttachment]] = Field(default=None, max_length=5)
+
 
 class MessageResponse(BaseModel):
     id: str
@@ -24,6 +60,8 @@ class MessageResponse(BaseModel):
     created_at: datetime
     citations: List[CitationResponse] = []
     web_sources: List[WebSourceResponse] = []
+    images: List[WebImageResponse] = []
     follow_up_questions: List[str] = []
+    attachments: Optional[List[UploadedAttachmentInfo]] = None
 
     model_config = ConfigDict(from_attributes=True)

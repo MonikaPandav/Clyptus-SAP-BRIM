@@ -1,4 +1,4 @@
-import type { User, Chat, Message, Citation, WebSource } from '../types';
+import type { User, Chat, Message, Citation, WebSource, WebImage, DocumentAttachment, DocumentListResponse, ProcessingProgress } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -45,6 +45,20 @@ export const apiLogin = async (email: string, password: string) => {
   }
   return resp.json();
 };
+
+export const apiAdminLogin = async (email: string, password: string) => {
+  const resp = await fetch(`${API_BASE_URL}/auth/admin-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Invalid administrator email or password');
+  }
+  return resp.json();
+};
+
 
 export const apiDemoLogin = async () => {
   const resp = await fetch(`${API_BASE_URL}/auth/demo`, {
@@ -125,11 +139,45 @@ export const apiGetMessages = async (chatId: string): Promise<Message[]> => {
   return resp.json();
 };
 
-export const apiSendMessage = async (chatId: string, content: string): Promise<Message> => {
+export const apiExtractDocument = async (file: File): Promise<{
+  filename: string;
+  file_type: string;
+  size_bytes: number;
+  page_count: number;
+  char_count: number;
+  preview: string;
+  text: string;
+}> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const headers = authHeaders();
+  // Ensure browser sets multipart/form-data boundary automatically
+  delete (headers as Record<string, string>)['Content-Type'];
+
+  const resp = await fetch(`${API_BASE_URL}/chats/extract-document`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || `Failed to extract document (${resp.statusText})`);
+  }
+  return resp.json();
+};
+
+export const apiSendMessage = async (
+  chatId: string,
+  content: string,
+  attachments?: DocumentAttachment[]
+): Promise<Message> => {
   const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({
+      content,
+      attachments: attachments && attachments.length > 0 ? attachments : undefined
+    }),
   });
   if (!resp.ok) throw new Error('Failed to send message');
   return resp.json();
@@ -150,16 +198,17 @@ export const apiSavePartialMessage = async (chatId: string, content: string): Pr
 // SSE Streaming
 export interface StreamStatus {
   type: 'status';
-  stage: 'thinking' | 'retrieval' | 'reranking' | 'grounding' | 'generation' | string;
+  stage: 'thinking' | 'retrieval' | 'reranking' | 'grounding' | 'generation' | 'document_analysis' | string;
   message: string;
 }
 
 export interface StreamMetadata {
   message_id?: string;
-  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted';
+  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'attached_document';
   grounding_score?: number;
   citations?: Citation[];
   web_sources?: WebSource[];
+  images?: WebImage[];
   is_in_rag_pipeline?: boolean;
   kb_score?: number;
   web_score?: number;
@@ -186,7 +235,8 @@ export const apiStreamMessage = async (
   chatId: string,
   content: string,
   callbacks: StreamCallbacks,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  attachments?: DocumentAttachment[]
 ): Promise<void> => {
   try {
     const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages?stream=true`, {
@@ -195,7 +245,10 @@ export const apiStreamMessage = async (
         'Content-Type': 'application/json',
         ...authHeaders(),
       },
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({
+        content,
+        attachments: attachments && attachments.length > 0 ? attachments : undefined
+      }),
       signal,
     });
 
@@ -290,3 +343,207 @@ export const apiStreamMessage = async (
     callbacks.onError?.(err);
   }
 };
+
+// ==========================================
+// Document Management & Processing API
+// ==========================================
+
+export const apiGetDocuments = async (params?: {
+  status?: string;
+  search?: string;
+  page?: number;
+  page_size?: number;
+}): Promise<DocumentListResponse> => {
+  const url = new URL(`${API_BASE_URL}/documents`);
+  if (params?.status && params.status !== 'all') {
+    url.searchParams.append('status', params.status);
+  }
+  if (params?.search) {
+    url.searchParams.append('search', params.search);
+  }
+  if (params?.page) {
+    url.searchParams.append('page', params.page.toString());
+  }
+  if (params?.page_size) {
+    url.searchParams.append('page_size', params.page_size.toString());
+  }
+
+  const resp = await fetch(url.toString(), {
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to fetch knowledge base documents');
+  }
+  return resp.json();
+};
+
+export const apiGetDocumentDetails = async (documentId: string): Promise<any> => {
+  const resp = await fetch(`${API_BASE_URL}/documents/${documentId}`, {
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    throw new Error('Failed to fetch document details');
+  }
+  return resp.json();
+};
+
+export const apiUploadDocuments = async (files: File[]): Promise<{
+  status: string;
+  registered_count: number;
+  documents: any[];
+  errors: any[];
+}> => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+
+  const resp = await fetch(`${API_BASE_URL}/documents/upload`, {
+    method: 'POST',
+    headers: { ...authHeaders() },
+    body: formData,
+  });
+
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to upload documents');
+  }
+  return resp.json();
+};
+
+export const apiProcessAllDocuments = async (force: boolean = false): Promise<{
+  status: string;
+  message: string;
+}> => {
+  const resp = await fetch(`${API_BASE_URL}/documents/process-all`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ force }),
+  });
+
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to trigger batch document processing');
+  }
+  return resp.json();
+};
+
+export const apiProcessIndividualDocument = async (
+  documentId: string,
+  force: boolean = true
+): Promise<{ status: string; message: string }> => {
+  const resp = await fetch(`${API_BASE_URL}/documents/${documentId}/process`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ force }),
+  });
+
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to process document');
+  }
+  return resp.json();
+};
+
+export const apiGetProcessingStatus = async (): Promise<ProcessingProgress> => {
+  const resp = await fetch(`${API_BASE_URL}/documents/processing-status`, {
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    throw new Error('Failed to fetch processing status');
+  }
+  return resp.json();
+};
+
+export const apiDeleteDocument = async (documentId: string): Promise<{
+  success: boolean;
+  deleted_document_id: string;
+  deleted_filename: string;
+  deleted_chunks: number;
+  file_deleted_from_disk: boolean;
+  vector_database_status: string;
+}> => {
+  const resp = await fetch(`${API_BASE_URL}/documents/${documentId}`, {
+    method: 'DELETE',
+    headers: { ...authHeaders() },
+  });
+
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to delete document');
+  }
+  return resp.json();
+};
+
+export const connectProcessingStream = (
+  onProgress: (progress: ProcessingProgress) => void,
+  onError?: (error: any) => void
+): (() => void) => {
+  const token = getStoredToken();
+  const url = token
+    ? `${API_BASE_URL}/documents/processing-stream?token=${encodeURIComponent(token)}`
+    : `${API_BASE_URL}/documents/processing-stream`;
+  const eventSource = new EventSource(url);
+
+  eventSource.onmessage = (event) => {
+    try {
+      if (event.data && event.data.trim()) {
+        const data = JSON.parse(event.data);
+        onProgress(data);
+      }
+    } catch (err) {
+      console.error('Error parsing processing stream event:', err);
+    }
+  };
+
+  eventSource.onerror = (err) => {
+    onError?.(err);
+  };
+
+  return () => {
+    eventSource.close();
+  };
+};
+
+export const apiGetRAGInspectionDocuments = async (): Promise<any> => {
+  const resp = await fetch(`${API_BASE_URL}/rag-inspect/documents`, {
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to fetch knowledge base inspection status');
+  }
+  return resp.json();
+};
+
+export const apiTestSimilaritySearch = async (
+  query: string,
+  top_k: number = 10,
+  include_web_search: boolean = false
+): Promise<any> => {
+  const resp = await fetch(`${API_BASE_URL}/rag-inspect/similarity-search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ query, top_k, include_web_search }),
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to run similarity search inspection');
+  }
+  return resp.json();
+};
+
+export const apiTriggerIngest = async (): Promise<any> => {
+  const resp = await fetch(`${API_BASE_URL}/admin/documents/ingest`, {
+    method: 'POST',
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to trigger document ingestion');
+  }
+  return resp.json();
+};
+
+

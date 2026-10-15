@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from backend.app.schemas.citation import CitationResponse, WebSourceResponse
+from backend.app.schemas.citation import CitationResponse, WebSourceResponse, WebImageResponse
 
 class RAGQueryRequest(BaseModel):
     chat_id: Optional[str] = None
@@ -23,6 +23,7 @@ class RAGQueryResponse(BaseModel):
     external_search_used: Optional[bool] = False
     citations: List[CitationResponse] = []
     web_sources: List[WebSourceResponse] = []
+    images: List[WebImageResponse] = []
     follow_up_questions: List[str] = []
     selection_summary: Optional[str] = None
     chat_id: Optional[str] = None

@@ -14,6 +14,8 @@ from backend.app.models.chat import Chat
 from backend.app.models.message import Message
 from backend.app.models.citation import Citation
 from backend.app.models.web_source import WebSource
+from backend.app.models.web_image import WebImage
+from backend.app.models.uploaded_attachment import UploadedAttachment
 from backend.app.schemas.message import MessageCreate, MessageResponse
 from backend.app.security.auth import get_current_user
 from backend.app.services.rag_service import rag_service
@@ -33,6 +35,50 @@ def verify_chat_ownership(chat_id: str, user_id: str, db: Session) -> Chat:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat not found")
     return chat
 
+
+def persist_uploaded_attachments(message: Message, attachments: List[dict]) -> None:
+    """Keep extracted text scoped to the user message that uploaded it."""
+    message.uploaded_attachments = [
+        UploadedAttachment(
+            name=attachment["name"],
+            file_type=attachment.get("file_type") or "txt",
+            page_count=attachment.get("page_count"),
+            extracted_text=attachment["text"],
+        )
+        for attachment in attachments
+        if attachment.get("text", "").strip()
+    ]
+
+
+def latest_chat_attachments(
+    db: Session, chat_id: str, current_message_id: str, current_attachments: List[dict]
+) -> List[dict]:
+    """Reuse the most recently attached files for follow-up questions in this chat."""
+    if current_attachments:
+        return current_attachments
+    prior_message = (
+        db.query(Message)
+        .join(UploadedAttachment, UploadedAttachment.message_id == Message.id)
+        .filter(
+            Message.chat_id == chat_id,
+            Message.role == "user",
+            Message.id != current_message_id,
+        )
+        .order_by(Message.created_at.desc())
+        .first()
+    )
+    if not prior_message:
+        return []
+    return [
+        {
+            "name": item.name,
+            "file_type": item.file_type,
+            "page_count": item.page_count,
+            "text": item.extracted_text,
+        }
+        for item in prior_message.uploaded_attachments
+    ]
+
 @router.get("", response_model=List[MessageResponse])
 def get_messages(
     chat_id: str,
@@ -49,6 +95,7 @@ def get_messages(
         .all()
     )
 
+    is_admin = bool(current_user.is_admin)
     result = []
     for msg in messages:
         c_list = [
@@ -61,7 +108,8 @@ def get_messages(
                 "snippet": c.citation_text
             }
             for c in msg.citations
-        ]
+        ] if is_admin else []
+
         w_list = [
             {
                 "id": w.id,
@@ -71,6 +119,18 @@ def get_messages(
                 "snippet": w.snippet
             }
             for w in msg.web_sources
+        ] if is_admin else []
+
+        image_list = [
+            {
+                "url": image.url,
+                "description": image.description,
+                "alt_text": image.alt_text,
+                "source_url": image.source_url if is_admin else None,
+                "source_title": image.source_title if is_admin else None,
+                "relevance_score": None,
+            }
+            for image in msg.images
         ]
         result.append(
             MessageResponse(
@@ -78,11 +138,20 @@ def get_messages(
                 chat_id=msg.chat_id,
                 role=msg.role,
                 content=msg.content,
-                source_type=msg.source_type,
-                grounding_score=msg.grounding_score,
+                source_type=msg.source_type if is_admin else None,
+                grounding_score=msg.grounding_score if is_admin else None,
                 created_at=msg.created_at,
                 citations=c_list,
-                web_sources=w_list
+                web_sources=w_list,
+                images=image_list,
+                attachments=[
+                    {
+                        "name": attachment.name,
+                        "file_type": attachment.file_type,
+                        "page_count": attachment.page_count,
+                    }
+                    for attachment in msg.uploaded_attachments
+                ] or None,
             )
         )
     return result
@@ -97,12 +166,19 @@ def send_message(
 ):
     chat = verify_chat_ownership(chat_id, current_user.id, db)
 
+    attachments_data = [att.model_dump() for att in (msg_in.attachments or [])]
+    user_content = msg_in.content.strip()
+    if attachments_data and not user_content.startswith("[Attached"):
+        doc_summary = ", ".join([f"{a.get('name', 'Document')} ({a.get('page_count', 1)} pages)" for a in attachments_data])
+        user_content = f"[Attached: {doc_summary}]\n\n{user_content}"
+
     # 1. Save user message
     user_msg = Message(
         chat_id=chat_id,
         role="user",
-        content=msg_in.content.strip()
+        content=user_content
     )
+    persist_uploaded_attachments(user_msg, attachments_data)
     db.add(user_msg)
     
     # Auto-generate chat title from first question if default
@@ -126,13 +202,14 @@ def send_message(
         {"role": m.role, "content": m.content, "source_type": m.source_type}
         for m in prev_messages
     ]
+    rag_attachments = latest_chat_attachments(db, chat_id, user_msg.id, attachments_data)
 
     # 2. Check SSE streaming flow
     if stream:
-        return handle_streaming_response(chat_id, msg_in.content.strip(), chat_history=chat_history, current_user=current_user)
+        return handle_streaming_response(chat_id, msg_in.content.strip(), chat_history=chat_history, current_user=current_user, attachments=rag_attachments)
 
     # 3. Synchronous RAG flow with enterprise security
-    rag_result = rag_service.process_query(db, msg_in.content.strip(), chat_history=chat_history, user=current_user)
+    rag_result = rag_service.process_query(db, msg_in.content.strip(), chat_history=chat_history, user=current_user, attachments=rag_attachments)
 
     # 4. Save assistant message
     assistant_msg = Message(
@@ -175,23 +252,37 @@ def send_message(
             db.add(ws)
         db.commit()
 
+    if rag_result.get("images"):
+        for image in rag_result["images"]:
+            db.add(WebImage(
+                message_id=assistant_msg.id,
+                url=image["url"],
+                description=image.get("description"),
+                alt_text=image.get("alt_text"),
+                source_url=image.get("source_url"),
+                source_title=image.get("source_title"),
+            ))
+        db.commit()
+
     db.refresh(assistant_msg)
+
+    is_admin = bool(current_user.is_admin)
 
     return MessageResponse(
         id=assistant_msg.id,
         chat_id=assistant_msg.chat_id,
         role=assistant_msg.role,
         content=assistant_msg.content,
-        source_type=assistant_msg.source_type,
-        grounding_score=assistant_msg.grounding_score,
-        is_in_rag_pipeline=rag_result.get("is_in_rag_pipeline"),
-        kb_score=rag_result.get("kb_score"),
-        web_score=rag_result.get("web_score"),
-        winning_score=rag_result.get("winning_score"),
-        verification_status=rag_result.get("verification_status", "verified"),
-        internal_evidence_confidence=rag_result.get("internal_evidence_confidence"),
-        selected_evidence_quality=rag_result.get("selected_evidence_quality"),
-        external_search_used=rag_result.get("external_search_used", False),
+        source_type=assistant_msg.source_type if is_admin else None,
+        grounding_score=assistant_msg.grounding_score if is_admin else None,
+        is_in_rag_pipeline=rag_result.get("is_in_rag_pipeline") if is_admin else None,
+        kb_score=rag_result.get("kb_score") if is_admin else None,
+        web_score=rag_result.get("web_score") if is_admin else None,
+        winning_score=rag_result.get("winning_score") if is_admin else None,
+        verification_status=rag_result.get("verification_status", "verified") if is_admin else "verified",
+        internal_evidence_confidence=rag_result.get("internal_evidence_confidence") if is_admin else None,
+        selected_evidence_quality=rag_result.get("selected_evidence_quality") if is_admin else None,
+        external_search_used=rag_result.get("external_search_used", False) if is_admin else False,
         created_at=assistant_msg.created_at,
         citations=[
             {
@@ -203,7 +294,7 @@ def send_message(
                 "snippet": c.citation_text
             }
             for c in assistant_msg.citations
-        ],
+        ] if is_admin else [],
         web_sources=[
             {
                 "id": w.id,
@@ -213,6 +304,17 @@ def send_message(
                 "snippet": w.snippet
             }
             for w in assistant_msg.web_sources
+        ] if is_admin else [],
+        images=[
+            {
+                "url": image.url,
+                "description": image.description,
+                "alt_text": image.alt_text,
+                "source_url": image.source_url if is_admin else None,
+                "source_title": image.source_title if is_admin else None,
+                "relevance_score": None,
+            }
+            for image in assistant_msg.images
         ],
         follow_up_questions=rag_result.get("follow_up_questions", [])
     )
@@ -228,12 +330,19 @@ def send_message_stream(
     """Direct POST /chats/{chat_id}/messages/stream endpoint for SSE streaming."""
     chat = verify_chat_ownership(chat_id, current_user.id, db)
 
+    attachments_data = [att.model_dump() for att in (msg_in.attachments or [])]
+    user_content = msg_in.content.strip()
+    if attachments_data and not user_content.startswith("[Attached"):
+        doc_summary = ", ".join([f"{a.get('name', 'Document')} ({a.get('page_count', 1)} pages)" for a in attachments_data])
+        user_content = f"[Attached: {doc_summary}]\n\n{user_content}"
+
     # 1. Save user message
     user_msg = Message(
         chat_id=chat_id,
         role="user",
-        content=msg_in.content.strip()
+        content=user_content
     )
+    persist_uploaded_attachments(user_msg, attachments_data)
     db.add(user_msg)
 
     if chat.title == "New SAP Chat" or not chat.title:
@@ -255,8 +364,9 @@ def send_message_stream(
         {"role": m.role, "content": m.content, "source_type": m.source_type}
         for m in prev_messages
     ]
+    rag_attachments = latest_chat_attachments(db, chat_id, user_msg.id, attachments_data)
 
-    return handle_streaming_response(chat_id, msg_in.content.strip(), chat_history=chat_history, current_user=current_user)
+    return handle_streaming_response(chat_id, msg_in.content.strip(), chat_history=chat_history, current_user=current_user, attachments=rag_attachments)
 
 
 @router.post("/save-partial")
@@ -287,7 +397,8 @@ def handle_streaming_response(
     query: str,
     db: Session = None,
     chat_history: List[Dict[str, Any]] = None,
-    current_user: User = None
+    current_user: User = None,
+    attachments: Optional[List[Dict[str, Any]]] = None
 ):
     """
     Generates Server-Sent Events (SSE) stream using the complete verified RAG pipeline.
@@ -314,10 +425,14 @@ def handle_streaming_response(
                 hist.append({"role": m.role, "content": m.content, "source_type": m.source_type})
 
         try:
-            for event in rag_service.stream_query(save_db, query, chat_history=hist, user=current_user):
+            for event in rag_service.stream_query(save_db, query, chat_history=hist, user=current_user, attachments=attachments):
                 event_type = event.get("type")
 
-                if event_type == "token":
+                if event_type == "status":
+                    if not current_user.is_admin:
+                        event["message"] = "Thinking..." if event.get("stage") != "generating" else "Generating response..."
+
+                elif event_type == "token":
                     accumulated_text += event.get("content", "")
 
                 elif event_type == "done":
@@ -327,6 +442,7 @@ def handle_streaming_response(
                     grounding = event.get("grounding_score", 0.0)
                     citations = event.get("citations", [])
                     web_sources = event.get("web_sources", [])
+                    images = event.get("images", [])
 
                     # Anti-duplicate persistence check:
                     # Check if an interrupted or duplicate message was already saved for this turn
@@ -381,11 +497,51 @@ def handle_streaming_response(
                             ))
                         save_db.commit()
 
+                    if images:
+                        for image in images:
+                            save_db.add(WebImage(
+                                message_id=assistant_msg.id,
+                                url=image.get("url"),
+                                description=image.get("description"),
+                                alt_text=image.get("alt_text"),
+                                source_url=image.get("source_url"),
+                                source_title=image.get("source_title"),
+                            ))
+                        save_db.commit()
+
                     event["message_id"] = assistant_msg.id
+
+                    if not current_user.is_admin:
+                        event["citations"] = []
+                        event["web_sources"] = []
+                        event["source_type"] = None
+                        event["grounding_score"] = None
+                        event["source_scores"] = None
+                        event["winning_score"] = None
+                        event["kb_score"] = None
+                        event["web_score"] = None
+                        event["internal_evidence_confidence"] = None
+                        event["selected_evidence_quality"] = None
+                        event["external_search_used"] = False
+                        event["selection_summary"] = None
+                        event["comparison_audit"] = None
+                        event["selected_source"] = None
+                        if event.get("images"):
+                            event["images"] = [
+                                {
+                                    "url": img.get("url"),
+                                    "description": img.get("description"),
+                                    "alt_text": img.get("alt_text"),
+                                    "source_url": None,
+                                    "source_title": None,
+                                }
+                                for img in event["images"]
+                            ]
 
                 # SSE Event Formats:
                 # 1. Main JSON payload: data: {"type": ...}\n\n
                 yield f"data: {json.dumps(event)}\n\n"
+
 
         except Exception as e:
             logger.error(f"Streaming generation error: {e}", exc_info=True)

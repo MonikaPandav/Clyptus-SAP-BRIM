@@ -10,6 +10,7 @@ import type { User } from '../types';
 import {
   apiGetMe,
   apiLogin,
+  apiAdminLogin,
   apiDemoLogin,
   apiRegister,
   getStoredToken,
@@ -22,6 +23,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  adminLogin: (email: string, password: string) => Promise<void>;
   register: (
     name: string,
     email: string,
@@ -31,6 +33,7 @@ interface AuthContextType {
   updateProfile: (updates: { name: string; dateOfBirth?: string; avatar?: string }) => void;
   logout: () => void;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -109,6 +112,25 @@ export const AuthProvider: React.FC<{
     // Reset guest trial count on real login
     localStorage.removeItem('clyptus_trial_query_count');
   };
+
+  const adminLogin = async (
+    email: string,
+    password: string
+  ): Promise<void> => {
+    const data = await apiAdminLogin(email, password);
+
+    setStoredToken(data.access_token);
+    setToken(data.access_token);
+    const enrichedUser: User = {
+      ...data.user,
+      isGuest: false,
+      profileCompleted: true,
+    };
+    setUser(enrichedUser);
+    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(enrichedUser));
+    localStorage.removeItem('clyptus_trial_query_count');
+  };
+
 
   const register = async (
     name: string,
@@ -193,11 +215,13 @@ export const AuthProvider: React.FC<{
         token,
         loading,
         login,
+        adminLogin,
         register,
         guestLogin,
         updateProfile,
         logout,
       }}
+
     >
       {children}
     </AuthContext.Provider>

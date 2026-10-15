@@ -30,12 +30,31 @@ export interface WebSource {
   snippet: string;
 }
 
+export interface WebImage {
+  url: string;
+  description?: string | null;
+  alt_text?: string | null;
+  source_url?: string | null;
+  source_title?: string | null;
+  relevance_score?: number | null;
+}
+
+export interface DocumentAttachment {
+  name: string;
+  file_type?: string;
+  size_bytes?: number;
+  page_count?: number;
+  text?: string;
+  preview?: string;
+}
+
 export interface Message {
   id: string;
   chat_id: string;
   role: 'user' | 'assistant';
   content: string;
-  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational';
+  attachments?: DocumentAttachment[];
+  source_type?: 'knowledge_base' | 'github_repo' | 'web' | 'combined' | 'abstention' | 'insufficient' | 'refusal' | 'error' | 'interrupted' | 'security_policy' | 'conversational' | 'attached_document';
   grounding_score?: number;
   confidence?: number;
   grounding?: string;
@@ -54,6 +73,7 @@ export interface Message {
   created_at: string;
   citations: Citation[];
   web_sources: WebSource[];
+  images?: WebImage[];
 }
 
 export interface Chat {
@@ -76,3 +96,64 @@ export interface Project {
   updatedAt: string;
   isPinned: boolean;
 }
+
+export interface KBDocument {
+  id: string;
+  filename: string;
+  title: string;
+  file_type: string;
+  file_size_bytes: number;
+  file_size_formatted: string;
+  page_count: number;
+  chunk_count: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  stage: string;
+  error_message?: string | null;
+  vector_indexed: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DocumentCounts {
+  all: number;
+  pending: number;
+  processing: number;
+  completed: number;
+  failed: number;
+  total_chunks: number;
+}
+
+export interface ProcessingProgress {
+  is_processing: boolean;
+  total_selected: number;
+  completed_count: number;
+  processing_count: number;
+  pending_count: number;
+  failed_count: number;
+  total_chunks_generated: number;
+  total_embeddings_stored: number;
+  overall_progress_pct: number;
+  current_document_id?: string | null;
+  current_document_name?: string | null;
+  current_stage: string;
+  verification_status: 'Pending' | 'Successful' | 'Partial' | 'Failed';
+  summary?: {
+    documents_processed: number;
+    completed_documents?: number;
+    chunks_generated: number;
+    embeddings_stored: number;
+    failed_documents: number;
+    vector_database_verification: string;
+  } | null;
+  recent_logs?: string[];
+  timestamp?: string;
+}
+
+export interface DocumentListResponse {
+  documents: KBDocument[];
+  total: number;
+  page: number;
+  page_size: number;
+  counts: DocumentCounts;
+}
+

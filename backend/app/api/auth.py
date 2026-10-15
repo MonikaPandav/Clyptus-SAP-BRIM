@@ -56,6 +56,29 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
         user=UserResponse.model_validate(user)
     )
 
+@router.post("/admin-login", response_model=Token)
+def admin_login(login_data: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == login_data.email.lower()).first()
+    if not user or not verify_password(login_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid administrator email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access Denied: Account lacks Super Administrator privileges.",
+        )
+
+    access_token = create_access_token(data={"sub": user.id, "email": user.email, "role": user.role})
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user)
+    )
+
+
 @router.post("/demo", response_model=Token)
 def demo_login(db: Session = Depends(get_db)):
     demo_email = "consultant@clyptusap.ai"

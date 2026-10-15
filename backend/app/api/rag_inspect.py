@@ -1,4 +1,4 @@
-﻿"""
+"""
 RAG Inspection API Endpoints
 Provides full transparency into the RAG pipeline:
 - Document ingestion status (all files in knowledge base, chunk counts, embedding coverage)
@@ -18,7 +18,7 @@ from backend.app.config import settings
 from backend.app.database import get_db
 from backend.app.models.document import Document
 from backend.app.models.chunk import DocumentChunk
-from backend.app.security.auth import get_current_user
+from backend.app.security.auth import get_current_user, get_current_admin_user
 from backend.app.models.user import User
 from backend.app.services.retrieval_service import retrieval_service
 from backend.app.services.reranking_service import reranking_service
@@ -42,7 +42,7 @@ class SimilarityTestRequest(BaseModel):
 @router.get("/documents")
 def get_document_status(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin_user)
 ) -> Dict[str, Any]:
     """
     Returns the full ingestion status for every document in the knowledge base.
@@ -137,8 +137,9 @@ def get_document_status(
 def test_similarity_search(
     request: SimilarityTestRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin_user)
 ) -> Dict[str, Any]:
+
     """
     Runs full retrieval + reranking for the given query and returns per-chunk scores,
     internal evidence confidence signals, web search results, source comparison, and winner.

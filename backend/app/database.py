@@ -71,7 +71,7 @@ def get_db() -> Generator:
         db.close()
 
 def init_db():
-    from backend.app.models import user, chat, message, document, chunk, citation, web_source, repo_chunk  # noqa: F401
+    from backend.app.models import user, chat, message, document, chunk, citation, web_source, web_image, uploaded_attachment, repo_chunk  # noqa: F401
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables initialized successfully.")
 
@@ -91,6 +91,38 @@ def init_db():
     except Exception as e:
         logger.warning(f"Could not verify or migrate users.role column: {e}")
 
+    # Lightweight migration: Ensure Document Management columns exist on documents table
+    try:
+        with engine.connect() as conn:
+            if engine.dialect.name == "sqlite":
+                cols = [r[1] for r in conn.execute(text("PRAGMA table_info(documents)")).fetchall()]
+                if "file_type" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN file_type VARCHAR(50) DEFAULT 'pdf'"))
+                if "file_size_bytes" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN file_size_bytes INTEGER DEFAULT 0"))
+                if "status" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN status VARCHAR(50) DEFAULT 'completed'"))
+                if "stage" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN stage VARCHAR(100) DEFAULT 'Indexed'"))
+                if "error_message" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN error_message TEXT"))
+                if "vector_indexed" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN vector_indexed BOOLEAN DEFAULT 1"))
+                if "updated_at" not in cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN updated_at DATETIME"))
+                conn.commit()
+            elif engine.dialect.name == "postgresql":
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS file_type VARCHAR(50) DEFAULT 'pdf'"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS file_size_bytes INTEGER DEFAULT 0"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'completed'"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS stage VARCHAR(100) DEFAULT 'Indexed'"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS error_message TEXT"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS vector_indexed BOOLEAN DEFAULT true"))
+                conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"))
+                conn.commit()
+    except Exception as e:
+        logger.warning(f"Could not verify or migrate documents columns: {e}")
+
     if engine.dialect.name == "postgresql":
         try:
             with engine.connect() as conn:
@@ -109,4 +141,40 @@ def init_db():
                 logger.info("pgvector HNSW index and GIN full-text search index verified.")
         except Exception as e:
             logger.warning(f"Could not initialize PostgreSQL vector/FTS indices: {e}")
+
+    # Seed designated super admin user
+    try:
+        from backend.app.models.user import User
+        from backend.app.security.auth import hash_password, verify_password
+        with SessionLocal() as db:
+            admin_email = "vamshiyadav245@gmail.com"
+            admin_user = db.query(User).filter(User.email == admin_email).first()
+            if not admin_user:
+                new_admin = User(
+                    email=admin_email,
+                    name="Vamshi Yadav (Super Admin)",
+                    password_hash=hash_password("Vamshi@06"),
+                    is_admin=True,
+                    role="admin",
+                )
+                db.add(new_admin)
+                db.commit()
+                logger.info(f"Default Super Admin account created: {admin_email}")
+            else:
+                updated = False
+                if not admin_user.is_admin:
+                    admin_user.is_admin = True
+                    updated = True
+                if admin_user.role != "admin":
+                    admin_user.role = "admin"
+                    updated = True
+                if not verify_password("Vamshi@06", admin_user.password_hash):
+                    admin_user.password_hash = hash_password("Vamshi@06")
+                    updated = True
+                if updated:
+                    db.commit()
+                    logger.info(f"Updated Super Admin account permissions/credentials: {admin_email}")
+    except Exception as e:
+        logger.warning(f"Could not seed super admin user: {e}")
+
 

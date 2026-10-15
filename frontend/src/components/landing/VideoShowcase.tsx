@@ -30,8 +30,9 @@ export const VideoShowcase: React.FC = () => {
                 <ShieldCheck size={14} />
                 <span>Grounded answer</span>
                 <i />
-                <span>Sources when available</span>
+                <span>Enterprise verified</span>
               </div>
+
             </div>
             <div className="mock-preview-note">
               <Sparkles size={13} /> AI Enterprise Assistant

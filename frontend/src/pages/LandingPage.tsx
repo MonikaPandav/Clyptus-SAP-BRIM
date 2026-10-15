@@ -81,13 +81,14 @@ function ResponsePreview({ specific = false }: { specific?: boolean }) {
         </div>
       )}
       <div className="response-preview-meta">
-        <div><strong>Grounding Score</strong><span>0.94 · Highly Grounded</span></div>
-        <div><strong>Source Type</strong><span>Knowledge Base</span></div>
-        <div><strong>Citations</strong><span>3 Verified Doc Chunks</span></div>
+        <div><strong>Accuracy Model</strong><span>Enterprise Guardrails</span></div>
+        <div><strong>Domain Boundary</strong><span>Strict SAP &amp; BRIM</span></div>
+        <div><strong>Internal Sources</strong><span>Admin Managed</span></div>
       </div>
     </article>
   );
 }
+
 
 export const LandingPage: React.FC = () => {
   return (
@@ -251,14 +252,15 @@ export const LandingPage: React.FC = () => {
         {/* Response Preview */}
         <section className="response-section section section-wrap">
           <div className="response-copy">
-            <span className="eyebrow">SOURCES + CONFIDENCE</span>
-            <h2>Don't just get an answer.<br /><span>See what supports it.</span></h2>
+            <span className="eyebrow">VERIFIED ENTERPRISE INTELLIGENCE</span>
+            <h2>Don't just get an answer.<br /><span>Get verified accuracy.</span></h2>
             <p>
-              <strong>Clyptus.AI</strong> provides <strong>clickable sources</strong>, <strong>grounding score badges</strong>, and <strong>exact page citations</strong> alongside each response.
+              <strong>Clyptus.AI</strong> provides <strong>authoritative SAP answers</strong> backed by strict enterprise boundaries and high precision. Internal knowledge base documents and source repositories are securely restricted to authorized administrators.
             </p>
           </div>
           <ResponsePreview />
         </section>
+
 
         {/* Boundary Section */}
         <section className="boundary-section">
@@ -425,8 +427,9 @@ export const LandingPage: React.FC = () => {
             <span className="eyebrow">READY TO EXPLORE SAP?</span>
             <h2>Have an SAP question?<br /><span>Ask Clyptus.AI.</span></h2>
             <p>
-              Get <strong>grounded answers</strong> across <strong>SAP and BRIM</strong>, backed by <strong>retrieved knowledge, authoritative sources</strong>, and <strong>verified confidence</strong>.
+              Get <strong>grounded answers</strong> across <strong>SAP and BRIM</strong>, backed by <strong>verified enterprise intelligence</strong> and <strong>strict accuracy guardrails</strong>.
             </p>
+
             <Link className="button button-brand" to="/login">
               Open Workspace <ArrowUpRight size={17} />
             </Link>

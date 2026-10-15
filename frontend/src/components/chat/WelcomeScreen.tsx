@@ -88,9 +88,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onSelectPrompt }) 
 
       <div className="chat-start-note flex items-center justify-center gap-2 mt-8 text-xs text-slate-400 dark:text-slate-500">
         <span className="tiny-status w-2 h-2 rounded-full bg-orange-500 inline-block animate-pulse" />
-        <span>RAG Pipeline Active</span>
+        <span>Enterprise AI Active</span>
         <span>·</span>
-        <span>Grounded in verified enterprise documentation</span>
+        <span>Verified SAP Intelligence</span>
       </div>
 
     </div>

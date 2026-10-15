@@ -17,7 +17,10 @@ import {
   Trash2,
   Sparkles,
   MessageSquare,
+  ShieldCheck,
 } from 'lucide-react';
+
+
 import { BrandLogo } from '../components/navbar/BrandLogo';
 import { ProjectModal } from '../components/projects/ProjectModal';
 import { AssistantGuideModal } from '../components/ui/AssistantGuideModal';
@@ -500,6 +503,22 @@ export const AppLayout: React.FC = () => {
             </span>
           </button>
 
+          {/* Admin Dashboard link - strictly restricted to Super Admin */}
+          {user?.is_admin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `chatgpt-bottom-row-btn ${isActive ? 'active-bottom-btn' : ''} bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30`
+              }
+              title="Super Admin Knowledge Base & Document Manager"
+            >
+              <ShieldCheck size={16} strokeWidth={2.2} className="text-amber-500 shrink-0" />
+              <span className="font-bold text-xs truncate">
+                Admin Dashboard
+              </span>
+            </NavLink>
+          )}
+
           {/* Settings link */}
           <NavLink
             to="/app/settings"
@@ -542,6 +561,12 @@ export const AppLayout: React.FC = () => {
                   <UserRound size={15} strokeWidth={2} />
                   <span className="font-semibold text-xs">Your Profile</span>
                 </NavLink>
+                {user?.is_admin && (
+                  <NavLink to="/admin" onClick={() => setMenuOpen(false)} className="text-amber-600 dark:text-amber-400 font-bold">
+                    <ShieldCheck size={15} strokeWidth={2} />
+                    <span className="font-semibold text-xs">Admin Dashboard</span>
+                  </NavLink>
+                )}
                 <NavLink to="/app/settings" onClick={() => setMenuOpen(false)}>
                   <Settings size={15} strokeWidth={2} />
                   <span className="font-semibold text-xs">Settings & Theme</span>
@@ -554,6 +579,7 @@ export const AppLayout: React.FC = () => {
               </div>
             )}
           </div>
+
         </div>
       </aside>
 
