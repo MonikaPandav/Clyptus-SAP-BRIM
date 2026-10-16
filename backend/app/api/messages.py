@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import List
+from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import StreamingResponse
@@ -25,7 +25,16 @@ from backend.app.services.reranking_service import reranking_service
 from backend.app.services.grounding_service import grounding_service
 from backend.app.services.web_search_service import web_search_service
 from backend.app.services.sap_classifier import sap_classifier
+from backend.app.services.evidence_markers import strip_markers, StreamingMarkerStripper
 from backend.app.config import settings
+
+# Validation/audit fields produced by the RAG pipeline that only admins may see.
+ADMIN_ONLY_DONE_FIELDS = ("validation_audit", "answer_decision")
+
+
+def visible_content(content: str, is_admin: bool) -> str:
+    """Inline evidence markers point at sources; users who cannot see sources get clean text."""
+    return content if is_admin else strip_markers(content or "")
 
 router = APIRouter(prefix="/chats/{chat_id}/messages", tags=["Messages"])
 
@@ -137,7 +146,7 @@ def get_messages(
                 id=msg.id,
                 chat_id=msg.chat_id,
                 role=msg.role,
-                content=msg.content,
+                content=visible_content(msg.content, is_admin),
                 source_type=msg.source_type if is_admin else None,
                 grounding_score=msg.grounding_score if is_admin else None,
                 created_at=msg.created_at,
@@ -272,7 +281,7 @@ def send_message(
         id=assistant_msg.id,
         chat_id=assistant_msg.chat_id,
         role=assistant_msg.role,
-        content=assistant_msg.content,
+        content=visible_content(assistant_msg.content, is_admin),
         source_type=assistant_msg.source_type if is_admin else None,
         grounding_score=assistant_msg.grounding_score if is_admin else None,
         is_in_rag_pipeline=rag_result.get("is_in_rag_pipeline") if is_admin else None,
@@ -409,6 +418,7 @@ def handle_streaming_response(
         save_db = SessionLocal()
         accumulated_text = ""
         done_payload = None
+        marker_stripper = None if current_user.is_admin else StreamingMarkerStripper()
 
         hist = chat_history
         if hist is None:
@@ -434,8 +444,16 @@ def handle_streaming_response(
 
                 elif event_type == "token":
                     accumulated_text += event.get("content", "")
+                    if marker_stripper is not None:
+                        event["content"] = marker_stripper.feed(event.get("content", ""))
+                        if not event["content"]:
+                            continue
 
                 elif event_type == "done":
+                    if marker_stripper is not None:
+                        leftover = marker_stripper.flush()
+                        if leftover:
+                            yield f"data: {json.dumps({'type': 'token', 'content': leftover})}\n\n"
                     done_payload = event
                     full_answer = event.get("answer", accumulated_text)
                     source_type = event.get("source_type", "knowledge_base")
@@ -512,6 +530,9 @@ def handle_streaming_response(
                     event["message_id"] = assistant_msg.id
 
                     if not current_user.is_admin:
+                        event["answer"] = strip_markers(event.get("answer", ""))
+                        for field_name in ADMIN_ONLY_DONE_FIELDS:
+                            event[field_name] = None
                         event["citations"] = []
                         event["web_sources"] = []
                         event["source_type"] = None

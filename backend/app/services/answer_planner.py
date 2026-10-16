@@ -85,7 +85,28 @@ class AnswerPlanner:
                 )
             }
 
-        # 2. Comparison questions
+        # 2. Blocks, locks and restrictions (BP, customer, supplier, org-level, FI-CA)
+        from backend.app.services.restriction_scope_classifier import restriction_scope_classifier
+        scope = restriction_scope_classifier.classify(query)
+        if scope.is_restriction_query:
+            return {
+                "question_type": "restriction_block",
+                "title": "Block / Restriction Diagnosis",
+                "instructions": (
+                    "STRUCTURE REQUIREMENT (Block or Restriction):\n"
+                    "1. Direct answer: state whether the evidence identifies ONE block type or several possible ones.\n"
+                    "2. Block-type scope: for each block type the evidence covers, give the business object, role and "
+                    "organizational level it applies to, and what the cited passage establishes (cite [E#]).\n"
+                    "3. Where it can be viewed: only locations documented in a cited passage, per block type.\n"
+                    "4. How it is removed or changed: only procedures a cited passage documents for that exact block type. "
+                    "If none is documented, say the removal procedure is not established by the evidence. Never suggest "
+                    "direct table edits.\n"
+                    "5. Unresolved points and one targeted clarification question when the block type or release is unknown.\n"
+                    "Omit any section the evidence cannot support; do not fill it with generic SAP knowledge."
+                ),
+            }
+
+        # 3. Comparison questions
         if any(term in q_lower for term in ["difference between", "compare", "versus", " vs ", "diff between", "comparison"]):
             return {
                 "question_type": "comparison",
