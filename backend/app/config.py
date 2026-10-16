@@ -11,13 +11,12 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     DEBUG: bool = False
 
-    # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5434/sap_assistant"
-    )
-    # If postgresql fails, fallback to local sqlite for zero-friction development
-    SQLITE_FALLBACK_URL: str = f"sqlite:///{BASE_DIR / 'sap_assistant.db'}"
+    # Database: PostgreSQL + pgvector (Docker) is the only supported database.
+    # Required; there is deliberately no default and no fallback database.
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    DATABASE_CONNECT_TIMEOUT: int = int(os.getenv("DATABASE_CONNECT_TIMEOUT", "5"))
+    DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "10"))
+    DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "20"))
 
     # JWT Security
     JWT_SECRET: str = os.getenv("JWT_SECRET", "sap-super-secret-jwt-key-2026-production-ready")
@@ -54,6 +53,25 @@ class Settings(BaseSettings):
     FOLLOWUP_QUESTION_COUNT: int = int(os.getenv("FOLLOWUP_QUESTION_COUNT", "3"))
     TAVILY_MAX_RESULTS: int = int(os.getenv("TAVILY_MAX_RESULTS", "5"))
     TAVILY_MAX_IMAGES: int = int(os.getenv("TAVILY_MAX_IMAGES", "4"))
+
+    # Claim-level technical validation (new; additive to the existing grounding gate)
+    TECHNICAL_CLAIM_VALIDATION_ENABLED: bool = os.getenv("TECHNICAL_CLAIM_VALIDATION_ENABLED", "True").lower() in ("true", "1")
+    # Inline [E#] evidence markers next to claims (stripped for users who cannot see sources)
+    INLINE_EVIDENCE_MARKERS_ENABLED: bool = os.getenv("INLINE_EVIDENCE_MARKERS_ENABLED", "True").lower() in ("true", "1")
+    # Restriction/block scope classification and per-scope retrieval expansion
+    RESTRICTION_SCOPE_ENABLED: bool = os.getenv("RESTRICTION_SCOPE_ENABLED", "True").lower() in ("true", "1")
+    RESTRICTION_SCOPE_MAX_EXPANSIONS: int = int(os.getenv("RESTRICTION_SCOPE_MAX_EXPANSIONS", "5"))
+    RESTRICTION_SCOPE_PASSAGES_PER_CATEGORY: int = int(os.getenv("RESTRICTION_SCOPE_PASSAGES_PER_CATEGORY", "1"))
+    # Web evidence: extract claim-relevant passages from page content instead of snippets only
+    WEB_RAW_CONTENT_ENABLED: bool = os.getenv("WEB_RAW_CONTENT_ENABLED", "True").lower() in ("true", "1")
+    WEB_PASSAGE_MAX_CHARS: int = int(os.getenv("WEB_PASSAGE_MAX_CHARS", "1800"))
+    # Confidence components (observable; overall score never overrides a failed critical claim)
+    CONFIDENCE_WEIGHT_RETRIEVAL: float = float(os.getenv("CONFIDENCE_WEIGHT_RETRIEVAL", "0.15"))
+    CONFIDENCE_WEIGHT_COVERAGE: float = float(os.getenv("CONFIDENCE_WEIGHT_COVERAGE", "0.20"))
+    CONFIDENCE_WEIGHT_CLAIMS: float = float(os.getenv("CONFIDENCE_WEIGHT_CLAIMS", "0.35"))
+    CONFIDENCE_WEIGHT_AUTHORITY: float = float(os.getenv("CONFIDENCE_WEIGHT_AUTHORITY", "0.10"))
+    CONFIDENCE_WEIGHT_TECHNICAL: float = float(os.getenv("CONFIDENCE_WEIGHT_TECHNICAL", "0.20"))
+    CRITICAL_FAILURE_CONFIDENCE_CAP: float = float(os.getenv("CRITICAL_FAILURE_CONFIDENCE_CAP", "0.49"))
 
     # Generation Contract & Context Packing Flags (Grounded RAG)
     GROUNDED_CONTRACT_ENABLED: bool = os.getenv("GROUNDED_CONTRACT_ENABLED", "True").lower() in ("true", "1")

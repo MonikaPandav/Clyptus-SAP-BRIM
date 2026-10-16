@@ -3,9 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
 
 from backend.app.config import settings
-from backend.app.database import init_db, SessionLocal
+from backend.app.database import init_db, SessionLocal, DatabaseConnectionError, describe_target
 from backend.app.models.document import Document
 from backend.app.models.chunk import DocumentChunk
 from backend.app.api.auth import router as auth_router
@@ -22,7 +23,12 @@ logger = logging.getLogger("main")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing database and verifying tables...")
-    init_db()
+    try:
+        init_db()
+    except DatabaseConnectionError as exc:
+        # No fallback database: refuse to start with a clear, actionable message.
+        logger.critical("DATABASE UNAVAILABLE - backend not started. %s", exc)
+        raise
     logger.info("SAP Knowledge Assistant backend ready.")
     yield
     logger.info("Shutting down SAP Knowledge Assistant backend.")
@@ -42,6 +48,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+DATABASE_UNAVAILABLE_DETAIL = "Database unavailable: the PostgreSQL server cannot be reached. Please try again shortly."
+
+
+# PostgreSQL went away after startup: report it explicitly instead of a generic 500.
+@app.exception_handler(OperationalError)
+@app.exception_handler(DatabaseConnectionError)
+async def database_unavailable_handler(request: Request, exc: Exception):
+    logger.error(f"Database unavailable on {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"detail": DATABASE_UNAVAILABLE_DETAIL},
+    )
+
 
 # Global safe error handling: never leak stack traces to client
 @app.exception_handler(Exception)
@@ -82,12 +102,25 @@ def health_check():
             "status": "healthy",
             "service": settings.PROJECT_NAME,
             "version": "1.0.0",
+            "database": {"engine": "postgresql+pgvector", "status": "connected"},
             "knowledge_base": {
                 "documents_count": doc_count,
                 "chunks_count": chunk_count,
                 "model": settings.EMBEDDING_MODEL
             }
         }
+    except OperationalError as exc:
+        logger.error(f"Health check: PostgreSQL unreachable at {describe_target(settings.DATABASE_URL)}: {exc.orig}")
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "unhealthy",
+                "service": settings.PROJECT_NAME,
+                "version": "1.0.0",
+                "database": {"engine": "postgresql+pgvector", "status": "unavailable"},
+                "detail": DATABASE_UNAVAILABLE_DETAIL,
+            },
+        )
     finally:
         db.close()
 

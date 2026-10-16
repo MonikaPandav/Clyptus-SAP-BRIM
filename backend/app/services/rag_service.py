@@ -14,6 +14,16 @@ from backend.app.services.answer_planner import answer_planner
 from backend.app.services.followup_service import followup_service
 from backend.app.services.llm_service import llm_service
 from backend.app.services.query_rewriter import query_rewriter
+from backend.app.services.restriction_scope_classifier import restriction_scope_classifier, RestrictionScope
+from backend.app.services.sap_identifier_validator import sap_identifier_validator
+from backend.app.services.evidence_markers import (
+    assign_evidence_ids,
+    valid_ids,
+    remove_invalid_markers,
+    strip_markers,
+)
+from backend.app.services.answer_guard import apply_guard
+from backend.app.services import confidence_scoring
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +200,162 @@ class RAGService:
                 })
         return output
 
+    # ------------------------------------------------------------------
+    # Restriction/block scope handling
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _classify_scope(query: str) -> Optional[RestrictionScope]:
+        if not getattr(settings, "RESTRICTION_SCOPE_ENABLED", True):
+            return None
+        scope = restriction_scope_classifier.classify(query)
+        return scope if scope.is_restriction_query else None
+
+    def _retrieve_scope_evidence(self, db: Session, scope: Optional[RestrictionScope], *, hybrid: bool = False) -> List[Dict[str, Any]]:
+        """Retrieve evidence per candidate block type with the existing hybrid retrieval + reranker."""
+        if not scope:
+            return []
+        retrieve = self.retrieval.hybrid_search if hybrid else self.retrieval.retrieve
+        per_category = max(1, int(getattr(settings, "RESTRICTION_SCOPE_PASSAGES_PER_CATEGORY", 1)))
+        passages: List[Dict[str, Any]] = []
+        for item in scope.retrieval_queries(limit=int(getattr(settings, "RESTRICTION_SCOPE_MAX_EXPANSIONS", 5))):
+            try:
+                candidates = retrieve(db, item["query"], top_k=10)
+                ranked, _, _ = reranking_service.rerank_kb(item["query"], candidates, top_n=per_category)
+            except Exception as exc:
+                logger.warning("Scope retrieval for %s failed: %s", item["category"], exc)
+                continue
+            for row in ranked or []:
+                tagged = dict(row)
+                tagged["restriction_scope"] = item["category"]
+                passages.append(tagged)
+        return passages
+
+    @staticmethod
+    def _ensure_scope_coverage(selected: List[Dict[str, Any]], scope_passages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Add one passage per candidate block type that is not already in the selected evidence."""
+        def key(p: Dict[str, Any]) -> str:
+            return str(p.get("chunk_id") or p.get("candidate_id") or p.get("source_id") or (p.get("chunk_text") or "")[:160])
+
+        output = list(selected or [])
+        by_key = {key(p): p for p in output}
+        for passage in scope_passages:
+            existing = by_key.get(key(passage))
+            if existing is not None:
+                existing.setdefault("restriction_scope", passage.get("restriction_scope"))
+                continue
+            output.append(passage)
+            by_key[key(passage)] = passage
+        return output
+
+    @staticmethod
+    def _prepare_evidence(passages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Copy passages (retrieval caches share dicts) and number them E1..En for inline citation."""
+        prepared = [dict(p) for p in (passages or [])]
+        return assign_evidence_ids(prepared)
+
+    @staticmethod
+    def _generation_guidance(scope: Optional[RestrictionScope], passages: List[Dict[str, Any]]) -> Optional[str]:
+        parts: List[str] = []
+        if scope:
+            parts.append(scope.prompt_guidance())
+        if getattr(settings, "TECHNICAL_CLAIM_VALIDATION_ENABLED", True):
+            try:
+                conflicts = sap_identifier_validator.detect_evidence_conflicts(passages)
+            except Exception as exc:
+                logger.warning("Evidence conflict detection failed: %s", exc)
+                conflicts = []
+            if conflicts:
+                lines = ["EVIDENCE CONFLICTS (state them; scope each claim to its source/release):"]
+                for c in conflicts[:5]:
+                    lines.append(
+                        f"- {c['identifier']}: documented for use in {', '.join(c['documented_use_in'])}, "
+                        f"but described as not available/obsolete in {', '.join(c['unavailable_in'])}."
+                    )
+                parts.append("\n".join(lines))
+        return "\n\n".join(p for p in parts if p) or None
+
+    @staticmethod
+    def _verification_rank(verification: Dict[str, Any]):
+        critical = len(verification.get("critical_failures") or []) + len(verification.get("contradicted_claims") or [])
+        return (critical, -float(verification.get("grounding_score") or 0.0))
+
+    def _finalize_answer(
+        self,
+        query: str,
+        answer: str,
+        passages: List[Dict[str, Any]],
+        source_type: str,
+        scope: Optional[RestrictionScope],
+        guidance: Optional[str],
+        verification: Optional[Dict[str, Any]] = None,
+    ):
+        """Verify -> repair once -> deterministic guard -> re-verify before publication."""
+        if verification is None:
+            verification = grounding_service.verify_answer(query, answer, passages, source_type=source_type)
+        repair = {"attempted": False, "adopted": False, "guard_applied": False, "removed_claims": 0}
+        final_answer = answer
+
+        if not verification.get("passes_grounding_gate") and settings.MAX_GROUNDING_REPAIR_ATTEMPTS > 0:
+            repair["attempted"] = True
+            repaired = llm_service.repair_answer(
+                query=query,
+                candidate_answer=answer,
+                unsupported_claims=verification.get("unsupported_claims", []),
+                critical_unsupported_ids=verification.get("critical_unsupported_claims", []),
+                evidence=passages,
+                source_type=source_type,
+                critical_failures=verification.get("critical_failures", []),
+                guidance=guidance,
+            )
+            if repaired and len(repaired.strip()) > 30 and repaired.strip() != (answer or "").strip():
+                repaired_verification = grounding_service.verify_answer(query, repaired, passages, source_type=source_type)
+                # Never publish a repair that is worse than the candidate it replaces.
+                if self._verification_rank(repaired_verification) <= self._verification_rank(verification):
+                    final_answer, verification = repaired, repaired_verification
+                    repair["adopted"] = True
+
+        if verification.get("critical_failures") or verification.get("contradicted_claims"):
+            guarded = apply_guard(
+                final_answer,
+                verification,
+                allowed_evidence_ids=valid_ids(passages),
+                clarification_question=scope.clarification_question if scope else None,
+                evidence_needed=scope.evidence_needed if scope and scope.ambiguous else None,
+            )
+            if guarded["applied"]:
+                final_answer = guarded["answer"]
+                # Revalidate the degraded answer before it is published.
+                verification = grounding_service.verify_answer(query, final_answer, passages, source_type=source_type)
+                repair["guard_applied"] = True
+                repair["removed_claims"] = len(guarded["removed_claims"])
+
+        final_answer = remove_invalid_markers(final_answer, valid_ids(passages))
+        if not getattr(settings, "INLINE_EVIDENCE_MARKERS_ENABLED", True):
+            final_answer = strip_markers(final_answer)
+
+        status = verification.get("verification_status", "partial")
+        if repair["guard_applied"] and status == "verified":
+            # The original procedure was not verified; only a reduced answer is.
+            status = "partial"
+        return final_answer, verification, repair, status
+
+    def _validation_audit(self, query, document_match_score, passages, verification, aspects, scope, repair) -> Dict[str, Any]:
+        try:
+            report = confidence_scoring.build_report(
+                retrieval_relevance=document_match_score,
+                passages=passages,
+                verification=verification,
+                aspects=aspects,
+                scope=scope,
+                repair=repair,
+            )
+            confidence_scoring.log_report(report, query)
+            return report
+        except Exception as exc:
+            logger.warning("Validation audit could not be built: %s", exc)
+            return {"decision": "unknown", "error": str(exc)}
+
     @staticmethod
     def _should_auto_compare(document_match_score: float, confidence_data: Dict[str, Any]) -> bool:
         threshold = float(getattr(settings, "DOCUMENT_MATCH_THRESHOLD", 0.80))
@@ -241,7 +407,9 @@ class RAGService:
         snippet = (raw_chunk.get("snippet") or raw_chunk.get("chunk_text") or "").replace("\ufffd", "-").strip()
         return {
             "source_type": "knowledge_base",
-            "chunk_id": str(raw_chunk.get("chunk_id") or raw_chunk.get("id") or ""),
+            # Normalized evidence keeps the chunk ID as source_id; without it, distinct chunks
+            # from the same page would be merged into one citation by _dedupe_citations.
+            "chunk_id": str(raw_chunk.get("chunk_id") or raw_chunk.get("id") or raw_chunk.get("source_id") or ""),
             "document": document,
             "page": page,
             "section": raw_chunk.get("section", "") or f"Page {page}",
@@ -293,11 +461,12 @@ class RAGService:
         self,
         query: str,
         passages: List[Dict[str, Any]],
-        source_type: str = "knowledge_base"
+        source_type: str = "knowledge_base",
+        guidance: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generates candidate answer and runs claim grounding verification."""
         candidate_answer = llm_service.generate_answer(
-            query, passages, source_type=source_type
+            query, passages, source_type=source_type, guidance=guidance
         )
         verification = grounding_service.verify_answer(
             query, candidate_answer, passages, source_type=source_type
@@ -311,6 +480,7 @@ class RAGService:
             "critical_unsupported_claims": verification.get("critical_unsupported_claims", []),
             "citations": [],
             "insufficient_evidence": not bool(passages),
+            "verification": verification,
         }
 
     def query(self, query: str, db: Optional[Session] = None) -> Dict[str, Any]:
@@ -523,47 +693,47 @@ class RAGService:
                 "this retrieval outcome does not establish that the functionality is unsupported."
             )
 
+        # 5b. Block/restriction questions: add evidence for each candidate block type so the
+        # answer can establish the precise block type before naming any procedure.
+        scope = self._classify_scope(cleaned_query)
+        if scope:
+            selected_passages = self._ensure_scope_coverage(
+                selected_passages, self._retrieve_scope_evidence(db, scope, hybrid=False)
+            )
+
+        selected_passages = self._prepare_evidence(selected_passages)
+        guidance = self._generation_guidance(scope, selected_passages)
+
         # 6. Generate Candidate Answer
         gen_res = self._generate_grounded_answer(
-            cleaned_query, selected_passages, source_type=selected_source_type
+            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
         )
         candidate_answer = gen_res["answer"]
-        final_answer = candidate_answer
-        final_grounding_score = gen_res.get("grounded_score", 0.85)
-        verification_status = gen_res.get("verification_status", "verified")
-        verification = {
+        initial_score = gen_res.get("grounded_score", 0.85)
+        initial_verification = gen_res.get("verification") or {
+            "grounding_score": initial_score,
+            "verification_status": gen_res.get("verification_status", "verified"),
             "passes_grounding_gate": gen_res.get(
-                "passes_grounding_gate", final_grounding_score >= settings.ANSWER_GROUNDING_THRESHOLD
+                "passes_grounding_gate", initial_score >= settings.ANSWER_GROUNDING_THRESHOLD
             ),
             "unsupported_claims": gen_res.get("unsupported_claims", []),
             "critical_unsupported_claims": gen_res.get("critical_unsupported_claims", []),
         }
 
-        # 8. Controlled Answer Repair if needed
-        regeneration_count = 0
-        if not verification.get("passes_grounding_gate") and settings.MAX_GROUNDING_REPAIR_ATTEMPTS > 0:
-            logger.info("Attempting answer repair...")
-            regeneration_count += 1
-            repaired_answer = llm_service.repair_answer(
-                query=cleaned_query,
-                candidate_answer=candidate_answer,
-                unsupported_claims=verification.get("unsupported_claims", []),
-                critical_unsupported_ids=verification.get("critical_unsupported_claims", []),
-                evidence=selected_passages,
-                source_type=selected_source_type
-            )
-            if repaired_answer and len(repaired_answer.strip()) > 30:
-                final_answer = repaired_answer
-                re_ver = grounding_service.verify_answer(
-                    cleaned_query, repaired_answer, selected_passages, source_type=selected_source_type
-                )
-                final_grounding_score = re_ver.get("grounding_score", final_grounding_score)
-                verification_status = re_ver.get("verification_status", "partial")
-                verification["passes_grounding_gate"] = re_ver.get("passes_grounding_gate", False)
+        # 7-8. Claim verification, one controlled repair, deterministic guard, revalidation
+        final_answer, final_verification, repair_info, verification_status = self._finalize_answer(
+            cleaned_query, candidate_answer, selected_passages, selected_source_type, scope, guidance,
+            verification=initial_verification,
+        )
+        final_grounding_score = final_verification.get("grounding_score", initial_score)
+        regeneration_count = 1 if repair_info["attempted"] else 0
+        validation_audit = self._validation_audit(
+            cleaned_query, document_match_score, selected_passages, final_verification, aspect_results, scope, repair_info
+        )
 
         # 10. Generate Exactly 3 Recommended Follow-up Questions
         follow_ups = followup_service.generate_followup_questions(
-            cleaned_query, final_answer, selected_passages
+            cleaned_query, strip_markers(final_answer), selected_passages
         )
 
         # Build Citations and Web Sources with exact metadata
@@ -580,9 +750,10 @@ class RAGService:
                     "section": p.get("section") or "Attached Document Content",
                     "score": 1.0,
                     "snippet": (p.get("snippet") or p.get("chunk_text") or "")[:350],
+                    "ref": p.get("evidence_id"),
                 })
             elif src_type == "knowledge_base":
-                citations.append(self._format_kb_citation(p))
+                citations.append({**self._format_kb_citation(p), "ref": p.get("evidence_id")})
             elif src_type == "github_repo":
                 repo_name = p.get("document_name") or f"github:{p.get('repo_name', 'repository')}"
                 sec = p.get("section") or p.get("file_path") or "Repository Source"
@@ -596,7 +767,8 @@ class RAGService:
                     "page": 1,
                     "section": sec,
                     "score": score_val,
-                    "snippet": clean_snip
+                    "snippet": clean_snip,
+                    "ref": p.get("evidence_id"),
                 })
             elif src_type == "web":
                 title_val = p.get("title") or p.get("document_name") or "SAP Official Documentation"
@@ -608,7 +780,8 @@ class RAGService:
                     "title": title_val,
                     "url": url_val,
                     "domain": domain_val,
-                    "snippet": clean_snip
+                    "snippet": clean_snip,
+                    "ref": p.get("evidence_id"),
                 })
 
         citations = self._dedupe_citations(citations)
@@ -652,7 +825,10 @@ class RAGService:
             "failed_over": getattr(llm_service, "failed_over", False),
             "regeneration_count": regeneration_count,
             "shadow_audit": shadow_audit,
-            "comparison_audit": comparison_summary["comparison_audit"]
+            "comparison_audit": comparison_summary["comparison_audit"],
+            # Admin/audit only: stripped for ordinary users by the API layer.
+            "answer_decision": validation_audit.get("decision"),
+            "validation_audit": validation_audit,
         }
 
     def stream_query(
@@ -893,6 +1069,15 @@ class RAGService:
                 "this retrieval outcome does not establish that the functionality is unsupported."
             )
 
+        # Block/restriction questions: evidence per candidate block type (same hybrid retrieval).
+        scope = self._classify_scope(cleaned_query)
+        if scope:
+            selected_passages = self._ensure_scope_coverage(
+                selected_passages, self._retrieve_scope_evidence(db, scope, hybrid=True)
+            )
+        selected_passages = self._prepare_evidence(selected_passages)
+        guidance = self._generation_guidance(scope, selected_passages)
+
         # STAGE 5: Direct Live Answer Streaming (Instant TTFT)
         yield {
             "type": "status",
@@ -900,10 +1085,11 @@ class RAGService:
             "message": "Generating response..."
         }
 
-        # Stream answer tokens live from LLM directly to client as they are generated
+        # Stream answer tokens live from LLM directly to client as they are generated.
+        # The verified answer in the 'done' event replaces this draft in the client.
         token_buffer = []
         for token in llm_service.stream_answer(
-            cleaned_query, selected_passages, source_type=selected_source_type
+            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
         ):
             token_buffer.append(token)
             yield {"type": "token", "content": token}
@@ -912,45 +1098,28 @@ class RAGService:
         if not final_answer:
             # Resilient fallback if stream yielded no tokens
             final_answer = llm_service.generate_answer(
-                cleaned_query, selected_passages, source_type=selected_source_type
+                cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
             )
             if final_answer:
                 yield {"type": "token", "content": final_answer}
 
-        # STAGE 6: Instant Claim-Level Grounding Verification
+        # STAGE 6: Claim-level verification, one controlled repair, guard, revalidation
         yield {
             "type": "status",
             "stage": "verifying_claims",
             "message": "Finalizing response..."
         }
-        verification = grounding_service.verify_answer(
-            cleaned_query, final_answer, selected_passages, source_type=selected_source_type
+        final_answer, verification, repair_info, verification_status = self._finalize_answer(
+            cleaned_query, final_answer, selected_passages, selected_source_type, scope, guidance
         )
         final_grounding_score = verification.get("grounding_score", 0.85)
-        verification_status = verification.get("verification_status", "verified")
-
-        # Repair before publishing when claim verification identifies unsupported details.
-        if not verification.get("passes_grounding_gate") and settings.MAX_GROUNDING_REPAIR_ATTEMPTS > 0:
-            repaired = llm_service.repair_answer(
-                query=cleaned_query,
-                candidate_answer=final_answer,
-                unsupported_claims=verification.get("unsupported_claims", []),
-                critical_unsupported_ids=verification.get("critical_unsupported_claims", []),
-                evidence=selected_passages,
-                source_type=selected_source_type,
-            )
-            if repaired and repaired != final_answer:
-                repaired_verification = grounding_service.verify_answer(
-                    cleaned_query, repaired, selected_passages, source_type=selected_source_type
-                )
-                final_answer = repaired
-                verification = repaired_verification
-                final_grounding_score = repaired_verification.get("grounding_score", final_grounding_score)
-                verification_status = repaired_verification.get("verification_status", "partial")
+        validation_audit = self._validation_audit(
+            cleaned_query, document_match_score, selected_passages, verification, aspect_results, scope, repair_info
+        )
 
         # STAGE 7: Recommend Exactly 3 Follow-Up Questions (instant, <1ms)
         follow_ups = followup_service.generate_followup_questions(
-            cleaned_query, final_answer, selected_passages
+            cleaned_query, strip_markers(final_answer), selected_passages
         )
 
         # Build Citations & Web Sources
@@ -967,9 +1136,10 @@ class RAGService:
                     "section": p.get("section") or "Attached Document Content",
                     "score": 1.0,
                     "snippet": (p.get("snippet") or p.get("chunk_text") or "")[:350],
+                    "ref": p.get("evidence_id"),
                 })
             elif src_type == "knowledge_base":
-                citations.append(self._format_kb_citation(p))
+                citations.append({**self._format_kb_citation(p), "ref": p.get("evidence_id")})
             elif src_type == "github_repo":
                 citations.append({
                     "source_type": "github_repo",
@@ -979,6 +1149,7 @@ class RAGService:
                     "section": p.get("file_path") or p.get("section", "Repository source"),
                     "score": round(float(p.get("final_score", p.get("calibrated_relevance_score", 0.0))), 4),
                     "snippet": (p.get("snippet") or p.get("chunk_text") or "").replace("\ufffd", "-").strip(),
+                    "ref": p.get("evidence_id"),
                 })
             elif src_type == "web":
                 title_val = p.get("title") or p.get("document_name") or "SAP Official Documentation"
@@ -990,7 +1161,8 @@ class RAGService:
                     "title": title_val,
                     "url": url_val,
                     "domain": domain_val,
-                    "snippet": clean_snip
+                    "snippet": clean_snip,
+                    "ref": p.get("evidence_id"),
                 })
 
         citations = self._dedupe_citations(citations)
@@ -1033,7 +1205,10 @@ class RAGService:
             "images": images,
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
-            "comparison_audit": comparison_summary["comparison_audit"]
+            "comparison_audit": comparison_summary["comparison_audit"],
+            # Admin/audit only: stripped for ordinary users by the API layer.
+            "answer_decision": validation_audit.get("decision"),
+            "validation_audit": validation_audit,
         }
 
 

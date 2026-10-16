@@ -182,6 +182,10 @@ def query_rag_stream(
                 db.commit()
                 db.refresh(assistant_message)
                 event["message_id"] = assistant_message.id
+            if event.get("type") == "done" and not getattr(current_user, "is_admin", False):
+                # Claim-level validation details are admin-only.
+                event.pop("validation_audit", None)
+                event.pop("answer_decision", None)
 
             yield f"data: {json.dumps(event)}\n\n"
 
