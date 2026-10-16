@@ -210,7 +210,7 @@ export const LoginPage: React.FC = () => {
               <ShieldCheck size={15} />
               <span>
                 Enterprise Security &amp; JWT isolation<br />
-                <small>Connected to FastAPI &amp; PostgreSQL/SQLite RAG backend</small>
+                <small>Connected to FastAPI &amp; PostgreSQL + pgvector RAG backend</small>
               </span>
             </div>
           </div>

@@ -11,13 +11,12 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     DEBUG: bool = False
 
-    # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5434/sap_assistant"
-    )
-    # If postgresql fails, fallback to local sqlite for zero-friction development
-    SQLITE_FALLBACK_URL: str = f"sqlite:///{BASE_DIR / 'sap_assistant.db'}"
+    # Database: PostgreSQL + pgvector (Docker) is the only supported database.
+    # Required; there is deliberately no default and no fallback database.
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    DATABASE_CONNECT_TIMEOUT: int = int(os.getenv("DATABASE_CONNECT_TIMEOUT", "5"))
+    DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "10"))
+    DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "20"))
 
     # JWT Security
     JWT_SECRET: str = os.getenv("JWT_SECRET", "sap-super-secret-jwt-key-2026-production-ready")

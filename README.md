@@ -21,6 +21,7 @@ Follow these steps to run the complete system locally on Windows, macOS, or Linu
 Make sure the following are installed on your machine:
 * **Python 3.10+** (tested up to Python 3.14): [Download Python](https://www.python.org/downloads/)
 * **Node.js 18+ & npm 9+**: [Download Node.js](https://nodejs.org/)
+* **Docker Desktop** (runs the PostgreSQL + pgvector database): [Download Docker](https://www.docker.com/products/docker-desktop/)
 * **Git**: [Download Git](https://git-scm.com/)
 
 ---
@@ -34,7 +35,28 @@ cd SAP_BRIM_Ai
 
 ---
 
-### Step 2: Set Up Backend
+### Step 2: Start the Database (PostgreSQL + pgvector in Docker)
+
+PostgreSQL with the pgvector extension is the application's **only** database. It stores documents, chunks, 384-dimensional embeddings, users, chats and citations. There is no SQLite or other fallback; if PostgreSQL is unreachable the backend refuses to start with a clear error.
+
+1. **Create the Compose settings file** at the repository root and set two passwords:
+   * **Windows (PowerShell)**: `Copy-Item .env.example .env`
+   * **macOS / Linux**: `cp .env.example .env`
+
+   `SAP_BRIM_DB_PASSWORD` is the application's database password (it must match `DATABASE_URL` in `backend/.env`, see Step 3). `POSTGRES_HOST_PORT` (default `5435`) is the host port.
+
+2. **Start PostgreSQL**:
+   ```bash
+   docker compose up -d postgres
+   ```
+   This starts the `sap_assistant_postgres` container (`pgvector/pgvector:pg16`) on `127.0.0.1:5435`. On a new volume it creates the `sap_brim_ai` role and database with the `vector` extension (`docker/postgres/init/`); the backend creates tables and indexes on startup.
+
+> [!WARNING]
+> The container and its `sap_projects_pgdata` volume are shared with the sibling SAP_Projects stack (whose `sap_assistant` database lives in the same server). Never run `docker compose down -v`: it deletes the volume and every database in it.
+
+---
+
+### Step 3: Set Up Backend
 
 1. **Create and activate a Python virtual environment**:
    * **Windows (PowerShell)**:
@@ -64,6 +86,12 @@ cd SAP_BRIM_Ai
      cp backend/.env.example backend/.env
      ```
 
+   Set `DATABASE_URL` to the application database, using the password from the root `.env`:
+   ```ini
+   DATABASE_URL=postgresql://sap_brim_ai:<SAP_BRIM_DB_PASSWORD>@127.0.0.1:5435/sap_brim_ai
+   ```
+   (A backend running inside the Compose network would use `postgres:5432` instead of `127.0.0.1:5435`.)
+
    *(Optional)* Open `backend/.env` in your text editor and add your API keys:
    * `GROQ_API_KEY`: For ultra-fast streaming (Tier 1).
    * `GEMINI_API_KEY` / `OPENROUTER_API_KEY`: Secondary cloud LLM tiers.
@@ -72,7 +100,7 @@ cd SAP_BRIM_Ai
 
 ---
 
-### Step 3: Set Up Frontend
+### Step 4: Set Up Frontend
 
 Open a new terminal window or tab:
 
@@ -83,16 +111,20 @@ npm install
 
 ---
 
-### Step 4: Run the Application
+### Step 5: Run the Application
 
 You will run the backend and frontend in two separate terminal windows:
 
 #### Terminal 1: Backend Server (FastAPI)
 From the repository root (`SAP_BRIM_Ai`):
 ```bash
+# Database first (no-op if it is already running)
+docker compose up -d postgres
+
 # Ensure your virtual environment is active (.venv)
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+`/health` reports `"database": {"engine": "postgresql+pgvector", "status": "connected"}` and the document/chunk counts. If PostgreSQL goes down while the backend is running, API calls return `503 Database unavailable` instead of falling back to another store.
 * **Backend API**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 * **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 * **Health Check**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
@@ -150,11 +182,20 @@ The database automatically seeds an initial Super Admin account on startup:
 
 ## 🧪 Running Automated Tests
 
+Tests never touch the live database: `backend/tests/conftest.py` redirects them to `<database>_test` (`sap_brim_ai_test`) and refuses to run against any database whose name does not end in `_test`. Create it once as a clone of the live database (it also gives retrieval tests the real knowledge base); drop and re-create it to reset:
+
+```bash
+docker exec sap_assistant_postgres createdb -U sap_assistant -O sap_brim_ai -T sap_brim_ai sap_brim_ai_test
+```
+
 Run the backend test suite to verify system integrity:
 
 ```bash
-# Run all tests
-python -m pytest backend/tests -v
+# Run all offline tests (tests marked "live" call external LLM/web APIs)
+python -m pytest backend/tests -m "not live" -v
+
+# PostgreSQL migration regression tests (no-fallback, 503 handling, exact vectors, retrieval parity)
+python -m pytest backend/tests/test_postgres_migration.py -v
 
 # Run admin security and role-enforcement tests
 python -m pytest backend/tests/test_admin_portal_security.py -v
@@ -170,18 +211,20 @@ python -m pytest backend/tests/test_streaming_and_source_hiding.py -v
 ```text
 SAP_BRIM_Ai/
 ├── README.md                           # Master setup and architecture documentation
-├── docker-compose.yml                  # Optional PostgreSQL + pgvector container definition
+├── docker-compose.yml                  # PostgreSQL + pgvector container (the only database)
+├── .env.example                        # Compose settings template (ports, DB passwords)
+├── docker/postgres/init/               # First-start script: sap_brim_ai role, database, vector extension
 ├── pytest.ini                          # Pytest configuration
 │
 ├── backend/                            # FastAPI Backend Service
-│   ├── .env.example                    # Environment variable template
+│   ├── .env.example                    # Environment variable template (DATABASE_URL, API keys)
 │   ├── requirements.txt                # Python dependencies
-│   ├── sap_assistant.db                # Pre-indexed SQLite database
+│   ├── scripts/migrate_sqlite_to_pgvector.py  # One-time SQLite cutover utility (backup/migrate/verify)
 │   │
 │   ├── app/                            # Application Core
 │   │   ├── main.py                     # FastAPI entrypoint and route mounting
 │   │   ├── config.py                   # Pydantic application settings & feature flags
-│   │   ├── database.py                 # SQLAlchemy engine, migrations, auto-seeding
+│   │   ├── database.py                 # PostgreSQL engine, schema/index setup, auto-seeding
 │   │   ├── api/                        # API routes (auth, chats, messages, documents, rag_inspect)
 │   │   ├── models/                     # SQLAlchemy models (User, Chat, Message, Document, Chunk)
 │   │   ├── schemas/                    # Pydantic validation schemas
@@ -223,18 +266,54 @@ SAP_BRIM_Ai/
   lsof -ti :8000 | xargs kill -9
   ```
 
-### 2. How to run with PostgreSQL instead of SQLite?
-1. Start the Docker container:
-   ```bash
-   docker-compose up -d
-   ```
-2. Update `DATABASE_URL` in `backend/.env`:
-   ```ini
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sap_assistant
-   ```
+### 2. Backend exits with `DATABASE UNAVAILABLE` / `Cannot connect to PostgreSQL`
+1. Start the database: `docker compose up -d postgres`, then check `docker ps` shows `sap_assistant_postgres` as `healthy`.
+2. Check `DATABASE_URL` in `backend/.env`: host port must match `POSTGRES_HOST_PORT` (default `5435`) and the password must match `SAP_BRIM_DB_PASSWORD`.
+3. Port `5434` on this machine belongs to an unrelated container (`clyptus-postgres`); do not point the app at it.
 
 ### 3. Frontend fails to connect to backend
 Ensure the backend server is running on `http://127.0.0.1:8000`. The Vite development server automatically proxies `/api/*` requests to port `8000`.
+
+---
+
+## 🗄️ Database: PostgreSQL + pgvector
+
+| Setting | Value |
+| :--- | :--- |
+| Container / image | `sap_assistant_postgres` / `pgvector/pgvector:pg16` (pgvector 0.8.7) |
+| Volume | `sap_projects_pgdata` (shared with SAP_Projects) |
+| Host port | `127.0.0.1:5435` → container `5432` |
+| Application database / role | `sap_brim_ai` / `sap_brim_ai` |
+| Test database | `sap_brim_ai_test` (clone; used only by pytest) |
+| Vector column | `document_chunks.embedding vector(384)` + HNSW index (`vector_cosine_ops`) + GIN full-text index |
+
+**Backup and restore** (custom-format dump; run from the repository root):
+
+```bash
+docker exec sap_assistant_postgres pg_dump -U sap_assistant -d sap_brim_ai -Fc -f /tmp/sap_brim_ai.dump
+docker cp sap_assistant_postgres:/tmp/sap_brim_ai.dump backups/postgres/
+
+# Restore into an empty sap_brim_ai database (e.g. on another laptop after `docker compose up -d postgres`):
+docker cp backups/postgres/sap_brim_ai.dump sap_assistant_postgres:/tmp/sap_brim_ai.dump
+docker exec sap_assistant_postgres pg_restore -U sap_assistant -d sap_brim_ai --no-owner --role=sap_brim_ai /tmp/sap_brim_ai.dump
+```
+
+### Migration from SQLite (2026-10-16)
+
+The knowledge base previously lived in `backend/sap_assistant.db` (SQLite). It was migrated with `backend/scripts/migrate_sqlite_to_pgvector.py`, which:
+1. took a consistent backup and manifest (`backups/sqlite/`),
+2. copied all 11 tables in one transaction with `ON CONFLICT (id) DO NOTHING` duplicate protection, transferring the existing embeddings verbatim (no re-embedding, re-chunking or re-ingestion),
+3. verified every row and column, and every vector component for exact float32 equality, plus foreign keys and delete cascade.
+
+The original `backend/sap_assistant.db` and its backup are kept until their deletion is explicitly authorised. Logs and reports are in `backups/migration_logs/`.
+
+**Rollback to SQLite** (restores the pre-cutover code; other work in progress is untouched):
+1. Stop the backend.
+2. Reverse exactly the cutover changes: `git apply -R backups/cutover/postgres_cutover.patch`
+3. If `backend/sap_assistant.db` is missing or altered, restore it from the backup and check its SHA-256 against `backups/sqlite/sap_assistant_20261016T054133Z.manifest.json`:
+   `Copy-Item backups/sqlite/sap_assistant_20261016T054133Z.db backend/sap_assistant.db; attrib -R backend/sap_assistant.db`
+4. Set `DATABASE_URL=postgresql://nobody@127.0.0.1:1/none` in `backend/.env`. The old code uses SQLite only when PostgreSQL is unreachable, and its built-in default (`localhost:5434`) points at an unrelated container on this machine.
+5. Start the backend. The PostgreSQL `sap_brim_ai` database is left intact for a later re-cutover. Data written to PostgreSQL after the cutover is not copied back to SQLite.
 
 ---
 
