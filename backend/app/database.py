@@ -117,7 +117,7 @@ def create_search_indexes(conn) -> None:
 
 
 def init_db():
-    from backend.app.models import user, chat, message, document, chunk, citation, web_source, web_image, uploaded_attachment, repo_chunk, web_doc_chunk  # noqa: F401
+    from backend.app.models import user, chat, message, document, chunk, citation, web_source, web_image, uploaded_attachment, repo_chunk, web_doc_chunk, shared_prompt  # noqa: F401
     check_database_connection()
 
     with engine.begin() as conn:

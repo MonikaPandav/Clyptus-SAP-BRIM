@@ -147,6 +147,8 @@ export const apiExtractDocument = async (file: File): Promise<{
   char_count: number;
   preview: string;
   text: string;
+  detected_question?: string | null;
+  analysis_method?: 'vision' | 'vision+ocr' | 'ocr' | null;
 }> => {
   const formData = new FormData();
   formData.append('file', file);
@@ -195,6 +197,23 @@ export const apiSavePartialMessage = async (chatId: string, content: string): Pr
   }
 };
 
+/** Creates (or refreshes) the public link for one prompt and returns its token. */
+export const apiSharePrompt = async (chatId: string, messageId: string): Promise<string> => {
+  const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}/share`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  if (!resp.ok) throw new Error('Could not create share link');
+  return (await resp.json()).token;
+};
+
+/** Public: no login needed to read a shared prompt. */
+export const apiGetSharedPrompt = async (token: string): Promise<{ content: string; created_at: string }> => {
+  const resp = await fetch(`${API_BASE_URL}/shared/prompts/${encodeURIComponent(token)}`);
+  if (!resp.ok) throw new Error('Shared prompt not found');
+  return resp.json();
+};
+
 // SSE Streaming
 export interface StreamStatus {
   type: 'status';
@@ -229,26 +248,48 @@ export interface StreamCallbacks {
   onToken?: (token: string) => void;
   onDone?: (meta: StreamMetadata, fullAnswer?: string) => void;
   onError?: (err: any) => void;
+  /** Stored id of the prompt that this stream answers. */
+  onUserMessage?: (messageId: string) => void;
 }
 
-export const apiStreamMessage = async (
+export const apiStreamMessage = (
   chatId: string,
   content: string,
   callbacks: StreamCallbacks,
   signal?: AbortSignal,
   attachments?: DocumentAttachment[]
+): Promise<void> =>
+  streamSSE(
+    `${API_BASE_URL}/chats/${chatId}/messages?stream=true`,
+    { content, attachments: attachments && attachments.length > 0 ? attachments : undefined },
+    callbacks,
+    signal
+  );
+
+/** Replaces a stored prompt, drops every later message, and streams the new answer. */
+export const apiEditMessageStream = (
+  chatId: string,
+  messageId: string,
+  content: string,
+  callbacks: StreamCallbacks,
+  signal?: AbortSignal
+): Promise<void> =>
+  streamSSE(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}/edit`, { content }, callbacks, signal);
+
+const streamSSE = async (
+  url: string,
+  body: Record<string, unknown>,
+  callbacks: StreamCallbacks,
+  signal?: AbortSignal
 ): Promise<void> => {
   try {
-    const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages?stream=true`, {
+    const resp = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders(),
       },
-      body: JSON.stringify({
-        content,
-        attachments: attachments && attachments.length > 0 ? attachments : undefined
-      }),
+      body: JSON.stringify(body),
       signal,
     });
 
@@ -303,6 +344,8 @@ export const apiStreamMessage = async (
               finishStream(parsed, ans);
             } else if (parsed.type === 'error') {
               callbacks.onError?.(new Error(parsed.message || 'Generation error occurred'));
+            } else if (parsed.type === 'user_message') {
+              callbacks.onUserMessage?.(parsed.message_id);
             } else if (parsed.citations !== undefined || parsed.message_id !== undefined) {
               lastDoneMeta = { ...lastDoneMeta, ...parsed };
               callbacks.onMetadata?.(parsed);

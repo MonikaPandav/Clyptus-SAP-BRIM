@@ -28,6 +28,10 @@ class DocumentExtractResponse(BaseModel):
     char_count: int
     preview: str
     text: str
+    # Images only: the question/error found in the image, and how it was read
+    # ("vision", "vision+ocr" or "ocr").
+    detected_question: Optional[str] = None
+    analysis_method: Optional[str] = None
 
 
 class UploadedAttachmentInfo(BaseModel):

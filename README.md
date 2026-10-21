@@ -176,7 +176,63 @@ The database automatically seeds an initial Super Admin account on startup:
 * **Tier 2 (Lexical Search)**: BM25 keyword matching for exact SAP transaction codes, tables (`DFKKKO`, `FKKVKP`), and BAPIs.
 * **Tier 3 (Cross-Encoder Reranking)**: `cross-encoder/ms-marco-MiniLM-L-6-v2` calibrates final relevance scores.
 * **Tier 4 (Tavily SAP Web Fallback)**: Automatically queries authoritative `help.sap.com` documentation when internal confidence is weak.
-* **Tier 5 (Visual Diagrams)**: Automatically fetches relevant SAP technical architecture diagrams and flowcharts for visual inquiries.
+
+### 5. Adaptive Answer Formatting
+* Each answer is laid out to fit the question: a direct answer, a technical explanation, a comparison, step-by-step instructions, troubleshooting, or document research.
+* Tables appear only for comparisons, genuinely tabular data, or when the user asks for one. Explicit requests such as "in a table", "without a table", "briefly" or "step by step" are followed.
+* Grounding, claim verification and citations work exactly as before; only the layout changes.
+
+---
+
+## 📝 Recent Changes (2026-10-21)
+
+### Chat experience
+| Change | What it does | Main files |
+|---|---|---|
+| Removed "Relevant images" | Answers no longer show a web-image gallery, and the backend no longer calls Tavily for images. The `images` field stays in responses (always empty) so nothing that reads it breaks. | `ChatMessage.tsx`, `rag_service.py` |
+| Chat-app layout | Your questions appear on the right in a bubble; answers stay on the left. | `ChatMessage.tsx` |
+| Copy / Share / Edit under each question | **Copy** copies the question. **Edit** rewrites it: the old answer and every later message are deleted and a new answer is streamed. Files attached to the original question stay attached. | `ChatMessage.tsx`, `ChatPage.tsx`, `messages.py` |
+| Share prompt dialog | **Share** opens a dialog with a preview and Copy link / X / LinkedIn / Reddit. The link (`/share/<token>`) opens a public page showing only the question text (never the answer, files or file names) with an "Ask Clyptus.AI this question" button that pre-fills the chat input. | `SharePromptModal.tsx`, `SharedPromptPage.tsx`, `shared.py`, `shared_prompt.py` |
+
+### Answer Style Router
+Answers used to come back as large Markdown tables with repeated sections. The cause was the prompts: the system prompt asked for "structured tables", and every question type was forced into a fixed 4–7 section template.
+
+* **`answer_style_router.py`** (new) builds an internal answer plan once per question: `answer_type`, `detail_level`, `needs_table`, `needs_steps`, `needs_citations`, `source_mode` (internal / web / hybrid) and `max_sections`.
+* **Rules first**, building on the existing `answer_planner` categories. Only questions the rules cannot place get one small, cached LLM classification, validated with Pydantic. Any failure falls back to a balanced technical explanation.
+* **Prompts**: the rigid section templates are replaced by a short format directive plus formatting rules (answer first, no tables by default, state each fact once, no recap sections, cite only real `[E#]` IDs). The upgrade/reconciliation and block/restriction templates are kept because they carry safety content.
+* **Pipeline**: the plan is routed once and reused for streaming, the fallback answer and repair. It is recorded only in the admin-only `validation_audit` and never streamed to users. SSE events are unchanged.
+* **Fix**: `answer_planner` matched error words as substrings, so "issued" or "prefix" were treated as troubleshooting. It now matches whole words.
+
+Live example ("How does SAP Convergent Invoicing aggregate billable items?"): before, 3,063 characters with a 7-row table holding paragraphs; after, about 1,100 characters with a direct answer and three cited bullets.
+
+New settings (all optional; defaults shown):
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `ANSWER_STYLE_ROUTER_ENABLED` | `True` | `False` restores the previous template prompts |
+| `ANSWER_STYLE_LLM_CLASSIFIER_ENABLED` | `True` | LLM classification for questions the rules cannot place |
+| `ANSWER_STYLE_CLASSIFIER_MODEL` | `openai/gpt-oss-20b` | Groq model used for that classification |
+| `ANSWER_STYLE_CLASSIFIER_TIMEOUT` | `4.0` | Seconds before falling back |
+| `ANSWER_STYLE_DEFAULT` | `technical_explanation` | Style used when classification fails |
+| `ANSWER_STYLE_DEFAULT_DETAIL` | `balanced` | `concise`, `balanced` or `detailed` |
+| `ANSWER_STYLE_MAX_SECTIONS` | `4` | Heading budget for balanced answers |
+
+### Backend API additions
+| Endpoint | Auth | Purpose |
+|---|---|---|
+| `POST /api/chats/{chat_id}/messages/{message_id}/edit` | Owner | Replace a question, delete later messages, stream a new answer (SSE) |
+| `POST /api/chats/{chat_id}/messages/{message_id}/share` | Owner | Create or refresh the public link for a question; returns `{token}` |
+| `GET /api/shared/prompts/{token}` | Public | Read a shared question |
+
+The answer stream now also starts with a `{"type": "user_message", "message_id": ...}` event so the page knows the saved ID of the question being answered.
+
+**Database:** a new `shared_prompts` table is created automatically when the backend starts. Restart the backend after pulling these changes.
+
+### Known limitations
+* Formatting is guided by the prompt; the model can still occasionally add a table or a recap.
+* Logged-out visitors who click "Ask Clyptus.AI" on a shared link go through login and lose the pre-filled question.
+* Share links use the current host (`localhost` in development), so they only work for others once the app is deployed.
+* The older sidebar "Share chat" option builds a link that nothing handles yet.
 
 ---
 
@@ -202,6 +258,12 @@ python -m pytest backend/tests/test_admin_portal_security.py -v
 
 # Run live streaming and source hiding verification
 python -m pytest backend/tests/test_streaming_and_source_hiding.py -v
+
+# Answer Style Router (offline; LLM and retrieval mocked)
+python -m pytest backend/tests/test_answer_style_router.py -v
+
+# Edit and share prompt endpoints
+python -m pytest backend/tests/test_edit_prompt.py backend/tests/test_share_prompt.py -v
 ```
 
 ---
@@ -319,3 +381,43 @@ The original `backend/sap_assistant.db` and its backup are kept until their dele
 
 ## 📄 License
 Proprietary & Confidential. All rights reserved by **Clyptus-Soft**.
+
+
+How it works now
+One plan per question. A new router, answer_style_router.py, decides the layout once, after evidence is selected. The same plan is used for the streamed answer, the fallback answer and any repair. It picks one of the six styles you specified (direct answer, explanation, comparison, steps, troubleshooting, document research), a detail level, whether a table or numbered steps fit, and a maximum number of headings.
+Rules first. It builds on the planner's existing question categories, plus checks for explicit requests ("in a table", "without a table", "briefly", "step by step", bullets), how-to vs how-does wording, comparisons, error reports, document questions and short factual questions.
+LLM only for unclear questions. Questions the rules can't place get one small, fast call to the Groq model openai/gpt-oss-20b. The result is checked against a strict schema and cached. If the call fails or returns anything invalid, the answer uses a balanced explanation.
+Prompts. For most question types, a short format instruction replaces the rigid section templates, together with the formatting rules from your spec. Upgrade/reconciliation and business-partner block questions keep their structured templates, because those carry safety content.
+Grounding is unchanged. Claim verification, repair, the safety guard and citation rules run exactly as before. When both internal documents and web results are used, the model is told to say which statements come from the web.
+The plan stays internal. It is stored only in the admin-only audit data and is never streamed, so the SSE events are unchanged.
+Frontend: headings now have sizes, h4 is styled, and table cells are top-aligned. Lists, code and table scrolling already rendered correctly.
+Example answers (live runs against your dev database, web search off)
+Before (router off): a 5-row table with whole paragraphs inside the cells. It explained aggregation twice, then added separate "Component" and "Release" blocks.
+After: one direct sentence, three workflow bullets citing [E1]–[E5], and a one-line note on what the evidence doesn't cover.
+Comparison (CI vs FI-CA): a one-sentence summary of the difference, a 3-row table with short cells, the key differences, and a conclusion.
+Troubleshooting (billable items stuck in raw status): the cause labelled "Suspected", 7 numbered diagnostic steps, the fix, and verification steps.
+The early live runs showed two leftovers, and I've fixed both in the prompts:
+
+Recap sections: answers ended with "Key points" sections that repeated earlier content.
+Invalid citation markers: the model wrote markers like [All evidence] and [E1-E5], which aren't real evidence IDs and aren't stripped for regular users.
+Tests
+New tests: I added test_answer_style_router.py with 31 offline tests, all passing. They cover your 14 cases plus caching, the planner fix and turning the router off. Case 11 runs the real streaming pipeline with retrieval and the LLM mocked.
+Full backend suite: 239 passed and 8 failed. The 8 are the same ones that were already failing (6 document-dashboard tests plus test_integration_real_retriever_and_chunk_uuids and test_file_filtering_skips_binaries_and_lockfiles).
+Frontend: the type check and build pass.
+Configuration
+Seven new settings in config.py, all with working defaults, so .env changes are optional:
+
+Setting	Default
+ANSWER_STYLE_ROUTER_ENABLED	True (set False to go back to the old template prompts)
+ANSWER_STYLE_LLM_CLASSIFIER_ENABLED	True
+ANSWER_STYLE_CLASSIFIER_MODEL	openai/gpt-oss-20b
+ANSWER_STYLE_CLASSIFIER_TIMEOUT	4.0 seconds
+ANSWER_STYLE_DEFAULT	technical_explanation
+ANSWER_STYLE_DEFAULT_DETAIL	balanced
+ANSWER_STYLE_MAX_SECTIONS	4
+Limitations
+Prompt guidance only. The model can still occasionally add a table or a recap. I didn't add an automatic rewrite step afterwards, because it could drop citations.
+Most tests check prompts and routing, not live answers. The live runs above are the only check of actual output.
+Other tests may hit the classifier live. Some existing pipeline tests call the real LLM, so an ambiguous question in them may trigger one classifier call.
+A transaction question was refused. "What is transaction FKKBIXBIT_MON used for?" was turned down by the existing SAP topic check before reaching the router. That's unrelated to this change.
+Other edits: I widened three test fakes in test_bp_block_regression.py to accept the new argument, and fixed the planner's error-word matching.

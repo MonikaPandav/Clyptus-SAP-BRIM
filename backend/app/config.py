@@ -34,6 +34,15 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
 
+    # Vision models that read chat image attachments (comma-separated, tried in order).
+    # OCR-only reading is used when vision is disabled or every model fails.
+    VISION_ENABLED: bool = os.getenv("VISION_ENABLED", "True").lower() in ("true", "1")
+    VISION_GROQ_MODELS: str = os.getenv("VISION_GROQ_MODELS", "qwen/qwen3.8-27b")
+    VISION_OPENROUTER_MODELS: str = os.getenv(
+        "VISION_OPENROUTER_MODELS", "nvidia/nemotron-3.5-super-vl:free,google/gemma-4-31b-it:free"
+    )
+    VISION_TIMEOUT_SEC: float = float(os.getenv("VISION_TIMEOUT_SEC", "45"))
+
     # Embedding & RAG parameters
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
     EMBEDDING_DIM: int = 384
@@ -53,6 +62,17 @@ class Settings(BaseSettings):
     FOLLOWUP_QUESTION_COUNT: int = int(os.getenv("FOLLOWUP_QUESTION_COUNT", "3"))
     TAVILY_MAX_RESULTS: int = int(os.getenv("TAVILY_MAX_RESULTS", "5"))
     TAVILY_MAX_IMAGES: int = int(os.getenv("TAVILY_MAX_IMAGES", "4"))
+
+    # Answer Style Router: picks the answer layout (direct answer, explanation, comparison, steps,
+    # troubleshooting, document research) before generation. Grounding rules are unaffected.
+    ANSWER_STYLE_ROUTER_ENABLED: bool = os.getenv("ANSWER_STYLE_ROUTER_ENABLED", "True").lower() in ("true", "1")
+    # One small LLM call, only for questions the rules cannot place.
+    ANSWER_STYLE_LLM_CLASSIFIER_ENABLED: bool = os.getenv("ANSWER_STYLE_LLM_CLASSIFIER_ENABLED", "True").lower() in ("true", "1")
+    ANSWER_STYLE_CLASSIFIER_MODEL: str = os.getenv("ANSWER_STYLE_CLASSIFIER_MODEL", "openai/gpt-oss-20b")
+    ANSWER_STYLE_CLASSIFIER_TIMEOUT: float = float(os.getenv("ANSWER_STYLE_CLASSIFIER_TIMEOUT", "4.0"))
+    ANSWER_STYLE_DEFAULT: str = os.getenv("ANSWER_STYLE_DEFAULT", "technical_explanation")
+    ANSWER_STYLE_DEFAULT_DETAIL: str = os.getenv("ANSWER_STYLE_DEFAULT_DETAIL", "balanced")
+    ANSWER_STYLE_MAX_SECTIONS: int = int(os.getenv("ANSWER_STYLE_MAX_SECTIONS", "4"))
 
     # Claim-level technical validation (new; additive to the existing grounding gate)
     TECHNICAL_CLAIM_VALIDATION_ENABLED: bool = os.getenv("TECHNICAL_CLAIM_VALIDATION_ENABLED", "True").lower() in ("true", "1")

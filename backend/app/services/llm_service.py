@@ -6,6 +6,12 @@ from typing import List, Dict, Any, Generator, Optional
 
 from backend.app.config import settings
 from backend.app.services.answer_planner import answer_planner
+from backend.app.services.answer_style_router import (
+    AnswerPlan,
+    answer_style_router,
+    domain_structure,
+    render_style_instructions,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +26,13 @@ CORE ARCHITECTURAL AND GROUNDING PRINCIPLES:
    - NEVER fabricate SAP transaction codes, database tables, field names, field meanings, BAPIs/APIs, customizing or menu paths, or processing statuses. Never infer a field's meaning from its name, and never assume a transaction performs an operation just because the transaction exists.
    - Cite evidence only with the bracketed evidence IDs from the evidence labels (for example [E2]), placed immediately after the claim each one supports. Never write source document names, file names, page numbers, URLs, or other retrieval details in the response text.
 
-2. Mandatory Technical Classification:
-   - Explicitly distinguish between:
+2. Technical Classification (where the answer mixes kinds of statements):
+   - Keep these kinds distinguishable whenever more than one is present:
      * [Verified SAP-Standard Functionality]
      * [Customer-Specific Configuration or Custom Implementation]
      * [General Testing Recommendations]
      * [Hypotheses That Still Require Verification]
+   - Do not add these labels to an answer that contains only one kind, such as a simple cited fact.
 
 3. Multi-Part Questions and Partial Answers:
    - Treat every explicit subquestion/requested deliverable as a separate evidence obligation. Answer each part independently; evidence for one part does not establish another.
@@ -38,19 +45,20 @@ CORE ARCHITECTURAL AND GROUNDING PRINCIPLES:
    - Missing retrieval evidence is not proof that a feature is unsupported. Describe the exact gap (missing source, release mismatch, insufficient snippet, or failed search).
 5. BRIM Billing Vocabulary:
    - Keep service period, charge period, billable item, billing document, invoicing document, and FI-CA posting document distinct. Do not collapse their lifecycle or assert connections not directly established in evidence.
-6. Senior Upgrade & Invoice Reconciliation Methodology:
+6. Senior Upgrade & Invoice Reconciliation Methodology (only for upgrade, release-change or invoice-reconciliation questions):
    - Symptom Classification: classify the reported issue only to the stage or component supported by the question/evidence.
    - Stage-by-Stage Reconciliation Matrix: show only processing stages and connections directly established for the identified product/release; do not present an assumed universal sequence.
    - Granular Record Matching: use stable business identifiers only when the source establishes them for this process.
    - Never assume VBRK/VBRP or /BIC/* are the relevant objects for a BRIM process; name technical objects only when retrieved evidence supports the exact use.
    - Testing recommendations must include financial-side-effect safeguards appropriate to the evidenced process and environment.
-7. Professional Senior Architecture Structure:
-   - Maintain an authoritative, senior consultant tone with clean Markdown formatting, structured tables, diagnostic decision trees, and clear separation between verified standard behavior and customer-specific configuration."""
+7. Clear, Fitting Structure:
+   - Write like a senior consultant: answer first, no filler, and clear separation between verified standard behavior and customer-specific configuration.
+   - Follow the ANSWER FORMAT given with each request. Do not default to Markdown tables, decision trees or many headings; use them only when they make the answer easier to understand."""
 
 
 EVIDENCE_AWARE_ANSWER_INSTRUCTIONS = """ANSWER REQUIREMENTS:
 1. Answer the user's exact question first. Be complete but concise; do not add unrelated background or repeat points.
-2. Identify the SAP component and business object the answer applies to (for example an FI-CA contract account versus the customer role of a Business Partner) and the product/release each cited source applies to. If a source does not state a release, say so.
+2. Make clear which SAP component and business object the answer applies to (for example an FI-CA contract account versus the customer role of a Business Partner) and the product/release each cited source applies to. Say this within the answer's own sentences, not in separate "Component" or "Release" sections. If no cited source states a release, mention that once, briefly.
 3. Every factual SAP statement must be supported by a passage above. Put that passage's ID in square brackets immediately after the claim it supports, for example: "... is prevented by a central posting block [E2]." Cite only IDs shown above, never a RETRIEVAL LIMITATION note. Do not write document names, file names, pages or URLs.
 4. Keep three kinds of statements visibly separate: verified facts (cited); reasonable inferences (prefix with "Inference:" and do not present them as documented); and unresolved details the evidence does not establish.
 5. Never invent or assume transaction codes, tables, fields, field meanings, IMG/menu paths, reports, APIs or configuration settings. Name a technical object only if a cited passage shows it, and describe it only within the scope that passage states (table, organizational level, process, release).
@@ -590,26 +598,33 @@ class LLMService:
             evidence_context = evidence_context[:max_context_len] + "..."
         return evidence_context
 
+    @staticmethod
+    def _format_guidance(
+        query: str, evidence: List[Dict[str, Any]], answer_plan: Optional[AnswerPlan] = None
+    ) -> str:
+        """Layout guidance: the Answer Style Router's plan, or the legacy archetype structure if the router is off."""
+        if not getattr(settings, "ANSWER_STYLE_ROUTER_ENABLED", True):
+            legacy = answer_planner.plan_answer(query)
+            return f"QUESTION ARCHETYPE:\n{legacy.get('title', 'Technical Inquiry')}\n\n{legacy.get('instructions', '')}"
+        plan = answer_plan or answer_style_router.route(query, evidence)
+        domain = domain_structure(plan, query)
+        style = render_style_instructions(plan)
+        return f"DOMAIN STRUCTURE (use only the sections the evidence supports):\n{domain}\n\n{style}" if domain else style
+
     def _build_answer_prompt(
         self,
         query: str,
         evidence: List[Dict[str, Any]],
         source_type: str,
         guidance: Optional[str] = None,
+        answer_plan: Optional[AnswerPlan] = None,
     ) -> str:
         """One evidence-aware prompt for streamed and non-streamed generation."""
         evidence_context = self._bounded_evidence_context(evidence)
-        plan = answer_planner.plan_answer(query)
-        structure_guidance = plan.get("instructions", "")
         extra = f"\n{guidance.strip()}\n" if guidance else ""
 
         return f"""USER QUERY:
 {query}
-
-QUESTION ARCHETYPE:
-{plan.get('title', 'Technical Inquiry')}
-
-{structure_guidance}
 {extra}
 SOURCE TYPE:
 {source_type.upper()}
@@ -618,7 +633,9 @@ RETRIEVED EVIDENCE (each block starts with its evidence ID):
 {evidence_context}
 
 TASK:
-Answer the user's question using only the evidence above. Structure guidance is a layout aid: omit any section the evidence cannot support rather than filling it.
+Answer the user's question using only the evidence above. Omit any part the evidence cannot support rather than filling it.
+
+{self._format_guidance(query, evidence, answer_plan)}
 
 {EVIDENCE_AWARE_ANSWER_INSTRUCTIONS}
 """
@@ -629,9 +646,10 @@ Answer the user's question using only the evidence above. Structure guidance is 
         evidence: List[Dict[str, Any]],
         source_type: str = "knowledge_base",
         guidance: Optional[str] = None,
+        answer_plan: Optional[AnswerPlan] = None,
     ) -> str:
 
-        user_prompt = self._build_answer_prompt(query, evidence, source_type, guidance)
+        user_prompt = self._build_answer_prompt(query, evidence, source_type, guidance, answer_plan)
         evidence_context = self._bounded_evidence_context(evidence)
 
         # Tier 1: Groq
@@ -863,6 +881,7 @@ Answer the user's question using only the evidence above. Structure guidance is 
         source_type: str = "knowledge_base",
         critical_failures: Optional[List[Dict[str, Any]]] = None,
         guidance: Optional[str] = None,
+        answer_plan: Optional[AnswerPlan] = None,
     ) -> str:
         """
         Executes a single evidence-based answer repair attempt when verification fails.
@@ -897,7 +916,9 @@ VERIFIED RETRIEVED EVIDENCE (each block starts with its evidence ID):
 {evidence_context}
 
 TASK:
-Repair claim by claim. Keep every claim that is supported, with its evidence ID in brackets right after it. For each failure above: delete the claim, or restate it as an explicit limitation (for example "The retrieved documentation does not establish which transaction removes this block."). Never replace a failed identifier with a different guessed identifier, path or field meaning. If a passage documents an identifier only for a different operation, object or release, say exactly that. Do not turn missing retrieval evidence into a claim that SAP does not support a feature. Separate verified facts, inferences ("Inference:") and unresolved details. If the question is ambiguous, end with one targeted clarification question.
+Repair claim by claim. Keep every claim that is supported, with its evidence ID in brackets right after it. For each failure above: delete the claim, or restate it as an explicit limitation (for example "The retrieved documentation does not establish which transaction removes this block."). Never replace a failed identifier with a different guessed identifier, path or field meaning. If a passage documents an identifier only for a different operation, object or release, say exactly that. Do not turn missing retrieval evidence into a claim that SAP does not support a feature. Separate verified facts, inferences ("Inference:") and unresolved details. If the question is ambiguous, end with one targeted clarification question. Keep the answer's layout unless a removed claim leaves a section empty.
+
+{self._format_guidance(query, evidence, answer_plan)}
 
 {EVIDENCE_AWARE_ANSWER_INSTRUCTIONS}
 """
@@ -915,6 +936,28 @@ Repair claim by claim. Keep every claim that is supported, with its evidence ID 
 
         # If repair was unavailable or truncated the text, preserve the complete candidate answer
         return candidate_answer
+
+    def classify_answer_style(self, prompt: str) -> Optional[str]:
+        """
+        Small, fast layout classification for the Answer Style Router (Groq only, short timeout).
+        Returns the raw reply, or None when no key is configured; the router validates the output.
+        """
+        if not self.groq_api_key:
+            return None
+        from groq import Groq
+
+        timeout = float(getattr(settings, "ANSWER_STYLE_CLASSIFIER_TIMEOUT", 4.0))
+        client = Groq(api_key=self.groq_api_key, timeout=timeout, max_retries=0)
+        response = client.chat.completions.create(
+            model=getattr(settings, "ANSWER_STYLE_CLASSIFIER_MODEL", "openai/gpt-oss-20b"),
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            max_tokens=600,
+            timeout=timeout,
+        )
+        if response.choices and response.choices[0].message:
+            return response.choices[0].message.content
+        return None
 
     def generate_completion(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """One-shot completion helper with tiered multi-provider fallback."""
@@ -1180,9 +1223,10 @@ Repair claim by claim. Keep every claim that is supported, with its evidence ID 
         evidence: List[Dict[str, Any]],
         source_type: str = "knowledge_base",
         guidance: Optional[str] = None,
+        answer_plan: Optional[AnswerPlan] = None,
     ) -> Generator[str, None, None]:
 
-        user_prompt = self._build_answer_prompt(query, evidence, source_type, guidance)
+        user_prompt = self._build_answer_prompt(query, evidence, source_type, guidance, answer_plan)
         evidence_context = self._bounded_evidence_context(evidence)
 
         streamed = False

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Lock } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { Message, DocumentAttachment } from '../types';
 import { ChatMessage } from '../components/chat/ChatMessage';
+import { isStoredMessage } from '../components/chat/messageUtils';
 import { ChatInput } from '../components/chat/ChatInput';
 import { WelcomeScreen } from '../components/chat/WelcomeScreen';
 import { AuthLimitModal } from '../components/chat/AuthLimitModal';
@@ -12,7 +13,9 @@ import {
   apiCreateChat,
   apiGetMessages,
   apiStreamMessage,
+  apiEditMessageStream,
   apiSavePartialMessage,
+  type StreamCallbacks,
   type StreamMetadata,
   type StreamStatus,
 } from '../services/api';
@@ -23,7 +26,16 @@ const GUEST_COUNT_KEY = 'clyptus_trial_query_count';
 export const ChatPage: React.FC = () => {
   const { conversationId } = useParams<{ conversationId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  // A prompt opened from a share link pre-fills the input; the user decides whether to send it.
+  const [prefillPrompt] = useState<string>(() => (location.state as { prefillPrompt?: string } | null)?.prefillPrompt ?? '');
+
+  useEffect(() => {
+    // Drop the router state so a page refresh doesn't pre-fill again.
+    if (prefillPrompt) navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -201,18 +213,21 @@ export const ChatPage: React.FC = () => {
     setStreamingMeta(null);
   };
 
-  const handleSendMessage = async (content: string, attachments?: DocumentAttachment[]) => {
-    // Check trial limit for free preview users
-    if (isTrialUser && trialCount >= GUEST_QUERY_LIMIT) {
+  // Free preview users get a fixed number of questions; edits count as questions too.
+  const consumeTrialQuery = (): boolean => {
+    if (!isTrialUser) return true;
+    if (trialCount >= GUEST_QUERY_LIMIT) {
       setShowAuthModal(true);
-      return;
+      return false;
     }
+    const nextCount = trialCount + 1;
+    setTrialCount(nextCount);
+    localStorage.setItem(GUEST_COUNT_KEY, String(nextCount));
+    return true;
+  };
 
-    if (isTrialUser) {
-      const nextCount = trialCount + 1;
-      setTrialCount(nextCount);
-      localStorage.setItem(GUEST_COUNT_KEY, String(nextCount));
-    }
+  const handleSendMessage = async (content: string, attachments?: DocumentAttachment[]) => {
+    if (!consumeTrialQuery()) return;
 
     lastUserPromptRef.current = content;
     let targetChatId = isTrialUser ? guestChatIdRef.current : conversationId;
@@ -254,9 +269,46 @@ export const ChatPage: React.FC = () => {
     };
 
     setMessages((prev) => [...prev, tempUserMsg]);
+    await streamAnswer(
+      targetChatId,
+      tempUserMsg.id,
+      attachments && attachments.length > 0 ? 'Analyzing attached document(s)...' : 'Thinking...',
+      (callbacks, signal) => apiStreamMessage(targetChatId!, content, callbacks, signal, attachments)
+    );
+  };
+
+  // Rewrites a sent prompt: everything after it is discarded and a new answer is streamed.
+  const handleEditMessage = async (messageId: string, newText: string) => {
+    const text = newText.trim();
+    const targetChatId = isTrialUser ? guestChatIdRef.current : conversationId;
+    if (!text || isLoading || !targetChatId) return;
+    if (!consumeTrialQuery()) return;
+
+    lastUserPromptRef.current = text;
+    setMessages((prev) => {
+      const idx = prev.findIndex((m) => m.id === messageId);
+      if (idx === -1) return prev;
+      const original = prev[idx];
+      // Files attached to the original prompt stay attached (the backend keeps them too).
+      const attachedPrefix = original.content.match(/^\[Attached:\s*.+?\]\n\n/)?.[0] ?? '';
+      return [...prev.slice(0, idx), { ...original, content: attachedPrefix + text }];
+    });
+
+    await streamAnswer(targetChatId, messageId, 'Thinking...', (callbacks, signal) =>
+      apiEditMessageStream(targetChatId, messageId, text, callbacks, signal)
+    );
+  };
+
+  // Drives the typewriter reveal for one answer stream and adds the finished answer to the chat.
+  const streamAnswer = async (
+    targetChatId: string,
+    userMessageId: string,
+    initialStage: string,
+    start: (callbacks: StreamCallbacks, signal: AbortSignal) => Promise<void>
+  ) => {
     setIsLoading(true);
     setStreamingContent('');
-    setStreamingStage(attachments && attachments.length > 0 ? 'Analyzing attached document(s)...' : 'Thinking...');
+    setStreamingStage(initialStage);
     setStreamingMeta(null);
     setIsUserScrolledUp(false);
 
@@ -338,10 +390,12 @@ export const ChatPage: React.FC = () => {
 
     let streamMetaRef: StreamMetadata = {};
 
-    await apiStreamMessage(
-      targetChatId,
-      content,
+    await start(
       {
+        onUserMessage: (storedId: string) => {
+          // Swap the optimistic id for the stored one so this prompt can be edited later.
+          setMessages((prev) => prev.map((m) => (m.id === userMessageId ? { ...m, id: storedId } : m)));
+        },
         onStatus: (status: StreamStatus) => {
           setStreamingStage(status.message);
         },
@@ -397,8 +451,7 @@ export const ChatPage: React.FC = () => {
           setStreamingMeta(null);
         },
       },
-      controller.signal,
-      attachments
+      controller.signal
     );
   };
 
@@ -422,6 +475,12 @@ export const ChatPage: React.FC = () => {
                   key={msg.id}
                   message={msg}
                   onSelectFollowUp={(q) => handleSendMessage(q)}
+                  onEdit={
+                    msg.role === 'user' && isStoredMessage(msg)
+                      ? (text) => handleEditMessage(msg.id, text)
+                      : undefined
+                  }
+                  editDisabled={isLoading}
                   onRetry={
                     isLast && (msg.source_type === 'error' || msg.source_type === 'interrupted')
                       ? () => handleSendMessage(lastUserPromptRef.current)
@@ -503,6 +562,7 @@ export const ChatPage: React.FC = () => {
         onSendMessage={handleSendMessage}
         onStop={handleStopGeneration}
         isLoading={isLoading}
+        initialInput={prefillPrompt}
       />
 
       <AuthLimitModal

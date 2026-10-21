@@ -13,6 +13,7 @@ from backend.app.models.message import Message
 from backend.app.schemas.chat import ChatCreate, ChatUpdate, ChatResponse, ChatListItem
 from backend.app.schemas.message import DocumentExtractResponse
 from backend.app.services.document_extractor import extract_document
+from backend.app.services.image_vision_service import analyze_chat_image, is_chat_image
 from backend.app.security.auth import get_current_user, get_optional_current_user
 
 logger = logging.getLogger(__name__)
@@ -161,8 +162,9 @@ async def extract_chat_document(
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """
-    Extracts text and page metadata from uploaded PDF, Word (DOCX), PNG, or plain text documents.
-    Enforces maximum file size limit of 25MB and returns structured content for question answering.
+    Extracts text and page metadata from uploaded PDF, Word (DOCX), image, or plain text documents.
+    Images are read by a vision model (with OCR cross-check/fallback) so screenshots of errors
+    and questions can be answered. Enforces a 25MB limit and returns structured content.
     """
     if not file.filename:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No file uploaded")
@@ -175,7 +177,8 @@ async def extract_chat_document(
         )
 
     try:
-        extracted = await run_in_threadpool(extract_document, file.filename, content)
+        extractor = analyze_chat_image if is_chat_image(file.filename) else extract_document
+        extracted = await run_in_threadpool(extractor, file.filename, content)
         if not extracted.get("text", "").strip():
             raise ValueError(f"No readable text could be extracted from '{file.filename}'.")
         return DocumentExtractResponse(**extracted)

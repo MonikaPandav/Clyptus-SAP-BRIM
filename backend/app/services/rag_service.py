@@ -11,6 +11,7 @@ from backend.app.services.grounding_service import grounding_service
 from backend.app.services.web_search_service import web_search_service
 from backend.app.services.evidence_selection_service import evidence_selection_service
 from backend.app.services.answer_planner import answer_planner
+from backend.app.services.answer_style_router import answer_style_router
 from backend.app.services.followup_service import followup_service
 from backend.app.services.llm_service import llm_service
 from backend.app.services.query_rewriter import query_rewriter
@@ -289,6 +290,7 @@ class RAGService:
         scope: Optional[RestrictionScope],
         guidance: Optional[str],
         verification: Optional[Dict[str, Any]] = None,
+        answer_plan=None,
     ):
         """Verify -> repair once -> deterministic guard -> re-verify before publication."""
         if verification is None:
@@ -307,6 +309,7 @@ class RAGService:
                 source_type=source_type,
                 critical_failures=verification.get("critical_failures", []),
                 guidance=guidance,
+                answer_plan=answer_plan,
             )
             if repaired and len(repaired.strip()) > 30 and repaired.strip() != (answer or "").strip():
                 repaired_verification = grounding_service.verify_answer(query, repaired, passages, source_type=source_type)
@@ -339,6 +342,12 @@ class RAGService:
             # The original procedure was not verified; only a reduced answer is.
             status = "partial"
         return final_answer, verification, repair, status
+
+    @staticmethod
+    def _attach_answer_style(validation_audit, answer_plan) -> None:
+        """Record the layout decision in the admin-only audit (never sent to regular users)."""
+        if isinstance(validation_audit, dict) and answer_plan is not None:
+            validation_audit["answer_style"] = answer_plan.model_dump()
 
     def _validation_audit(self, query, document_match_score, passages, verification, aspects, scope, repair) -> Dict[str, Any]:
         try:
@@ -463,10 +472,11 @@ class RAGService:
         passages: List[Dict[str, Any]],
         source_type: str = "knowledge_base",
         guidance: Optional[str] = None,
+        answer_plan=None,
     ) -> Dict[str, Any]:
         """Generates candidate answer and runs claim grounding verification."""
         candidate_answer = llm_service.generate_answer(
-            query, passages, source_type=source_type, guidance=guidance
+            query, passages, source_type=source_type, guidance=guidance, answer_plan=answer_plan
         )
         verification = grounding_service.verify_answer(
             query, candidate_answer, passages, source_type=source_type
@@ -539,10 +549,6 @@ class RAGService:
         is_follow_up = resolution.get("is_follow_up", False)
         resolved_query = resolution.get("resolved_query", query).strip()
         cleaned_query = resolved_query
-        visual_requested = web_search_service.wants_visuals(query)
-        visual_context = " ".join(
-            str(item.get("content", "")) for item in (chat_history or [])[-4:]
-        )
 
         # 3. Strict SAP Domain Classifier Enforcement
         # If user provided attachments, bypass scope rejection: query is analyzed against the uploaded documents.
@@ -703,10 +709,13 @@ class RAGService:
 
         selected_passages = self._prepare_evidence(selected_passages)
         guidance = self._generation_guidance(scope, selected_passages)
+        # Layout only (answer type, tables, headings); routed once and reused by generation and repair.
+        answer_plan = answer_style_router.route(cleaned_query, selected_passages, raw_question=query)
 
         # 6. Generate Candidate Answer
         gen_res = self._generate_grounded_answer(
-            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
+            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance,
+            answer_plan=answer_plan,
         )
         candidate_answer = gen_res["answer"]
         initial_score = gen_res.get("grounded_score", 0.85)
@@ -723,13 +732,14 @@ class RAGService:
         # 7-8. Claim verification, one controlled repair, deterministic guard, revalidation
         final_answer, final_verification, repair_info, verification_status = self._finalize_answer(
             cleaned_query, candidate_answer, selected_passages, selected_source_type, scope, guidance,
-            verification=initial_verification,
+            verification=initial_verification, answer_plan=answer_plan,
         )
         final_grounding_score = final_verification.get("grounding_score", initial_score)
         regeneration_count = 1 if repair_info["attempted"] else 0
         validation_audit = self._validation_audit(
             cleaned_query, document_match_score, selected_passages, final_verification, aspect_results, scope, repair_info
         )
+        self._attach_answer_style(validation_audit, answer_plan)
 
         # 10. Generate Exactly 3 Recommended Follow-up Questions
         follow_ups = followup_service.generate_followup_questions(
@@ -786,15 +796,6 @@ class RAGService:
 
         citations = self._dedupe_citations(citations)
 
-        # Visual retrieval is deliberately independent from textual evidence selection and
-        # grounding: an image can illustrate an answer but never proves a technical claim.
-        images = []
-        if visual_requested:
-            try:
-                images = web_search_service.search_sap_images(cleaned_query, visual_context)
-            except Exception as exc:
-                logger.warning("Tavily image retrieval failed without affecting answer delivery: %s", exc)
-
         comparison_summary = self._comparison_summary(comp_result) if comp_result else {
             "source_scores": {"knowledge_base": round(float(document_match_score), 4)},
             "comparison_audit": None,
@@ -814,10 +815,10 @@ class RAGService:
             "verification_status": verification_status,
             "internal_evidence_confidence": internal_conf,
             "selected_evidence_quality": selected_quality,
-            "external_search_used": should_trigger_tavily or bool(images),
+            "external_search_used": should_trigger_tavily,
             "citations": citations,
             "web_sources": web_sources,
-            "images": images,
+            "images": [],
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
             "model_used": getattr(llm_service, "last_model_used", "openai/gpt-oss-120b"),
@@ -902,10 +903,6 @@ class RAGService:
         is_follow_up = resolution.get("is_follow_up", False)
         resolved_query = resolution.get("resolved_query", query).strip()
         cleaned_query = resolved_query
-        visual_requested = web_search_service.wants_visuals(query)
-        visual_context = " ".join(
-            str(item.get("content", "")) for item in (chat_history or [])[-4:]
-        )
 
         # Scope Verification via SAPClassifier
         # If user uploaded attachments, bypass refusal gate: user is querying their uploaded documents
@@ -1077,6 +1074,8 @@ class RAGService:
             )
         selected_passages = self._prepare_evidence(selected_passages)
         guidance = self._generation_guidance(scope, selected_passages)
+        # Layout only (answer type, tables, headings); routed once and reused by generation and repair.
+        answer_plan = answer_style_router.route(cleaned_query, selected_passages, raw_question=query)
 
         # STAGE 5: Direct Live Answer Streaming (Instant TTFT)
         yield {
@@ -1089,7 +1088,8 @@ class RAGService:
         # The verified answer in the 'done' event replaces this draft in the client.
         token_buffer = []
         for token in llm_service.stream_answer(
-            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
+            cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance,
+            answer_plan=answer_plan,
         ):
             token_buffer.append(token)
             yield {"type": "token", "content": token}
@@ -1098,7 +1098,8 @@ class RAGService:
         if not final_answer:
             # Resilient fallback if stream yielded no tokens
             final_answer = llm_service.generate_answer(
-                cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance
+                cleaned_query, selected_passages, source_type=selected_source_type, guidance=guidance,
+                answer_plan=answer_plan,
             )
             if final_answer:
                 yield {"type": "token", "content": final_answer}
@@ -1110,12 +1111,14 @@ class RAGService:
             "message": "Finalizing response..."
         }
         final_answer, verification, repair_info, verification_status = self._finalize_answer(
-            cleaned_query, final_answer, selected_passages, selected_source_type, scope, guidance
+            cleaned_query, final_answer, selected_passages, selected_source_type, scope, guidance,
+            answer_plan=answer_plan,
         )
         final_grounding_score = verification.get("grounding_score", 0.85)
         validation_audit = self._validation_audit(
             cleaned_query, document_match_score, selected_passages, verification, aspect_results, scope, repair_info
         )
+        self._attach_answer_style(validation_audit, answer_plan)
 
         # STAGE 7: Recommend Exactly 3 Follow-Up Questions (instant, <1ms)
         follow_ups = followup_service.generate_followup_questions(
@@ -1167,18 +1170,6 @@ class RAGService:
 
         citations = self._dedupe_citations(citations)
 
-        images = []
-        if visual_requested:
-            yield {
-                "type": "status",
-                "stage": "image_search",
-                "message": "Finding relevant SAP technical visuals..."
-            }
-            try:
-                images = web_search_service.search_sap_images(cleaned_query, visual_context)
-            except Exception as exc:
-                logger.warning("Tavily image retrieval failed without affecting answer delivery: %s", exc)
-
         comparison_summary = self._comparison_summary(comp_result) if comp_result else {
             "source_scores": {"knowledge_base": round(float(document_match_score), 4)},
             "comparison_audit": None,
@@ -1199,10 +1190,10 @@ class RAGService:
             "verification_status": verification_status,
             "internal_evidence_confidence": internal_conf,
             "selected_evidence_quality": selected_quality,
-            "external_search_used": should_trigger_tavily or bool(images),
+            "external_search_used": should_trigger_tavily,
             "citations": citations,
             "web_sources": web_sources,
-            "images": images,
+            "images": [],
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
             "comparison_audit": comparison_summary["comparison_audit"],

@@ -72,12 +72,12 @@ def offline_pipeline(initial_answer, repair_answer=None):
     """Mocks every external dependency; records the prompt guidance the generator received."""
     calls = {"guidance": [], "repair_calls": 0, "repair_kwargs": None}
 
-    def fake_generate(query, passages, source_type="knowledge_base", guidance=None):
+    def fake_generate(query, passages, source_type="knowledge_base", guidance=None, **kwargs):
         calls["guidance"].append(guidance)
         calls["passages"] = passages
         return initial_answer
 
-    def fake_stream(query, passages, source_type="knowledge_base", guidance=None):
+    def fake_stream(query, passages, source_type="knowledge_base", guidance=None, **kwargs):
         calls["guidance"].append(guidance)
         calls["passages"] = passages
         for i in range(0, len(initial_answer), 17):
