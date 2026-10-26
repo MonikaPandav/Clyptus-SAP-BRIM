@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 from backend.app.schemas.citation import CitationResponse, WebSourceResponse, WebImageResponse
 
@@ -46,6 +46,11 @@ class MessageCreate(BaseModel):
     attachments: Optional[List[DocumentAttachment]] = Field(default=None, max_length=5)
 
 
+class MessageFeedback(BaseModel):
+    # None clears the rating.
+    value: Optional[Literal["up", "down"]] = None
+
+
 class MessageResponse(BaseModel):
     id: str
     chat_id: str
@@ -67,5 +72,6 @@ class MessageResponse(BaseModel):
     images: List[WebImageResponse] = []
     follow_up_questions: List[str] = []
     attachments: Optional[List[UploadedAttachmentInfo]] = None
+    feedback: Optional[Literal["up", "down"]] = None
 
     model_config = ConfigDict(from_attributes=True)

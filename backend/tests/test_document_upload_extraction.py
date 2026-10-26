@@ -13,6 +13,12 @@ from backend.app.services.llm_service import LLMService
 from backend.app.services.rag_service import RAGService
 
 
+def _guest_headers(client):
+    """Extraction requires a signed-in user; guests sign in through /auth/demo."""
+    token = client.post("/api/auth/demo").json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 def _png_bytes():
     import io
 
@@ -55,6 +61,7 @@ def test_png_upload_endpoint_returns_ocr_content():
          patch("backend.app.services.image_vision_service._call_vision_models", return_value=(None, None)):
         response = client.post(
             "/api/chats/extract-document",
+            headers=_guest_headers(client),
             files={"file": ("invoice.png", _png_bytes(), "image/png")},
         )
 
@@ -86,6 +93,7 @@ def test_pasted_image_endpoint_returns_vision_analysis_and_detected_question():
          patch("backend.app.services.image_vision_service._call_vision_models", return_value=(VISION_REPLY, "test-vision")):
         response = client.post(
             "/api/chats/extract-document",
+            headers=_guest_headers(client),
             files={"file": ("pasted-image-1.png", _png_bytes(), "image/png")},
         )
 

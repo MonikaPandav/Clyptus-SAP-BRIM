@@ -45,14 +45,17 @@ PostgreSQL with the pgvector extension is the application's **only** database. I
 
    `SAP_BRIM_DB_PASSWORD` is the application's database password (it must match `DATABASE_URL` in `backend/.env`, see Step 3). `POSTGRES_HOST_PORT` (default `5435`) is the host port.
 
-2. **Start PostgreSQL**:
+2. **Start Database & Self-Hosted Search Services**:
    ```bash
-   docker compose up -d postgres
+   # Starts PostgreSQL (pgvector), SearXNG (metasearch), and Siftdog (search & extraction API)
+   docker compose up -d postgres searxng siftdog
    ```
-   This starts the `sap_assistant_postgres` container (`pgvector/pgvector:pg16`) on `127.0.0.1:5435`. On a new volume it creates the `sap_brim_ai` role and database with the `vector` extension (`docker/postgres/init/`); the backend creates tables and indexes on startup.
+   * **PostgreSQL (`sap_assistant_postgres`)**: Runs on `127.0.0.1:5435`.
+   * **SearXNG (`sap_assistant_searxng`)**: Runs on `127.0.0.1:8089` for web & visual diagram discovery.
+   * **Siftdog (`sap_assistant_siftdog`)**: Runs on `127.0.0.1:8088` for search, clean Markdown extraction, crawling, and site mapping.
 
 > [!WARNING]
-> The container and its `sap_projects_pgdata` volume are shared with the sibling SAP_Projects stack (whose `sap_assistant` database lives in the same server). Never run `docker compose down -v`: it deletes the volume and every database in it.
+> The postgres container and its `sap_projects_pgdata` volume are shared with the sibling SAP_Projects stack (whose `sap_assistant` database lives in the same server). Never run `docker compose down -v`: it deletes the volume and every database in it.
 
 ---
 
@@ -139,13 +142,54 @@ npm run dev
 
 ---
 
+### Useful Operations & Verification Commands
+
+#### 1. Check Document Chunks in Database (`sap_brim_ai`)
+To verify the application's **32,838** vectorized chunks:
+```bash
+# Check total chunk count in sap_brim_ai
+docker exec sap_assistant_postgres psql -U sap_brim_ai -d sap_brim_ai -c "SELECT count(*) AS total_chunks FROM document_chunks;"
+
+# Interactive psql shell into the application database
+docker exec -it sap_assistant_postgres psql -U sap_brim_ai -d sap_brim_ai
+```
+
+#### 2. Check Self-Hosted Search Services (Siftdog & SearXNG)
+```bash
+# Check Siftdog health (Port 8088)
+curl http://127.0.0.1:8088/health
+
+# Check SearXNG JSON search (Port 8089)
+curl "http://127.0.0.1:8089/search?q=SAP+BRIM&format=json"
+
+# Check Docker container status
+docker ps --filter name=sap_assistant
+```
+
+#### 3. Run Automated Tests
+```bash
+# Run unit & regression tests
+python -m pytest backend/tests/test_searxng_siftdog_search.py -v
+
+# Run live integration tests against running Docker services
+python -m pytest backend/tests/test_live_siftdog_searxng.py -v
+```
+
+---
+
 ## 🔐 Credentials & Role-Based Access
 
-The database automatically seeds an initial Super Admin account on startup:
+On first start, the backend creates a Super Admin from `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` in `backend/.env` (password: at least 12 characters). An existing account's password is never overwritten; to change it, run:
+
+```bash
+python backend/scripts/set_admin_password.py admin@example.com
+```
+
+The backend refuses to start if `JWT_SECRET` (required) or `ADMIN_API_KEY` (optional) is shorter than 32 characters or is a value that was ever published in this repository.
 
 | Portal | URL | Email | Password | Access Privileges |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin Control Center** | [http://localhost:5173/admin/login](http://localhost:5173/admin/login) | `vamshiyadav245@gmail.com` | `Vamshi@06` | Full Document Management, Ingestion Pipeline, Internal Sources Repository, Chunk Sandbox, System Security |
+| **Admin Control Center** | [http://localhost:5173/admin/login](http://localhost:5173/admin/login) | `SUPER_ADMIN_EMAIL` | `SUPER_ADMIN_PASSWORD` | Full Document Management, Ingestion Pipeline, Internal Sources Repository, Chunk Sandbox, System Security |
 | **Standard User Chat** | [http://localhost:5173/app](http://localhost:5173/app) | *Any registered user* | *User password* | Enterprise Chat, Document Attachment Analysis, Recommended Follow-ups *(Sources and internal retrieval details strictly hidden)* |
 
 > [!NOTE]

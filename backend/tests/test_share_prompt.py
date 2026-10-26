@@ -50,7 +50,7 @@ def test_shared_prompt_is_public_and_hides_attachment_names():
     assert "payroll_2026" not in public.text
 
 
-def test_share_prompt_rejects_other_users_assistant_messages_and_unknown_tokens():
+def test_share_prompt_rejects_other_users_and_unknown_tokens():
     owner = _login("share_owner@sap.com")
     intruder = _login("share_intruder@sap.com")
     chat_id = client.post("/api/chats", json={"title": "Owned"}, headers=owner).json()["id"]
@@ -58,5 +58,55 @@ def test_share_prompt_rejects_other_users_assistant_messages_and_unknown_tokens(
     answer_id = _add_message(chat_id, "assistant", "Private answer")
 
     assert client.post(f"/api/chats/{chat_id}/messages/{user_id}/share", headers=intruder).status_code == 404
-    assert client.post(f"/api/chats/{chat_id}/messages/{answer_id}/share", headers=owner).status_code == 404
+    assert client.post(f"/api/chats/{chat_id}/messages/{answer_id}/share", headers=intruder).status_code == 404
     assert client.get("/api/shared/prompts/not-a-real-token").status_code == 404
+
+
+def test_shared_answer_includes_its_question_without_evidence_markers():
+    headers = _login("answer_sharer@sap.com")
+    chat_id = client.post("/api/chats", json={"title": "Answer share"}, headers=headers).json()["id"]
+    _add_message(chat_id, "user", "[Attached: secret.pdf (1 pages)]\n\nWhat is FI-CA?")
+    answer_id = _add_message(chat_id, "assistant", "FI-CA is Contract Accounting [E1].")
+
+    resp = client.post(f"/api/chats/{chat_id}/messages/{answer_id}/share", headers=headers)
+    assert resp.status_code == 200, resp.text
+
+    public = client.get(f"/api/shared/prompts/{resp.json()['token']}").json()
+    assert public["content"] == "What is FI-CA?"
+    assert public["answer"] == "FI-CA is Contract Accounting."
+    assert "secret.pdf" not in str(public)
+
+
+def test_concurrent_shares_of_one_message_return_the_same_link():
+    # React StrictMode opens the share dialog's effect twice, so two requests race in dev.
+    from concurrent.futures import ThreadPoolExecutor
+
+    headers = _login("race_sharer@sap.com")
+    chat_id = client.post("/api/chats", json={"title": "Race"}, headers=headers).json()["id"]
+    msg_id = _add_message(chat_id, "user", "Same prompt, two clicks")
+    url = f"/api/chats/{chat_id}/messages/{msg_id}/share"
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        responses = list(pool.map(lambda _: client.post(url, headers=headers), range(4)))
+
+    assert all(r.status_code == 200 for r in responses), [r.text for r in responses]
+    assert len({r.json()["token"] for r in responses}) == 1
+
+
+def test_feedback_is_saved_cleared_and_limited_to_owned_answers():
+    owner = _login("feedback_owner@sap.com")
+    intruder = _login("feedback_intruder@sap.com")
+    chat_id = client.post("/api/chats", json={"title": "Feedback"}, headers=owner).json()["id"]
+    question_id = _add_message(chat_id, "user", "Question")
+    answer_id = _add_message(chat_id, "assistant", "Answer")
+    url = f"/api/chats/{chat_id}/messages/{answer_id}/feedback"
+
+    assert client.put(url, json={"value": "up"}, headers=owner).json()["feedback"] == "up"
+    stored = client.get(f"/api/chats/{chat_id}/messages", headers=owner).json()
+    assert next(m for m in stored if m["id"] == answer_id)["feedback"] == "up"
+
+    assert client.put(url, json={"value": None}, headers=owner).json()["feedback"] is None
+    assert client.put(url, json={"value": "meh"}, headers=owner).status_code == 422
+    assert client.put(url, json={"value": "down"}, headers=intruder).status_code == 404
+    question_url = f"/api/chats/{chat_id}/messages/{question_id}/feedback"
+    assert client.put(question_url, json={"value": "up"}, headers=owner).status_code == 404

@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Copy, Check, Eye, RotateCcw, Sparkles, ArrowRight, FileText, Share, Pencil } from 'lucide-react';
-import type { Message } from '../../types';
+import {
+  User, Copy, Check, Eye, RotateCcw, Sparkles, ArrowRight, FileText, Share, Pencil,
+  ThumbsUp, ThumbsDown, Volume2, Square, RefreshCw,
+} from 'lucide-react';
+import type { Message, MessageFeedback } from '../../types';
 import { GroundingScoreBadge } from './GroundingScoreBadge';
 import { SourceTypeBadge } from './SourceTypeBadge';
 import { CitationModal } from './CitationModal';
 import { SharePromptModal } from './SharePromptModal';
-import { isStoredMessage } from './messageUtils';
+import { isStoredMessage, toSpeechText } from './messageUtils';
 import { useAuth } from '../../context/AuthContext';
+import { apiSetFeedback } from '../../services/api';
 import iconOnly from '../../assets/clyptusap-icon.png';
 
 interface ChatMessageProps {
@@ -21,7 +25,26 @@ interface ChatMessageProps {
   onEdit?: (newText: string) => void;
   /** True while an answer is streaming, so a second request cannot start. */
   editDisabled?: boolean;
+  /** Present only on the latest answer; asks the same question again for a new answer. */
+  onRegenerate?: () => void;
 }
+
+const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
+
+// Chrome stops speaking long utterances after ~15s, so text is queued in sentence-sized pieces.
+const speechChunks = (text: string, max = 200): string[] => {
+  const chunks: string[] = [];
+  let current = '';
+  for (const sentence of text.match(/[^.!?]+[.!?]*\s*/g) ?? [text]) {
+    if (current && (current + sentence).length > max) {
+      chunks.push(current.trim());
+      current = '';
+    }
+    current += sentence;
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
+};
 
 const promptActionClass =
   'p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent';
@@ -50,8 +73,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   onSelectFollowUp,
   onEdit,
   editDisabled = false,
+  onRegenerate,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<MessageFeedback | null>(message.feedback ?? null);
+  const [speaking, setSpeaking] = useState(false);
+  // Identifies this message's speech so a newer utterance elsewhere does not reset our state early.
+  const speechRunRef = useRef(0);
   const [showShare, setShowShare] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState('');
@@ -82,6 +110,50 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Clicking the active thumb clears it; the choice is rolled back if saving fails.
+  const handleFeedback = (value: MessageFeedback) => {
+    const previous = feedback;
+    const next = previous === value ? null : value;
+    setFeedback(next);
+    apiSetFeedback(message.chat_id, message.id, next).catch(() => setFeedback(previous));
+  };
+
+  const stopSpeaking = () => {
+    speechRunRef.current += 1;
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
+  };
+
+  const toggleSpeak = () => {
+    if (speaking) {
+      stopSpeaking();
+      return;
+    }
+    const chunks = speechChunks(toSpeechText(displayContent));
+    if (chunks.length === 0) return;
+    window.speechSynthesis.cancel(); // only one answer reads at a time
+    const run = ++speechRunRef.current;
+    chunks.forEach((chunk, i) => {
+      const utterance = new SpeechSynthesisUtterance(chunk);
+      const finish = () => {
+        if (speechRunRef.current === run) setSpeaking(false);
+      };
+      utterance.onerror = finish;
+      if (i === chunks.length - 1) utterance.onend = finish;
+      window.speechSynthesis.speak(utterance);
+    });
+    setSpeaking(true);
+  };
+
+  // Stop reading if this answer leaves the screen (chat switch, regenerate, delete).
+  const speakingRef = useRef(false);
+  speakingRef.current = speaking;
+  useEffect(() => {
+    return () => {
+      if (speakingRef.current) window.speechSynthesis.cancel();
+    };
+  }, []);
 
   const startEditing = () => {
     setDraft(displayContent);
@@ -155,18 +227,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5">
-                {!isUser && !isStreaming && message.content && (
-                  <button
-                    onClick={handleCopy}
-                    className="text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs flex items-center gap-1 cursor-pointer"
-                    title="Copy response"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                )}
-              </div>
             </div>
 
             {/* Body Content */}
@@ -315,6 +375,70 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             )}
 
+            {/* Answer actions: copy, rate, read aloud, share, regenerate */}
+            {!isUser && !isStreaming && displayContent && (
+              <div className="mt-3 flex items-center gap-0.5">
+                <button type="button" onClick={handleCopy} className={promptActionClass} title={copied ? 'Copied' : 'Copy'} aria-label="Copy response">
+                  {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+                {isStoredMessage(message) && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleFeedback('up')}
+                      className={promptActionClass}
+                      title="Good response"
+                      aria-label="Good response"
+                      aria-pressed={feedback === 'up'}
+                    >
+                      <ThumbsUp className={`w-4 h-4 ${feedback === 'up' ? 'text-slate-800 dark:text-slate-100' : ''}`} fill={feedback === 'up' ? 'currentColor' : 'none'} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleFeedback('down')}
+                      className={promptActionClass}
+                      title="Bad response"
+                      aria-label="Bad response"
+                      aria-pressed={feedback === 'down'}
+                    >
+                      <ThumbsDown className={`w-4 h-4 ${feedback === 'down' ? 'text-slate-800 dark:text-slate-100' : ''}`} fill={feedback === 'down' ? 'currentColor' : 'none'} />
+                    </button>
+                  </>
+                )}
+                {canSpeak && (
+                  <button
+                    type="button"
+                    onClick={toggleSpeak}
+                    className={promptActionClass}
+                    title={speaking ? 'Stop reading' : 'Read aloud'}
+                    aria-label={speaking ? 'Stop reading' : 'Read aloud'}
+                  >
+                    {speaking ? <Square className="w-4 h-4" fill="currentColor" /> : <Volume2 className="w-4 h-4" />}
+                  </button>
+                )}
+                {isStoredMessage(message) && (
+                  <button type="button" onClick={() => setShowShare(true)} className={promptActionClass} title="Share response" aria-label="Share response">
+                    <Share className="w-4 h-4" />
+                  </button>
+                )}
+                {onRegenerate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (speaking) stopSpeaking();
+                      onRegenerate();
+                    }}
+                    disabled={editDisabled}
+                    className={promptActionClass}
+                    title={editDisabled ? 'Wait for the current answer to finish' : 'Regenerate response'}
+                    aria-label="Regenerate response"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Interrupted / Error retry banner */}
             {isInterrupted && (
               <div className="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-slate-900/90 border border-amber-300 dark:border-amber-500/30 text-xs text-amber-900 dark:text-slate-300 flex items-center justify-between gap-3">
@@ -392,6 +516,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           chatId={message.chat_id}
           messageId={message.id}
           prompt={displayContent}
+          isAnswer={!isUser}
           onClose={() => setShowShare(false)}
         />
       )}

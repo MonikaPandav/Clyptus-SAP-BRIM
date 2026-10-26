@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { apiGetSharedPrompt } from '../services/api';
 import iconOnly from '../assets/clyptusap-icon.png';
 
-/** Public view of a prompt someone shared; offers to ask it in the app. */
+/** Public view of a prompt (or answer) someone shared; offers to ask it in the app. */
 export const SharedPromptPage: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!token) return;
     apiGetSharedPrompt(token)
-      .then((shared) => setPrompt(shared.content))
+      .then((shared) => {
+        setPrompt(shared.content);
+        setAnswer(shared.answer);
+      })
       .catch(() => setNotFound(true));
   }, [token]);
 
@@ -38,12 +44,19 @@ export const SharedPromptPage: React.FC = () => {
           </div>
         ) : (
           <>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Shared prompt</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
+              {answer ? 'Shared answer' : 'Shared prompt'}
+            </p>
             <div className="flex justify-end">
               <div className="max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 bg-orange-50/80 dark:bg-[#13131d] border border-orange-200/70 dark:border-orange-500/20 text-sm leading-relaxed whitespace-pre-wrap break-words">
                 {prompt}
               </div>
             </div>
+            {answer && (
+              <div className="mt-6 prose-sap text-sm text-slate-800 dark:text-slate-200 leading-relaxed break-words">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+              </div>
+            )}
             <div className="mt-8 flex justify-center">
               <button
                 type="button"

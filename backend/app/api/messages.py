@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import StreamingResponse
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ from backend.app.models.web_source import WebSource
 from backend.app.models.web_image import WebImage
 from backend.app.models.uploaded_attachment import UploadedAttachment
 from backend.app.models.shared_prompt import SharedPrompt
-from backend.app.schemas.message import MessageCreate, MessageResponse
+from backend.app.schemas.message import MessageCreate, MessageFeedback, MessageResponse
 from backend.app.security.auth import get_current_user
 from backend.app.services.rag_service import rag_service
 from backend.app.services.llm_service import llm_service
@@ -213,6 +214,7 @@ def get_messages(
                 source_type=msg.source_type if is_admin else None,
                 grounding_score=msg.grounding_score if is_admin else None,
                 created_at=msg.created_at,
+                feedback=msg.feedback,
                 citations=c_list,
                 web_sources=w_list,
                 images=image_list,
@@ -479,26 +481,68 @@ def share_prompt(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create (or refresh) the public read-only link for one of the user's prompts."""
+    """Create (or refresh) the public read-only link for one of the user's prompts or answers."""
     verify_chat_ownership(chat_id, current_user.id, db)
-    user_msg = (
+    msg = (
         db.query(Message)
-        .filter(Message.id == message_id, Message.chat_id == chat_id, Message.role == "user")
+        .filter(Message.id == message_id, Message.chat_id == chat_id, Message.role.in_(("user", "assistant")))
         .first()
     )
-    if not user_msg:
+    if not msg:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
 
-    # Only the question is published: attachment names and extracted file text stay private.
-    content = ATTACHED_PREFIX.sub("", user_msg.content, count=1).strip()
-    shared = db.query(SharedPrompt).filter(SharedPrompt.message_id == user_msg.id).first()
-    if shared:
-        shared.content = content
-    else:
-        shared = SharedPrompt(message_id=user_msg.id, content=content)
-        db.add(shared)
+    answer = None
+    question_msg = msg
+    if msg.role == "assistant":
+        # An answer is shared together with the question it answers.
+        question_msg = (
+            db.query(Message)
+            .filter(Message.chat_id == chat_id, Message.role == "user", Message.created_at < msg.created_at)
+            .order_by(Message.created_at.desc())
+            .first()
+        )
+        if not question_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
+        # The public page has no sources, so evidence markers are always stripped.
+        answer = strip_markers(msg.content or "").strip()
+
+    # Attachment names and extracted file text stay private.
+    content = ATTACHED_PREFIX.sub("", question_msg.content, count=1).strip()
+    # One atomic upsert: two concurrent shares of the same message get the same link
+    # instead of the second failing on the unique message_id.
+    token = db.execute(
+        pg_insert(SharedPrompt)
+        .values(message_id=msg.id, content=content, answer=answer)
+        .on_conflict_do_update(
+            index_elements=[SharedPrompt.message_id],
+            set_={"content": content, "answer": answer},
+        )
+        .returning(SharedPrompt.token)
+    ).scalar_one()
     db.commit()
-    return {"token": shared.token}
+    return {"token": token}
+
+
+@router.put("/{message_id}/feedback")
+def set_message_feedback(
+    chat_id: str,
+    message_id: str,
+    feedback_in: MessageFeedback,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Record a thumbs up/down on one of the user's answers; a null value clears it."""
+    verify_chat_ownership(chat_id, current_user.id, db)
+    answer = (
+        db.query(Message)
+        .filter(Message.id == message_id, Message.chat_id == chat_id, Message.role == "assistant")
+        .first()
+    )
+    if not answer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
+    answer.feedback = feedback_in.value
+    db.commit()
+    return {"message_id": answer.id, "feedback": answer.feedback}
 
 
 @router.post("/save-partial")

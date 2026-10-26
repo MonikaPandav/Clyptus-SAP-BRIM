@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Optional
 
 # Whole words only: substrings misroute "issued", "prefix", "unfixed" to troubleshooting.
 TROUBLESHOOTING_PATTERN = re.compile(
-    r"\b(?:errors?|fail(?:s|ed|ing|ure)?|dumps?|troubleshoot\w*|issues?|stuck|exceptions?|cannot|can't"
+    r"\b(?:errors?|fail(?:s|ed|ing|ures?)?|dumps?|troubleshoot\w*|issues?|stuck|exceptions?|cannot|can't"
     r"|fix(?:es)?|not\s+working)\b",
     re.I,
 )

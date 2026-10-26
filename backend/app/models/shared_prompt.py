@@ -17,4 +17,6 @@ class SharedPrompt(Base):
     # One link per prompt: sharing again refreshes the snapshot instead of minting a new link.
     message_id = Column(String(36), ForeignKey("messages.id", ondelete="CASCADE"), unique=True, nullable=False)
     content = Column(Text, nullable=False)
+    # Set when an answer was shared: message_id is then the answer and content its question.
+    answer = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)

@@ -25,7 +25,8 @@ from backend.app.services.answer_planner import TROUBLESHOOTING_PATTERN, answer_
 logger = logging.getLogger(__name__)
 
 AnswerType = Literal[
-    "direct_answer", "technical_explanation", "comparison", "step_by_step", "troubleshooting", "document_research"
+    "direct_answer", "technical_explanation", "comparison", "step_by_step", "troubleshooting", "document_research",
+    "solution_design",
 ]
 DetailLevel = Literal["concise", "balanced", "detailed"]
 ANSWER_TYPES = AnswerType.__args__
@@ -108,6 +109,27 @@ _DETAILED = re.compile(
     r"|in[\s-]depth|everything\s+about)\b",
     re.I,
 )
+# Design, interview and experience framing: the user wants a senior consultant's solution, not one fact.
+_SCENARIO_FRAMING = re.compile(
+    r"\b(?:design|architect)(?:\s+and\s+(?:implement|build|deliver))?\s+(?:an?\s+|the\s+)?(?:end[\s-]to[\s-]end|complete|overall)\b"
+    r"|\bend[\s-]to[\s-]end\s+(?:sap\s+)?(?:brim\s+)?(?:solution|implementation|design|architecture|landscape)\b"
+    r"|\b(?:interview|candidate)\b|\b\d+\s*\+?\s*(?:years?|yrs?)\b[^.?\n]{0,20}\bexp(?:erience|erienced)?\b"
+    r"|\bin\s+your\s+(?:experience|project|last\s+project)\b|\breal[\s-]time\s+scenario\b|\bscenario[\s-]based\b",
+    re.I,
+)
+_HOW_WOULD_YOU = re.compile(
+    r"\bhow\s+(?:would|will|should)\s+you\s+(?:design|implement|architect|approach|handle|build|plan|structure"
+    r"|set\s+up|support|deliver|run|manage)\b",
+    re.I,
+)
+
+
+def is_solution_design_question(text: str) -> bool:
+    """Broad design/scenario questions. A plain "how would you" about a specific error stays troubleshooting."""
+    text = text or ""
+    if _SCENARIO_FRAMING.search(text):
+        return True
+    return bool(_HOW_WOULD_YOU.search(text)) and not TROUBLESHOOTING_PATTERN.search(text)
 
 # Successful LLM classifications by normalized question; failures are not cached.
 _classifier_cache: Dict[str, _LLMStyleChoice] = {}
@@ -124,6 +146,7 @@ answer_type, choose one:
 - step_by_step: a procedure the user wants to carry out
 - troubleshooting: an error, failure or unexpected behaviour
 - document_research: questions about a specific supplied document
+- solution_design: designing, implementing or operating a whole solution, or a scenario/interview question
 detail_level: concise, balanced or detailed.
 needs_table: true only for comparisons or genuinely tabular data.
 needs_steps: true only when the answer is an ordered procedure or sequence.
@@ -169,7 +192,7 @@ class AnswerStyleRouter:
             needs_table = False
 
         needs_steps = (
-            answer_type in ("step_by_step", "troubleshooting")
+            answer_type in ("step_by_step", "troubleshooting", "solution_design")
             or archetype == "integration"
             or "steps" in explicit
             or bool(extra.get("needs_steps"))
@@ -194,6 +217,11 @@ class AnswerStyleRouter:
         """Returns (answer_type, routed_by, extra hints from the LLM classifier)."""
         if "steps" in explicit and archetype not in ("troubleshooting", "upgrade_invoice_reconciliation"):
             return "step_by_step", "explicit", {}
+
+        # Checked before the archetypes: a design question naming "FI-CA integration" is not an
+        # integration explanation. Archetypes with domain safety structure keep precedence.
+        if archetype not in DOMAIN_STRUCTURED_ARCHETYPES and is_solution_design_question(text):
+            return "solution_design", "rules", {}
 
         # Archetypes answer_planner already identifies reliably.
         mapped = {
@@ -295,7 +323,7 @@ class AnswerStyleRouter:
             return "concise"
         if "detailed" in explicit:
             return "detailed"
-        if archetype == "upgrade_invoice_reconciliation":
+        if archetype == "upgrade_invoice_reconciliation" or answer_type == "solution_design":
             return "detailed"
         if answer_type == "direct_answer":
             return "concise"
@@ -312,6 +340,8 @@ class AnswerStyleRouter:
             return 7  # the planner mandates seven sections for this diagnostic
         if answer_type == "direct_answer" or detail == "concise":
             return 0
+        if answer_type == "solution_design":
+            return 8  # architecture, integration, playbook, monitoring, performance, recovery
         budget = max(1, min(8, int(getattr(settings, "ANSWER_STYLE_MAX_SECTIONS", 4))))
         return min(8, budget + 2) if detail == "detailed" else budget
 
@@ -397,6 +427,26 @@ _LAYOUTS = {
         "the document does not cover. Use a table only for genuinely tabular content (records, field lists) or if "
         "the user asked for one."
     ),
+    "solution_design": (
+        "This is a solution-design or scenario question of the kind asked of experienced consultants. Answer every "
+        "part the user listed, each from the evidence retrieved for it, in this order where it applies:\n"
+        "1. Architecture: the components, the business object each one owns, and how they hand data to each other "
+        "(the integration mechanisms). State where a component runs and which product versions apply only as a "
+        "cited passage states them.\n"
+        "2. How the listed requirements are met (for example pricing, subscription lifecycle, high-volume usage).\n"
+        "3. If the question mentions failures, issues, discrepancies, bottlenecks or production support: a "
+        "troubleshooting playbook with one short entry per failure type the question names or implies (such as "
+        "rating failures, duplicate usage events, failed billing or invoicing runs, reconciliation mismatches, "
+        "FI-CA posting errors). Each entry gives the symptom, where to look (monitors, logs, statuses), likely causes, "
+        "the resolution and how to reprocess safely, and prevention. Call a cause confirmed only when a cited "
+        "passage establishes it.\n"
+        "4. Operations: monitoring and alerting, error reprocessing, performance tuning and recovery, where asked.\n"
+        "Prefer the concrete checks, monitors, logs, statuses and decisions the evidence names over generic statements. "
+        "If the question is framed as an interview or about experience, write a model answer in the first person "
+        "(\"When a billing run fails, I first ...\") that shows how the consultant diagnoses and resolves problems; "
+        "never invent client names, project figures, volumes or outcomes. Name the parts the evidence does not "
+        "cover once, briefly, at the end instead of repeating \"not covered\" in every section."
+    ),
 }
 
 _EXPLICIT_LABELS = {
@@ -434,7 +484,7 @@ def render_style_instructions(plan: AnswerPlan) -> str:
     else:
         lines.append("Do not use a Markdown table unless the evidence contains genuinely tabular data.")
 
-    if plan.needs_steps and plan.answer_type not in ("step_by_step", "troubleshooting"):
+    if plan.needs_steps and plan.answer_type not in ("step_by_step", "troubleshooting", "solution_design"):
         lines.append("Present any ordered sequence or process flow as a numbered list.")
 
     if not plan.needs_citations:

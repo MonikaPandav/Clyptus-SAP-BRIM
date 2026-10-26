@@ -6,6 +6,8 @@ interface SharePromptModalProps {
   chatId: string;
   messageId: string;
   prompt: string;
+  /** Sharing an answer: the link shows the question and this answer. */
+  isAnswer?: boolean;
   onClose: () => void;
 }
 
@@ -27,7 +29,7 @@ const RedditLogo = () => (
   </svg>
 );
 
-export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, messageId, prompt, onClose }) => {
+export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, messageId, prompt, isAnswer = false, onClose }) => {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -60,7 +62,8 @@ export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, mess
     if (shareUrl) window.open(buildUrl(shareUrl), '_blank', 'noopener,noreferrer');
   };
 
-  const title = 'SAP question on Clyptus.AI';
+  const title = isAnswer ? 'SAP answer on Clyptus.AI' : 'SAP question on Clyptus.AI';
+  const noun = isAnswer ? 'response' : 'prompt';
   const targets = [
     { label: 'X', icon: <XLogo />, href: (u: string) => `https://x.com/intent/tweet?url=${encodeURIComponent(u)}&text=${encodeURIComponent(title)}` },
     { label: 'LinkedIn', icon: <LinkedInLogo />, href: (u: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(u)}` },
@@ -83,7 +86,7 @@ export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, mess
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
-          <h2 id="share-prompt-title" className="text-lg font-semibold">Share prompt</h2>
+          <h2 id="share-prompt-title" className="text-lg font-semibold">Share {noun}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -96,8 +99,8 @@ export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, mess
 
         {/* Prompt preview, faded at the bottom like a snapshot card */}
         <div className="mx-6 rounded-2xl border border-slate-200 dark:border-[#1e1e2c] bg-white dark:bg-[#08080c] p-4">
-          <div className="relative max-h-64 overflow-hidden flex justify-end">
-            <div className="max-w-[80%] rounded-2xl px-4 py-2.5 bg-slate-100 dark:bg-[#161622] text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <div className={`relative max-h-64 overflow-hidden flex ${isAnswer ? 'justify-start' : 'justify-end'}`}>
+            <div className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${isAnswer ? '' : 'max-w-[80%] rounded-2xl px-4 py-2.5 bg-slate-100 dark:bg-[#161622]'}`}>
               {prompt}
             </div>
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white dark:from-[#08080c] to-transparent" />
@@ -106,7 +109,7 @@ export const SharePromptModal: React.FC<SharePromptModalProps> = ({ chatId, mess
 
         <div className="px-6 pt-5 flex items-center gap-2 text-sm font-semibold">
           <Globe className="w-4 h-4" />
-          <span>Share a public link to this prompt</span>
+          <span>Share a public link to this {noun}</span>
         </div>
         {error && (
           <p className="px-6 pt-2 text-xs text-red-600 dark:text-red-400">Could not create a link. Please try again.</p>

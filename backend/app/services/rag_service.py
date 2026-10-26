@@ -11,7 +11,7 @@ from backend.app.services.grounding_service import grounding_service
 from backend.app.services.web_search_service import web_search_service
 from backend.app.services.evidence_selection_service import evidence_selection_service
 from backend.app.services.answer_planner import answer_planner
-from backend.app.services.answer_style_router import answer_style_router
+from backend.app.services.answer_style_router import answer_style_router, is_solution_design_question
 from backend.app.services.followup_service import followup_service
 from backend.app.services.llm_service import llm_service
 from backend.app.services.query_rewriter import query_rewriter
@@ -27,6 +27,31 @@ from backend.app.services.answer_guard import apply_guard
 from backend.app.services import confidence_scoring
 
 logger = logging.getLogger(__name__)
+
+# Scenario questions list their topics in one sentence: "a solution covering SOM, CC rating, ..., while
+# handling billing discrepancies and production failures". Each topic is retrieved on its own.
+_TOPIC_LIST_LEAD = re.compile(r"^.*?\b(?:covering|including|spanning|across|involving|comprising|such\s+as)\s+", re.I)
+_TOPIC_SEPARATOR = re.compile(
+    r",\s*(?:and\s+|or\s+)?|\s+while\s+(?:also\s+)?|\s+as\s+well\s+as\s+|\s+along\s+with\s+", re.I
+)
+_TOPIC_FILLER = re.compile(r"^(?:(?:and|or|also|while|handling|managing|addressing|supporting|with)\s+)+", re.I)
+_OPERATIONS_ASKED = re.compile(
+    r"\b(?:production|fail(?:s|ed|ing|ures?)?|errors?|issues?|incidents?|discrepanc(?:y|ies)|bottlenecks?"
+    r"|troubleshoot\w*|recover\w*|reprocess\w*|monitor\w*|mismatch\w*)\b",
+    re.I,
+)
+# Retrieval queries (not answer content) for the operational ground senior design answers must cover.
+OPERATIONS_ASPECTS = [
+    "SAP BRIM rating failures and rejected or duplicate usage events: detection and reprocessing",
+    "failed billing and invoicing runs in Convergent Invoicing: error billable items, monitoring and restart",
+    "reconciliation mismatches between usage, billable items, billing documents, invoicing and FI-CA postings",
+    "FI-CA posting errors from invoicing documents and how they are corrected",
+    "performance tuning of high-volume billing mass runs and parallel processing",
+]
+MAX_SCENARIO_ASPECTS = 11
+PASSAGES_PER_ASPECT = 2
+# Web/repository search runs once per part; for scenario questions only the worst-covered parts are searched.
+MAX_EXTERNAL_SEARCH_ASPECTS = 3
 
 
 class RAGService:
@@ -151,7 +176,29 @@ class RAGService:
         )
         aspects = [re.sub(r"^\s*(?:\d+[.)]|[-*])\s*", "", p).strip(" ?\n\t") for p in pieces]
         aspects = [p for p in aspects if len(p) >= 8]
-        return aspects if len(aspects) > 1 else [(query or "").strip()]
+        if len(aspects) > 1:
+            return aspects
+        return RAGService.scenario_aspects(query) or [(query or "").strip()]
+
+    @staticmethod
+    def scenario_aspects(query: str) -> List[str]:
+        """
+        Retrieval parts for a broad design/scenario question: the whole question, its listed topics
+        (paired, to bound the number of searches) and, when it asks about operations, the standard
+        production-support topics. Empty for any other question.
+        """
+        text = " ".join((query or "").split())
+        if not is_solution_design_question(text):
+            return []
+        topics = [_TOPIC_FILLER.sub("", t).strip(" ?.") for t in _TOPIC_SEPARATOR.split(_TOPIC_LIST_LEAD.sub("", text, count=1))]
+        topics = [t for t in topics if len(t) >= 3]
+        aspects = [text]
+        if len(topics) >= 2:
+            size = 1 if len(topics) <= 4 else 2
+            aspects += [f"SAP BRIM {', '.join(topics[i:i + size])}" for i in range(0, len(topics), size)]
+        if _OPERATIONS_ASKED.search(text):
+            aspects += OPERATIONS_ASPECTS
+        return aspects[:MAX_SCENARIO_ASPECTS] if len(aspects) > 1 else []
 
     def _retrieve_aspect_evidence(self, db: Session, query: str, top_k: int, *, hybrid: bool = False):
         aspects = self.split_question_aspects(query)
@@ -179,12 +226,43 @@ class RAGService:
         combined = sorted(merged.values(), key=lambda item: float(item.get("rerank_score", item.get("score", 0))), reverse=True)
         # Use the weakest aspect match to trigger fallback rather than hiding an evidence gap in an average.
         weakest_score = min((row["score"] for row in aspect_results), default=0.0)
-        return combined[:max(settings.RERANK_TOP_K, settings.TOP_K)], weakest_score, aspect_results
+        kept = combined[:max(settings.RERANK_TOP_K, settings.TOP_K)]
+        # Every part keeps its own best passages; a global cut would drop the parts that score lower.
+        for aspect in aspects:
+            for item in [c for c in combined if c.get("question_aspect") == aspect][:PASSAGES_PER_ASPECT]:
+                if not any(k is item for k in kept):
+                    kept.append(item)
+        return kept, weakest_score, aspect_results
 
     @staticmethod
-    def _ensure_aspect_coverage(selected: List[Dict[str, Any]], internal: List[Dict[str, Any]], aspects: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Keep a passage or an explicit non-citable retrieval-gap marker for each ask."""
+    def _external_search_aspects(query: str, aspect_results: List[Dict[str, Any]]) -> List[str]:
+        """Parts to search outside the knowledge base: all of them, or the worst-covered few for a scenario question."""
+        aspects = RAGService.split_question_aspects(query)
+        if len(aspects) <= MAX_EXTERNAL_SEARCH_ASPECTS or not is_solution_design_question(query):
+            return aspects
+        weakest = sorted(aspect_results, key=lambda row: (row["score"], row["evidence_count"]))
+        return [row["aspect"] for row in weakest[:MAX_EXTERNAL_SEARCH_ASPECTS]]
+
+    @staticmethod
+    def _ensure_aspect_coverage(
+        selected: List[Dict[str, Any]],
+        internal: List[Dict[str, Any]],
+        aspects: List[Dict[str, Any]],
+        interleave: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """
+        Keep a passage or an explicit non-citable retrieval-gap marker for each ask.
+        interleave: put one passage per ask first, so a context limit trims extra passages, not whole asks.
+        """
         output = list(selected or [])
+        if interleave:
+            lead, seen = [], set()
+            for row in aspects:
+                first = next((p for p in output + list(internal or []) if p.get("question_aspect") == row["aspect"]), None)
+                if first is not None and id(first) not in seen:
+                    lead.append(first)
+                    seen.add(id(first))
+            output = lead + [p for p in output if id(p) not in seen]
         for row in aspects:
             aspect = row["aspect"]
             if any(p.get("question_aspect") == aspect for p in output):
@@ -648,7 +726,7 @@ class RAGService:
                 multi_source_compare_enabled=True,
                 web_search_available=settings.WEB_FALLBACK_ENABLED,
                 force_web_search=auto_compare_trigger,
-                query_aspects=self.split_question_aspects(cleaned_query),
+                query_aspects=self._external_search_aspects(cleaned_query, aspect_results),
             )
             winning_cand = comp_result.get("winning_candidate")
             if winning_cand:
@@ -682,7 +760,9 @@ class RAGService:
             selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
             selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
 
-        selected_passages = self._ensure_aspect_coverage(selected_passages, top_kb_chunks, aspect_results)
+        selected_passages = self._ensure_aspect_coverage(
+            selected_passages, top_kb_chunks, aspect_results, interleave=is_solution_design_question(cleaned_query)
+        )
 
         if has_attachments:
             attachment_passages = self._attachment_passages(cleaned_query, attachments)
@@ -1020,7 +1100,7 @@ class RAGService:
                 multi_source_compare_enabled=True,
                 web_search_available=settings.WEB_FALLBACK_ENABLED,
                 force_web_search=auto_compare_trigger,
-                query_aspects=self.split_question_aspects(cleaned_query),
+                query_aspects=self._external_search_aspects(cleaned_query, aspect_results),
             )
             winning = comp_result.get("winning_candidate")
             eligible = comp_result.get("eligible_candidates", [])
@@ -1050,7 +1130,9 @@ class RAGService:
             selected_source_type = evidence_selection.get("source_type") or "knowledge_base"
             selected_quality = evidence_selection.get("selected_evidence_quality", 0.8)
 
-        selected_passages = self._ensure_aspect_coverage(selected_passages, top_kb_chunks, aspect_results)
+        selected_passages = self._ensure_aspect_coverage(
+            selected_passages, top_kb_chunks, aspect_results, interleave=is_solution_design_question(cleaned_query)
+        )
 
         if has_attachments:
             attachment_passages = self._attachment_passages(cleaned_query, attachments)
@@ -1175,6 +1257,14 @@ class RAGService:
             "comparison_audit": None,
         }
 
+        # Visual retrieval: when user explicitly asks for diagrams/illustrations
+        relevant_images = []
+        if web_search_service.wants_visuals(cleaned_query):
+            try:
+                relevant_images = web_search_service.search_sap_images(cleaned_query)
+            except Exception as e:
+                logger.warning(f"Visual search failed: {e}")
+
         # STAGE 10: Completion 'done' event with all required fields
         yield {
             "type": "done",
@@ -1193,7 +1283,7 @@ class RAGService:
             "external_search_used": should_trigger_tavily,
             "citations": citations,
             "web_sources": web_sources,
-            "images": [],
+            "images": relevant_images,
             "follow_up_questions": follow_ups,
             "selection_summary": evidence_selection.get("selection_summary", ""),
             "comparison_audit": comparison_summary["comparison_audit"],

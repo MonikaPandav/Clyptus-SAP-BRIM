@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from backend.app.config import settings
+from backend.app.config import settings, security_settings_errors
 from backend.app.database import init_db, SessionLocal, DatabaseConnectionError, describe_target
 from backend.app.models.document import Document
 from backend.app.models.chunk import DocumentChunk
@@ -23,6 +23,11 @@ logger = logging.getLogger("main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    insecure = security_settings_errors()
+    if insecure:
+        for problem in insecure:
+            logger.critical("INSECURE CONFIGURATION - backend not started. %s", problem)
+        raise RuntimeError("Insecure configuration in backend/.env: " + " ".join(insecure))
     logger.info("Initializing database and verifying tables...")
     try:
         init_db()

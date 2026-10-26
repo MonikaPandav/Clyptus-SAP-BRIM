@@ -233,3 +233,27 @@ docker exec sap_assistant_postgres createdb -U sap_assistant -O sap_brim_ai -T s
 | `docker compose up` says `POSTGRES_PASSWORD` / `SAP_BRIM_DB_PASSWORD` must be set | Create `.env` in the repository root from `.env.example`. |
 | Backend exits with `DATABASE UNAVAILABLE` | The database isn't running or `DATABASE_URL` is wrong. Check with `docker ps` and section 1. |
 | `database "sap_brim_ai" does not exist` on a new machine | The init script only runs on a new, empty volume. Create the role and database manually (replace `<password>`):<br>`docker exec sap_assistant_postgres psql -U sap_assistant -d postgres -c "CREATE ROLE sap_brim_ai LOGIN PASSWORD '<password>';"`<br>`docker exec sap_assistant_postgres createdb -U sap_assistant -O sap_brim_ai sap_brim_ai`<br>`docker exec sap_assistant_postgres psql -U sap_assistant -d sap_brim_ai -c "CREATE EXTENSION IF NOT EXISTS vector;"` |
+
+---
+
+## 12. Self-Hosted Search Services (SearXNG & Siftdog)
+
+The Docker Compose stack also manages self-hosted search and retrieval services:
+
+| Service | Container | Image | Port | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **SearXNG** | `sap_assistant_searxng` | `searxng/searxng:latest` | `8089` | Metasearch engine with multi-engine web & image discovery |
+| **Siftdog** | `sap_assistant_siftdog` | `ghcr.io/khsarvar/siftdog:latest` | `8088` | Search, clean extraction, crawling, and site mapping API |
+
+Start search services:
+```bash
+docker compose up -d searxng siftdog
+```
+
+Health check:
+```bash
+curl http://127.0.0.1:8088/health
+curl "http://127.0.0.1:8089/search?q=test&format=json"
+```
+
+For full architecture and API details, refer to [docs/SEARXNG_SIFTDOG_INTEGRATION.md](file:///s:/ai/SAP_BRIM_Ai/docs/SEARXNG_SIFTDOG_INTEGRATION.md).

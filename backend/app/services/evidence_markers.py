@@ -11,10 +11,12 @@ markers removed; admins receive them together with citations carrying a matching
 import re
 from typing import Any, Dict, List, Sequence, Set
 
-MARKER_PATTERN = re.compile(r"\s?\[(E\d{1,3}(?:\s*,\s*E\d{1,3})*)\]")
+# Some models wrap marker IDs in zero-width characters ("[​E2​]"); they are still markers.
+_ZW = "[​‌‍⁠﻿]*"
+MARKER_PATTERN = re.compile(rf"\s?\[{_ZW}(E\d{{1,3}}(?:{_ZW}\s*,\s*{_ZW}E\d{{1,3}})*){_ZW}\]")
 _ID_PATTERN = re.compile(r"E\d{1,3}")
-_FULL_MARKER = re.compile(r"\[E\d{1,3}(?:\s*,\s*E\d{1,3})*\]")
-_MARKER_PREFIX = re.compile(r"\[(?:E\d{0,3}(?:\s*,\s*(?:E\d{0,3})?)*)?")
+_FULL_MARKER = re.compile(rf"\[{_ZW}E\d{{1,3}}(?:{_ZW}\s*,\s*{_ZW}E\d{{1,3}})*{_ZW}\]")
+_MARKER_PREFIX = re.compile(rf"\[{_ZW}(?:E\d{{0,3}}{_ZW}(?:\s*,\s*{_ZW}(?:E\d{{0,3}}{_ZW})?)*)?")
 
 
 def is_citable(passage: Dict[str, Any]) -> bool:
