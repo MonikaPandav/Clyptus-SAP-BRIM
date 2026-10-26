@@ -8,6 +8,7 @@ import React, {
 import type { User } from '../types';
 
 import {
+  ApiError,
   apiGetMe,
   apiLogin,
   apiAdminLogin,
@@ -62,9 +63,17 @@ export const AuthProvider: React.FC<{
           setToken(stored);
         } catch (error) {
           console.error('Authentication initialization failed:', error);
+          const status = error instanceof ApiError ? error.status : undefined;
           // Check if there is a cached guest/local session
           const savedLocal = localStorage.getItem(LOCAL_USER_KEY);
-          if (savedLocal) {
+          if (status === 401 || status === 403) {
+            // The server rejected the token (expired or signed with an old secret). Restoring the
+            // cached profile would look signed in while every chat request fails, so sign out.
+            clearStoredToken();
+            localStorage.removeItem(LOCAL_USER_KEY);
+            setToken(null);
+            setUser(null);
+          } else if (savedLocal) {
             try {
               const parsed = JSON.parse(savedLocal);
               setUser(parsed);

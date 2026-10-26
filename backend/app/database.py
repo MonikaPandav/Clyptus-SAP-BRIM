@@ -117,7 +117,7 @@ def create_search_indexes(conn) -> None:
 
 
 def init_db():
-    from backend.app.models import user, chat, message, document, chunk, citation, web_source, web_image, uploaded_attachment, repo_chunk, web_doc_chunk  # noqa: F401
+    from backend.app.models import user, chat, message, document, chunk, citation, web_source, web_image, uploaded_attachment, repo_chunk, web_doc_chunk, shared_prompt  # noqa: F401
     check_database_connection()
 
     with engine.begin() as conn:
@@ -132,7 +132,13 @@ def init_db():
     doc_cols = {c["name"] for c in inspector.get_columns("documents")}
     chunk_cols = {c["name"] for c in inspector.get_columns("document_chunks")}
     citation_doc_id = next(c for c in inspector.get_columns("citations") if c["name"] == "document_id")
+    message_cols = {c["name"] for c in inspector.get_columns("messages")}
+    shared_prompt_cols = {c["name"] for c in inspector.get_columns("shared_prompts")}
     with engine.begin() as conn:
+        if "feedback" not in message_cols:
+            conn.execute(text("ALTER TABLE messages ADD COLUMN feedback VARCHAR(10)"))
+        if "answer" not in shared_prompt_cols:
+            conn.execute(text("ALTER TABLE shared_prompts ADD COLUMN answer TEXT"))
         if "role" not in user_cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'consultant'"))
             conn.execute(text("UPDATE users SET role = 'admin' WHERE is_admin = true"))
@@ -161,37 +167,34 @@ def init_db():
         create_search_indexes(conn)
     logger.info("pgvector HNSW index and GIN full-text search index verified.")
 
-    # Seed designated super admin user
+    seed_super_admin()
+
+
+def seed_super_admin():
+    """Create the super admin named in .env. An existing account keeps its password."""
+    admin_email = settings.SUPER_ADMIN_EMAIL.strip()
+    if not admin_email:
+        logger.info("SUPER_ADMIN_EMAIL not set; no super admin account seeded.")
+        return
     try:
         from backend.app.models.user import User
-        from backend.app.security.auth import hash_password, verify_password
+        from backend.app.security.auth import hash_password
         with SessionLocal() as db:
-            admin_email = "vamshiyadav245@gmail.com"
             admin_user = db.query(User).filter(User.email == admin_email).first()
             if not admin_user:
-                new_admin = User(
+                db.add(User(
                     email=admin_email,
-                    name="Vamshi Yadav (Super Admin)",
-                    password_hash=hash_password("Vamshi@06"),
+                    name="Super Admin",
+                    password_hash=hash_password(settings.SUPER_ADMIN_PASSWORD),
                     is_admin=True,
                     role="admin",
-                )
-                db.add(new_admin)
+                ))
                 db.commit()
-                logger.info(f"Default Super Admin account created: {admin_email}")
-            else:
-                updated = False
-                if not admin_user.is_admin:
-                    admin_user.is_admin = True
-                    updated = True
-                if admin_user.role != "admin":
-                    admin_user.role = "admin"
-                    updated = True
-                if not verify_password("Vamshi@06", admin_user.password_hash):
-                    admin_user.password_hash = hash_password("Vamshi@06")
-                    updated = True
-                if updated:
-                    db.commit()
-                    logger.info(f"Updated Super Admin account permissions/credentials: {admin_email}")
+                logger.info("Super admin account created: %s", admin_email)
+            elif not admin_user.is_admin or admin_user.role != "admin":
+                admin_user.is_admin = True
+                admin_user.role = "admin"
+                db.commit()
+                logger.info("Super admin permissions restored: %s", admin_email)
     except Exception as e:
         logger.warning(f"Could not seed super admin user: {e}")

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from backend.app.config import settings
+from backend.app.config import settings, security_settings_errors
 from backend.app.database import init_db, SessionLocal, DatabaseConnectionError, describe_target
 from backend.app.models.document import Document
 from backend.app.models.chunk import DocumentChunk
@@ -16,12 +16,18 @@ from backend.app.api.rag import router as rag_router
 from backend.app.api.admin import router as admin_router
 from backend.app.api.rag_inspect import router as rag_inspect_router
 from backend.app.api.documents import router as documents_router
+from backend.app.api.shared import router as shared_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    insecure = security_settings_errors()
+    if insecure:
+        for problem in insecure:
+            logger.critical("INSECURE CONFIGURATION - backend not started. %s", problem)
+        raise RuntimeError("Insecure configuration in backend/.env: " + " ".join(insecure))
     logger.info("Initializing database and verifying tables...")
     try:
         init_db()
@@ -80,6 +86,7 @@ app.include_router(rag_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(rag_inspect_router, prefix=settings.API_V1_STR)
 app.include_router(documents_router, prefix=settings.API_V1_STR)
+app.include_router(shared_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Info"])
 def root():

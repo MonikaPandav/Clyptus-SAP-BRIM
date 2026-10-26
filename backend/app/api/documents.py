@@ -13,7 +13,7 @@ from backend.app.database import get_db
 from backend.app.models.document import Document
 from backend.app.models.chunk import DocumentChunk
 from backend.app.models.user import User
-from backend.app.security.auth import oauth2_scheme, get_optional_current_user
+from backend.app.security.auth import oauth2_scheme, get_optional_current_user, admin_key_matches
 from backend.app.services.document_processing_service import document_processing_service
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def authenticate_document_operator(
     Strictly enforces administrator privileges.
     Allows operations with valid X-Admin-Key header or authenticated admin JWT token.
     """
-    if x_admin_key and x_admin_key == settings.ADMIN_API_KEY:
+    if admin_key_matches(x_admin_key):
         return True
     user = get_optional_current_user(token=token, db=db)
     if user and user.is_admin:
@@ -81,7 +81,7 @@ async def stream_processing_progress(
 ):
     effective_token = token or header_token
     is_authorized = False
-    if x_admin_key and x_admin_key == settings.ADMIN_API_KEY:
+    if admin_key_matches(x_admin_key):
         is_authorized = True
     elif effective_token:
         user = get_optional_current_user(token=effective_token, db=db)

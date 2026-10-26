@@ -1,4 +1,4 @@
-import type { User, Chat, Message, Citation, WebSource, WebImage, DocumentAttachment, DocumentListResponse, ProcessingProgress } from '../types';
+import type { User, Chat, Message, MessageFeedback,Citation, WebSource, WebImage, DocumentAttachment, DocumentListResponse, ProcessingProgress } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -19,9 +19,41 @@ const authHeaders = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const SERVER_UNREACHABLE = 'Cannot reach the server. Make sure the backend is running on http://localhost:8000.';
+const SERVER_TIMEOUT = 'The server stopped responding. Please try again.';
+const SESSION_EXPIRED = 'Your session has expired. Please sign in again.';
+const CREATE_CHAT_TIMEOUT_MS = 15_000;
+
+/** A failed request, with the HTTP status when the server answered. */
+export class ApiError extends Error {
+  status?: number;
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+const httpError = (resp: Response, action: string): ApiError =>
+  new ApiError(resp.status === 401 ? SESSION_EXPIRED : `${action} (HTTP ${resp.status}).`, resp.status);
+
+// fetch() rejects with a bare "Failed to fetch" when the backend is down; surface the real cause.
+// A caller's own abort (Stop button) is passed through unchanged so it can be told apart.
+const fetchBackend = async (url: string, init?: RequestInit): Promise<Response> => {
+  try {
+    return await fetch(url, init);
+  } catch (err) {
+    if (init?.signal?.aborted) {
+      if ((init.signal.reason as Error | undefined)?.name === 'TimeoutError') throw new ApiError(SERVER_TIMEOUT);
+      throw err;
+    }
+    throw new ApiError(SERVER_UNREACHABLE);
+  }
+};
+
 // Auth API
 export const apiRegister = async (name: string, email: string, password: string) => {
-  const resp = await fetch(`${API_BASE_URL}/auth/register`, {
+  const resp = await fetchBackend(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
@@ -34,7 +66,7 @@ export const apiRegister = async (name: string, email: string, password: string)
 };
 
 export const apiLogin = async (email: string, password: string) => {
-  const resp = await fetch(`${API_BASE_URL}/auth/login`, {
+  const resp = await fetchBackend(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -47,7 +79,7 @@ export const apiLogin = async (email: string, password: string) => {
 };
 
 export const apiAdminLogin = async (email: string, password: string) => {
-  const resp = await fetch(`${API_BASE_URL}/auth/admin-login`, {
+  const resp = await fetchBackend(`${API_BASE_URL}/auth/admin-login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -61,7 +93,7 @@ export const apiAdminLogin = async (email: string, password: string) => {
 
 
 export const apiDemoLogin = async () => {
-  const resp = await fetch(`${API_BASE_URL}/auth/demo`, {
+  const resp = await fetchBackend(`${API_BASE_URL}/auth/demo`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -77,7 +109,7 @@ export const apiGetMe = async (): Promise<User> => {
     headers: { ...authHeaders() },
   });
   if (!resp.ok) {
-    throw new Error('Unauthorized');
+    throw new ApiError('Unauthorized', resp.status);
   }
   return resp.json();
 };
@@ -95,12 +127,13 @@ export const apiGetChats = async (search?: string): Promise<Chat[]> => {
 };
 
 export const apiCreateChat = async (title?: string): Promise<Chat> => {
-  const resp = await fetch(`${API_BASE_URL}/chats`, {
+  const resp = await fetchBackend(`${API_BASE_URL}/chats`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ title: title || 'New SAP Chat' }),
+    signal: AbortSignal.timeout(CREATE_CHAT_TIMEOUT_MS),
   });
-  if (!resp.ok) throw new Error('Failed to create chat');
+  if (!resp.ok) throw httpError(resp, 'Could not start a new chat');
   return resp.json();
 };
 
@@ -147,6 +180,8 @@ export const apiExtractDocument = async (file: File): Promise<{
   char_count: number;
   preview: string;
   text: string;
+  detected_question?: string | null;
+  analysis_method?: 'vision' | 'vision+ocr' | 'ocr' | null;
 }> => {
   const formData = new FormData();
   formData.append('file', file);
@@ -195,6 +230,35 @@ export const apiSavePartialMessage = async (chatId: string, content: string): Pr
   }
 };
 
+/** Saves a thumbs up/down on an answer; null clears it. */
+export const apiSetFeedback = async (chatId: string, messageId: string, value: MessageFeedback | null): Promise<void> => {
+  const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}/feedback`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ value }),
+  });
+  if (!resp.ok) throw new Error('Could not save feedback');
+};
+
+/** Creates (or refreshes) the public link for one prompt or answer and returns its token. */
+export const apiSharePrompt = async (chatId: string, messageId: string): Promise<string> => {
+  const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}/share`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  if (!resp.ok) throw new Error('Could not create share link');
+  return (await resp.json()).token;
+};
+
+/** Public: no login needed to read a shared prompt (and its answer, when an answer was shared). */
+export const apiGetSharedPrompt = async (
+  token: string
+): Promise<{ content: string; answer: string | null; created_at: string }> => {
+  const resp = await fetch(`${API_BASE_URL}/shared/prompts/${encodeURIComponent(token)}`);
+  if (!resp.ok) throw new Error('Shared prompt not found');
+  return resp.json();
+};
+
 // SSE Streaming
 export interface StreamStatus {
   type: 'status';
@@ -229,31 +293,81 @@ export interface StreamCallbacks {
   onToken?: (token: string) => void;
   onDone?: (meta: StreamMetadata, fullAnswer?: string) => void;
   onError?: (err: any) => void;
+  /** Stored id of the prompt that this stream answers. */
+  onUserMessage?: (messageId: string) => void;
 }
 
-export const apiStreamMessage = async (
+export const apiStreamMessage = (
   chatId: string,
   content: string,
   callbacks: StreamCallbacks,
   signal?: AbortSignal,
   attachments?: DocumentAttachment[]
+): Promise<void> =>
+  streamSSE(
+    `${API_BASE_URL}/chats/${chatId}/messages?stream=true`,
+    { content, attachments: attachments && attachments.length > 0 ? attachments : undefined },
+    callbacks,
+    signal
+  );
+
+/** Replaces a stored prompt, drops every later message, and streams the new answer. */
+export const apiEditMessageStream = (
+  chatId: string,
+  messageId: string,
+  content: string,
+  callbacks: StreamCallbacks,
+  signal?: AbortSignal
+): Promise<void> =>
+  streamSSE(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}/edit`, { content }, callbacks, signal);
+
+// The backend sends the response headers at once and then an event at every pipeline stage, so this
+// much silence means the connection is stuck (e.g. a hung dev server), not that the answer is slow.
+const STREAM_CONNECT_TIMEOUT_MS = 30_000;
+const STREAM_IDLE_TIMEOUT_MS = 120_000;
+
+/**
+ * Posts a question and reads the SSE answer. Always ends in exactly one of onDone or onError,
+ * except when the caller aborts (Stop), which ends silently.
+ */
+export const streamSSE = async (
+  url: string,
+  body: Record<string, unknown>,
+  callbacks: StreamCallbacks,
+  signal?: AbortSignal
 ): Promise<void> => {
+  // Aborted by the caller's signal or by the watchdog when the server goes quiet.
+  const controller = new AbortController();
+  const forwardAbort = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  else signal?.addEventListener('abort', forwardAbort);
+
+  let timedOut = false;
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  const expectDataWithin = (ms: number) => {
+    clearTimeout(watchdog);
+    watchdog = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, ms);
+  };
+
+  let isCompleted = false;
+
   try {
-    const resp = await fetch(`${API_BASE_URL}/chats/${chatId}/messages?stream=true`, {
+    expectDataWithin(STREAM_CONNECT_TIMEOUT_MS);
+    const resp = await fetchBackend(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders(),
       },
-      body: JSON.stringify({
-        content,
-        attachments: attachments && attachments.length > 0 ? attachments : undefined
-      }),
-      signal,
+      body: JSON.stringify(body),
+      signal: controller.signal,
     });
 
     if (!resp.ok) {
-      throw new Error(`Failed to stream message: ${resp.statusText}`);
+      throw httpError(resp, 'The server could not answer this question');
     }
 
     const reader = resp.body?.getReader();
@@ -261,7 +375,6 @@ export const apiStreamMessage = async (
 
     const decoder = new TextDecoder();
     let buffer = '';
-    let isCompleted = false;
     let finalReceivedAnswer: string | undefined = undefined;
     let lastDoneMeta: StreamMetadata = {};
 
@@ -279,6 +392,7 @@ export const apiStreamMessage = async (
 
       const lines = trimmed.split('\n');
       for (const line of lines) {
+        if (isCompleted) return;
         const trimmedLine = line.trim();
         if (trimmedLine.startsWith('data:')) {
           const rawData = trimmedLine.slice(5).trim();
@@ -302,7 +416,11 @@ export const apiStreamMessage = async (
               }
               finishStream(parsed, ans);
             } else if (parsed.type === 'error') {
+              // The backend ends the stream after an error event; nothing after it is an answer.
+              isCompleted = true;
               callbacks.onError?.(new Error(parsed.message || 'Generation error occurred'));
+            } else if (parsed.type === 'user_message') {
+              callbacks.onUserMessage?.(parsed.message_id);
             } else if (parsed.citations !== undefined || parsed.message_id !== undefined) {
               lastDoneMeta = { ...lastDoneMeta, ...parsed };
               callbacks.onMetadata?.(parsed);
@@ -315,6 +433,7 @@ export const apiStreamMessage = async (
     };
 
     while (true) {
+      expectDataWithin(STREAM_IDLE_TIMEOUT_MS);
       const { done, value } = await reader.read();
       if (done) {
         if (buffer.trim()) {
@@ -334,13 +453,26 @@ export const apiStreamMessage = async (
       }
     }
 
-    finishStream();
+    // The backend always ends with a done or error event; closing without one means it was cut off.
+    if (!isCompleted) {
+      isCompleted = true;
+      callbacks.onError?.(new Error('The answer was cut off before it finished. Please try again.'));
+    }
   } catch (err: any) {
+    if (isCompleted) return;
+    isCompleted = true;
+    if (timedOut) {
+      callbacks.onError?.(new ApiError(SERVER_TIMEOUT));
+      return;
+    }
     if (signal?.aborted || err?.name === 'AbortError') {
       console.log('Streaming aborted by user.');
       return;
     }
     callbacks.onError?.(err);
+  } finally {
+    clearTimeout(watchdog);
+    signal?.removeEventListener('abort', forwardAbort);
   }
 };
 
@@ -504,6 +636,30 @@ export const connectProcessingStream = (
   return () => {
     eventSource.close();
   };
+};
+
+export interface SystemConfig {
+  embedding_model: string;
+  embedding_dim: number;
+  llm_provider: string;
+  llm_model: string;
+  similarity_threshold: number;
+  internal_evidence_threshold: number;
+  grounding_threshold: number;
+  admin_api_key_enabled: boolean;
+  signed_in_admin: string;
+}
+
+/** Admin only: the live model and threshold settings shown on the System tab. */
+export const apiGetSystemConfig = async (): Promise<SystemConfig> => {
+  const resp = await fetch(`${API_BASE_URL}/rag-inspect/system-config`, {
+    headers: { ...authHeaders() },
+  });
+  if (!resp.ok) {
+    const errorData = await resp.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to load system configuration');
+  }
+  return resp.json();
 };
 
 export const apiGetRAGInspectionDocuments = async (): Promise<any> => {

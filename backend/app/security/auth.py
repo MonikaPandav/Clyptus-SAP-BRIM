@@ -1,3 +1,4 @@
+import hmac
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt
@@ -74,6 +75,13 @@ def get_optional_current_user(
         pass
     return None
 
+def admin_key_matches(candidate: Optional[str]) -> bool:
+    """X-Admin-Key check in constant time. An unset ADMIN_API_KEY disables key access entirely."""
+    configured = settings.ADMIN_API_KEY
+    if not configured or not candidate:
+        return False
+    return hmac.compare_digest(candidate.encode("utf-8"), configured.encode("utf-8"))
+
 def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
     if not current_user.is_admin:
         raise HTTPException(
@@ -88,7 +96,7 @@ def verify_admin_key_or_user(
     db: Session = Depends(get_db)
 ) -> bool:
     """Verifies either valid X-Admin-Key header or valid admin JWT token."""
-    if x_admin_key and x_admin_key == settings.ADMIN_API_KEY:
+    if admin_key_matches(x_admin_key):
         return True
     if token:
         try:

@@ -13,6 +13,7 @@ class Message(Base):
     content = Column(Text, nullable=False)
     source_type = Column(String(50), nullable=True)  # 'knowledge_base', 'web', 'refusal', 'error'
     grounding_score = Column(Float, nullable=True)
+    feedback = Column(String(10), nullable=True)  # 'up', 'down' or NULL; assistant answers only
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     chat = relationship("Chat", back_populates="messages")
