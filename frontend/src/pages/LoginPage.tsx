@@ -93,45 +93,40 @@ export const LoginPage: React.FC = () => {
         <div className="auth-ambient-orb orb-1" aria-hidden="true" />
         <div className="auth-ambient-orb orb-2" aria-hidden="true" />
 
-        {/* Floating Top Navigation */}
-        <header className="auth-top-bar">
-          <Link to="/" className="auth-back-link" title="Return to landing page">
-            <ArrowLeft size={13} />
-            <span>Back to home</span>
-          </Link>
-        </header>
+        {/* Central Rounded Card Panel */}
+        <section className="auth-card-panel">
+          {/* Top Navigation Row */}
+          <div className="auth-top-nav">
+            <Link to="/" className="auth-back-link" title="Return to landing page">
+              <ArrowLeft size={13} />
+              <span>Back to home</span>
+            </Link>
+          </div>
 
-        {/* Balanced Two-Column Split Layout */}
-        <div className="auth-split-layout">
-          {/* Left Column: Clean Clyptus Logo without frame, box, background container, or shadow */}
-          <section className="auth-column-left" aria-label="Brand Logo">
-            <div className="auth-logo-pure-wrap">
-              <Link to="/" className="auth-logo-link" title="Return to Clyptus.AI Home">
-                <img
-                  src={fullLogoDark}
-                  alt="Clyptus.AI"
-                  className="auth-logo-pure"
-                />
-              </Link>
-            </div>
-          </section>
+          {/* Clean Clyptus Logo inside the sign-in box itself (no outer box, no inner bordered box, no background container, no shadow) */}
+          <div className="auth-logo-center">
+            <Link to="/" className="auth-logo-link" title="Return to Clyptus.AI Home">
+              <img
+                src={fullLogoDark}
+                alt="Clyptus.AI"
+                className="auth-logo-pure"
+              />
+            </Link>
+          </div>
 
-          {/* Right Column: Welcome Heading & Sign-In Form */}
-          <section className="auth-column-right" aria-label="Sign In Form">
-            <div className="auth-card-panel">
-              {/* Header Copy */}
-              <div className="auth-header-copy">
-                <h1 className="auth-title">
-                  {mode === 'login' ? (
-                    <>Welcome to <span className="auth-brand-straight">Clyptus.AI</span></>
-                  ) : (
-                    <>Create Account on <span className="auth-brand-straight">Clyptus.AI</span></>
-                  )}
-                </h1>
-                <p className="auth-subtitle">
-                  Your intelligent SAP knowledge workspace
-                </p>
-              </div>
+          {/* Header Copy */}
+          <div className="auth-header-copy">
+            <h1 className="auth-title">
+              {mode === 'login' ? (
+                <>Welcome to <span className="auth-brand-straight">Clyptus.AI</span></>
+              ) : (
+                <>Create Account on <span className="auth-brand-straight">Clyptus.AI</span></>
+              )}
+            </h1>
+            <p className="auth-subtitle">
+              Your intelligent SAP knowledge workspace
+            </p>
+          </div>
 
           {/* Clean Sign In / Create Account Tabs */}
           <div className="auth-tabs-pill" role="tablist">
@@ -327,10 +322,8 @@ export const LoginPage: React.FC = () => {
             <span className="text-stone-300">·</span>
             <Link to="/how-it-works">How It Works</Link>
           </div>
-        </div>
-      </section>
-    </div>
-  </main>
-</>
-);
+        </section>
+      </main>
+    </>
+  );
 };
