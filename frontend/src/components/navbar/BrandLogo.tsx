@@ -35,16 +35,14 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   if (compact) {
     return (
       <Link
-        className={`brand inline-flex items-center ${
-          highlighted ? 'brand-highlighted' : ''
-        } ${className}`}
+        className={`brand inline-flex items-center ${highlighted ? 'brand-highlighted' : ''
+          } ${className}`}
         to="/"
         aria-label="Clyptusap.ai home"
       >
         <img
-          className={`${selectedSize.compact} object-contain drop-shadow-sm ${
-            highlighted ? 'brand-img-highlighted' : ''
-          } ${imgClassName}`}
+          className={`${selectedSize.compact} object-contain drop-shadow-sm ${highlighted ? 'brand-img-highlighted' : ''
+            } ${imgClassName}`}
           src={iconOnly}
           alt="Clyptusap.ai"
         />
@@ -54,24 +52,21 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <Link
-      className={`brand inline-flex items-center gap-2.5 ${light ? 'brand-light' : ''} ${
-        highlighted ? 'brand-highlighted' : ''
-      } ${className}`}
+      className={`brand inline-flex items-center gap-2.5 ${light ? 'brand-light' : ''} ${highlighted ? 'brand-highlighted' : ''
+        } ${className}`}
       to="/"
       aria-label="Clyptusap.ai home"
     >
       {/* On dark surfaces show white text version; on light surfaces show dark text version */}
       <img
-        className={`${selectedSize.full} w-auto object-contain dark:hidden ${
-          highlighted ? 'brand-img-highlighted' : ''
-        } ${imgClassName}`}
+        className={`${selectedSize.full} w-auto object-contain dark:hidden ${highlighted ? 'brand-img-highlighted' : ''
+          } ${imgClassName}`}
         src={fullLogoDark}
         alt="Clyptusap.ai"
       />
       <img
-        className={`${selectedSize.full} w-auto object-contain hidden dark:block ${
-          highlighted ? 'brand-img-highlighted' : ''
-        } ${imgClassName}`}
+        className={`${selectedSize.full} w-auto object-contain hidden dark:block ${highlighted ? 'brand-img-highlighted' : ''
+          } ${imgClassName}`}
         src={fullLogoWhite}
         alt="Clyptusap.ai"
       />
