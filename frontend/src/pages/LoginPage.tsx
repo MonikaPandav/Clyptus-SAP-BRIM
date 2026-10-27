@@ -101,11 +101,6 @@ export const LoginPage: React.FC = () => {
               <ArrowLeft size={13} />
               <span>Back to home</span>
             </Link>
-
-            <div className="auth-status-pill">
-              <span className="live-pulse-dot" />
-              <span>RAG Engine Online</span>
-            </div>
           </div>
 
           {/* Elevated Clyptus Logo Presentation */}
