@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, LogIn, Menu, X } from 'lucide-react';
+import { ArrowRight, LogIn, Menu, X } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { BrandLogo } from './BrandLogo';
 
@@ -27,8 +27,9 @@ export const PublicNav: React.FC = () => {
               <LogIn size={14} />
               <span>Sign in</span>
             </Link>
-            <Link className="button button-brand button-small" to="/login" onClick={() => setOpen(false)}>
-              Try now <ArrowUpRight size={15} />
+            <Link className="button-brand-nav" to="/login" onClick={() => setOpen(false)}>
+              <span>Get Started</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
         </nav>
@@ -37,8 +38,9 @@ export const PublicNav: React.FC = () => {
             <LogIn size={14} />
             <span>Sign in</span>
           </Link>
-          <Link className="button button-brand button-small" to="/login">
-            Try now <ArrowUpRight size={15} />
+          <Link className="button-brand-nav" to="/login">
+            <span>Get Started</span>
+            <ArrowRight size={14} />
           </Link>
         </div>
       </div>
