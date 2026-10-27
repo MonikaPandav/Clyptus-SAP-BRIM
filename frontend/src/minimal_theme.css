@@ -2550,8 +2550,8 @@
   font-weight: 450;
   font-style: normal !important;
   color: var(--ivory-ink-secondary);
-  margin: 0;
-  text-align: left;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .auth-tabs-pill {
