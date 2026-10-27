@@ -111,7 +111,9 @@ export const LandingPage: React.FC = () => {
               <span className="kicker-brand-mark">
                 <img src={iconOnly} alt="Clyptus.AI" className="h-4 w-4 object-contain" />
               </span>
-              <strong>SAP + BRIM</strong> ENTERPRISE ASSISTANT
+              <span className="kicker-brand-name">Clyptus.AI</span>
+              <span className="kicker-sep">/</span>
+              <span className="kicker-tag"><strong>SAP + BRIM</strong> ENTERPRISE ASSISTANT</span>
             </div>
             <h1>
               Your SAP questions.<br />
@@ -131,7 +133,22 @@ export const LandingPage: React.FC = () => {
             </div>
             <div className="hero-trust">
               <span className="trust-line" />
-              <strong>SAP-Focused</strong> · <strong>Hybrid Retrieval</strong> · <strong>Grounded in Verified Documentation</strong>
+              <div className="trust-items-wrap">
+                <span className="trust-item">
+                  <span className="trust-dot" />
+                  <strong>SAP-Focused</strong>
+                </span>
+                <span className="trust-sep">·</span>
+                <span className="trust-item">
+                  <span className="trust-dot" />
+                  <strong>Hybrid Retrieval</strong>
+                </span>
+                <span className="trust-sep">·</span>
+                <span className="trust-item">
+                  <span className="trust-dot" />
+                  <strong>Grounded in Verified Documentation</strong>
+                </span>
+              </div>
             </div>
           </motion.div>
 
