@@ -14,9 +14,9 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { BrandLogo } from '../components/navbar/BrandLogo';
 import { PageMeta } from '../components/ui/PageMeta';
 import { useAuth } from '../context/AuthContext';
+import fullLogoDark from '../assets/clyptusap-logo-darktext.png';
 
 export const LoginPage: React.FC = () => {
   const { user, login, register, guestLogin } = useAuth();
@@ -93,43 +93,45 @@ export const LoginPage: React.FC = () => {
         <div className="auth-ambient-orb orb-1" aria-hidden="true" />
         <div className="auth-ambient-orb orb-2" aria-hidden="true" />
 
-        {/* Central Rounded Card Panel */}
-        <section className="auth-card-panel">
-          {/* Top Navigation Row */}
-          <div className="auth-top-nav">
-            <Link to="/" className="auth-back-link" title="Return to landing page">
-              <ArrowLeft size={13} />
-              <span>Back to home</span>
-            </Link>
-          </div>
+        {/* Floating Top Navigation */}
+        <header className="auth-top-bar">
+          <Link to="/" className="auth-back-link" title="Return to landing page">
+            <ArrowLeft size={13} />
+            <span>Back to home</span>
+          </Link>
+        </header>
 
-          {/* Elevated Clyptus Logo Presentation */}
-          <div className="auth-logo-center">
-            <div className="auth-logo-badge" title="Clyptus.AI Enterprise Knowledge Platform">
-              <BrandLogo size="xl" highlighted />
+        {/* Balanced Two-Column Split Layout */}
+        <div className="auth-split-layout">
+          {/* Left Column: Clean Clyptus Logo without frame, box, background container, or shadow */}
+          <section className="auth-column-left" aria-label="Brand Logo">
+            <div className="auth-logo-pure-wrap">
+              <Link to="/" className="auth-logo-link" title="Return to Clyptus.AI Home">
+                <img
+                  src={fullLogoDark}
+                  alt="Clyptus.AI"
+                  className="auth-logo-pure"
+                />
+              </Link>
             </div>
-          </div>
+          </section>
 
-          {/* Header Copy */}
-          <div className="auth-header-copy">
-            {mode === 'login' ? (
-              <h1 className="auth-title">
-                Welcome Back to<br />
-                <span className="hero-italic-serif">Clyptus.AI</span>
-              </h1>
-            ) : (
-              <h1 className="auth-title">
-                Create Your<br />
-                <span className="hero-italic-serif">Enterprise Account</span>
-              </h1>
-            )}
-
-            <p className="auth-subtitle">
-              {mode === 'login'
-                ? 'Sign in to access your grounded SAP knowledge workspace and verified citations.'
-                : 'Register to explore SPRO customizing, transaction codes, and dual-stage RAG.'}
-            </p>
-          </div>
+          {/* Right Column: Welcome Heading & Sign-In Form */}
+          <section className="auth-column-right" aria-label="Sign In Form">
+            <div className="auth-card-panel">
+              {/* Header Copy */}
+              <div className="auth-header-copy">
+                <h1 className="auth-title">
+                  {mode === 'login' ? (
+                    <>Welcome to <span className="auth-brand-straight">Clyptus.AI</span></>
+                  ) : (
+                    <>Create Account on <span className="auth-brand-straight">Clyptus.AI</span></>
+                  )}
+                </h1>
+                <p className="auth-subtitle">
+                  Your intelligent SAP knowledge workspace
+                </p>
+              </div>
 
           {/* Clean Sign In / Create Account Tabs */}
           <div className="auth-tabs-pill" role="tablist">
@@ -325,8 +327,10 @@ export const LoginPage: React.FC = () => {
             <span className="text-stone-300">·</span>
             <Link to="/how-it-works">How It Works</Link>
           </div>
-        </section>
-      </main>
-    </>
-  );
+        </div>
+      </section>
+    </div>
+  </main>
+</>
+);
 };
