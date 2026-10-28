@@ -523,11 +523,12 @@ p {
 }
 
 .hero-description {
-  max-width: 420px;
+  max-width: 680px;
   font-size: 15px;
   line-height: 1.75;
   color: #777871;
-  margin: 23px 0 25px
+  margin: 23px auto 25px;
+  text-align: center;
 }
 
 .hero-actions {
@@ -3176,7 +3177,8 @@ p {
 
   .hero-description {
     font-size: 13px;
-    margin: 16px 0 20px
+    margin: 16px auto 20px;
+    text-align: center;
   }
 
   .hero-actions {

@@ -24,8 +24,8 @@ export const PublicNav: React.FC = () => {
           <a href="/#faq" onClick={() => setOpen(false)}>FAQs</a>
           <div className="mobile-nav-actions">
             <Link className="nav-signin" to="/login" onClick={() => setOpen(false)}>
-              <LogIn size={14} />
-              <span>Sign in</span>
+              <LogIn size={15} className="nav-signin-icon" />
+              <span>Sign In</span>
             </Link>
             <Link className="button-brand-nav" to="/login" onClick={() => setOpen(false)}>
               <span>Get Started</span>
@@ -35,8 +35,8 @@ export const PublicNav: React.FC = () => {
         </nav>
         <div className="nav-actions">
           <Link className="nav-signin" to="/login">
-            <LogIn size={14} />
-            <span>Sign in</span>
+            <LogIn size={15} className="nav-signin-icon" />
+            <span>Sign In</span>
           </Link>
           <Link className="button-brand-nav" to="/login">
             <span>Get Started</span>

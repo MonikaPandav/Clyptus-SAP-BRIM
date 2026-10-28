@@ -130,33 +130,63 @@
   gap: 12px !important;
 }
 
+/* Elevated Sign-In Pill Button */
 .public-nav .nav-signin {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px !important;
+  gap: 7px !important;
   min-height: 38px !important;
-  padding: 0 16px !important;
+  padding: 0 18px !important;
   border-radius: 999px !important;
   font-size: 13.5px !important;
-  font-weight: 600 !important;
-  color: var(--ivory-ink-secondary) !important;
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em !important;
+  color: #1C1917 !important;
+  background: #FFFFFF !important;
+  border: 1px solid rgba(255, 98, 0, 0.28) !important;
+  box-shadow: 0 2px 10px rgba(255, 98, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   cursor: pointer !important;
   text-decoration: none !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.public-nav .nav-signin .nav-signin-icon,
+.public-nav .nav-signin svg {
+  color: #FF6200 !important;
+  transition: transform 0.2s ease !important;
 }
 
 .public-nav .nav-signin:hover {
-  color: var(--orange-brand) !important;
-  background: var(--orange-peach-bg) !important;
-  border-color: var(--orange-peach-border) !important;
-  box-shadow: 0 2px 8px rgba(255, 98, 0, 0.08) !important;
-  transform: translateY(-1px) !important;
+  color: #EA5300 !important;
+  background: #FFF7ED !important;
+  border-color: #FF6200 !important;
+  box-shadow: 0 6px 20px rgba(255, 98, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  transform: translateY(-1.5px) !important;
+}
+
+.public-nav .nav-signin:hover .nav-signin-icon,
+.public-nav .nav-signin:hover svg {
+  transform: translateX(1.5px) scale(1.05) !important;
+}
+
+.public-nav .nav-signin:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 2px 6px rgba(255, 98, 0, 0.12) !important;
+}
+
+.dark .public-nav .nav-signin {
+  background: #1C1917 !important;
+  border-color: rgba(255, 98, 0, 0.38) !important;
+  color: #F5F5F4 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 98, 0, 0.2) !important;
+}
+
+.dark .public-nav .nav-signin:hover {
+  background: #29201A !important;
+  border-color: #FF7A1A !important;
+  color: #FFB280 !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.65), 0 0 12px rgba(255, 98, 0, 0.25) !important;
 }
 
 /* Signature Editorial Italic Serif Highlight */
@@ -389,7 +419,8 @@
   line-height: 1.72;
   color: var(--ivory-ink-secondary);
   max-width: 680px;
-  margin: 0 auto 32px;
+  margin: 0 auto 32px !important;
+  text-align: center !important;
 }
 
 .hero-description strong {

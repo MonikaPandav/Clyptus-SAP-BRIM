@@ -8,10 +8,8 @@ import { PageMeta } from '../components/ui/PageMeta';
 import { HeroChatbotPreview } from '../components/landing/HeroChatbotPreview';
 import { EnterprisePartnerTicker } from '../components/landing/EnterprisePartnerTicker';
 import { InfinitePossibilitiesGrid } from '../components/landing/InfinitePossibilitiesGrid';
-import { RagWorkflowSection } from '../components/landing/RagWorkflowSection';
 import { BrimModuleExplorer } from '../components/landing/BrimModuleExplorer';
 import { AiComparisonSection } from '../components/landing/AiComparisonSection';
-import { QuestionPromptBank } from '../components/landing/QuestionPromptBank';
 import { AboutClyptusSection } from '../components/landing/AboutClyptusSection';
 import { FaqSection } from '../components/landing/FaqSection';
 import { FinalCtaSection } from '../components/landing/FinalCtaSection';
@@ -107,7 +105,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Subtitle Description */}
             <motion.p
-              className="hero-description"
+              className="hero-description text-center mx-auto"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
@@ -174,17 +172,11 @@ export const LandingPage: React.FC = () => {
         {/* One Knowledge Platform. Infinite SAP Possibilities. (Feature Cards & Orbital Arcs) */}
         <InfinitePossibilitiesGrid />
 
-        {/* The 6-Stage RAG Pipeline Interactive Section */}
-        <RagWorkflowSection />
-
         {/* BRIM Module Explorer (SOM, CC, CI, FI-CA, CM) */}
         <BrimModuleExplorer />
 
         {/* Generic AI vs Clyptus.AI Side-by-Side Comparison */}
         <AiComparisonSection />
-
-        {/* Practical Consulting Prompt Bank */}
-        <QuestionPromptBank />
 
         {/* About Clyptus Section */}
         <AboutClyptusSection />

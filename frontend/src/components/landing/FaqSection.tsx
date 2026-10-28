@@ -71,7 +71,7 @@ export const FaqSection: React.FC = () => {
         >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
-            <span>FREQUENTLY ASKED QUESTIONS</span>
+            <span>FREQUENTLY ASKED QUESTIONS?</span>
           </div>
 
           <h2 className="section-title-large">
