@@ -204,7 +204,7 @@ export const ChatPage: React.FC = () => {
       setMessages((prev) => [...prev, stoppedAssistantMsg]);
 
       if (conversationId && !isTrialUser && stoppedContent.trim()) {
-        apiSavePartialMessage(conversationId, stoppedContent).catch(() => {});
+        apiSavePartialMessage(conversationId, stoppedContent).catch(() => { });
       }
     }
 

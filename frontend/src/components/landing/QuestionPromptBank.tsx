@@ -1,72 +1,87 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, CheckCircle2, Copy, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Copy,
+  Sparkles,
+} from 'lucide-react';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  tabPanelVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
-interface PromptItem {
+interface SamplePrompt {
   id: string;
-  category: 'Configuration' | 'Troubleshooting' | 'Transactions' | 'Processes';
+  category: string;
   question: string;
-  summary: string;
   sproOrTcode: string;
+  summary: string;
 }
 
-const samplePrompts: PromptItem[] = [
+const samplePrompts: SamplePrompt[] = [
   {
     id: 'p1',
-    category: 'Configuration',
-    question: 'What is transaction FKKBIXCIT_CONF used for in Convergent Invoicing?',
-    summary: 'Used to configure and generate Billable Item Classes (/1BIX/ structures and DB tables) after defining field catalogs.',
-    sproOrTcode: 'T-Code: FKKBIXCIT_CONF | SPRO: Convergent Invoicing > Basic Data > Billable Item Classes',
+    category: 'Billing & Invoicing',
+    question: 'How do billable items get grouped into a single billing document in SAP CI?',
+    sproOrTcode: 'SPRO: Convergent Invoicing > Basic Data > Billable Item Classes > Define Aggregation Criteria',
+    summary: 'Aggregation is governed by billing process definitions and grouping variants. Header fields (VKONT, GPART, WAERS) are evaluated alongside customizable grouping characteristics to combine raw BITs into consolidated invoice line items.',
   },
   {
     id: 'p2',
-    category: 'Configuration',
-    question: 'Where are document types and posting areas configured in FI-CA?',
-    summary: 'Document types define number ranges and clearing behavior, maintained in Posting Area 0100 under FI-CA Document settings.',
-    sproOrTcode: 'SPRO: Contract Accounts A/R & A/P > Basic Functions > Postings and Documents > Document > Maintain Document Types',
+    category: 'Charging & Rating',
+    question: 'Where is the rating logic defined for recurring monthly fees vs tiered usage in SAP CC?',
+    sproOrTcode: 'Core Tool: Price Plans > Reusable Charges > Tiered Rate Trees (Numeric Component)',
+    summary: 'Recurring charges are triggered via recurring events with periodic chronologies. Usage charges evaluate consumption metrics through decision trees and comparator branches in the Core Tool charge plan.',
   },
   {
     id: 'p3',
-    category: 'Processes',
-    question: 'Explain the complete BRIM rating, billing, and invoicing flow.',
-    summary: 'Mediation CDRs are priced by CC, stored as BITs in CI, grouped into Billing Documents, and converted into FI-CA subledger Invoices.',
+    category: 'Architecture & Process',
+    question: 'What is the end-to-end integration path from Subscription Order Management to SAP FI-CA?',
     sproOrTcode: 'Architecture: SAP CM -> SAP CC -> SAP CI -> SAP FI-CA',
+    summary: 'Order capture in SOM distributes technical provider contracts to FI-CA and charge plans to CC. Usage passes through CM to CC for rating, into CI for aggregation/billing, and finally posts as open items in FI-CA.',
   },
   {
     id: 'p4',
-    category: 'Troubleshooting',
-    question: 'Billing run completed successfully but no invoice document was generated. What should I check?',
-    summary: 'Check invoicing locks in the billing document header, verify invoicing category assignment in contract account master, and check invoicing log.',
-    sproOrTcode: 'T-Codes: FKKBIX_BILL_M, FKKBIX_INV_M | Table: DFKKBIXBIT_IT',
+    category: 'FI-CA Subledger',
+    question: 'How do clearing variants resolve open invoices when a customer makes a partial payment in FI-CA?',
+    sproOrTcode: 'SPRO: Contract Accounts > Basic Functions > Open Item Management > Define Clearing Variants',
+    summary: 'Clearing control matches incoming cash against open items based on clearing categories, due date sorting, and payment amount tolerances specified in clearing variant configuration.',
   },
   {
     id: 'p5',
-    category: 'Transactions',
-    question: 'What is the purpose of transaction FKKBIX_BIT_MON?',
-    summary: 'Billable Item Monitor: Inspect, analyze status (raw, billable, billed), and simulate billing for billable items across all classes.',
-    sproOrTcode: 'T-Code: FKKBIX_BIT_MON',
+    category: 'Billing & Invoicing',
+    question: 'What transaction code is used to generate DDIC structures for a billable item class?',
+    sproOrTcode: 'T-Code: FKKBIXCIT_CONF',
+    summary: 'Execute FKKBIXCIT_CONF after maintaining interface components. The transaction creates table structures (/1BIX/...), database indices, and generation statuses required for high-volume database storage.',
   },
   {
     id: 'p6',
-    category: 'Troubleshooting',
-    question: 'Why was an open invoice item excluded from the payment run (FPY1)?',
-    summary: 'Exclusion is caused by item-level payment/clearing locks, missing bank details, or failure to meet minimum payment tolerances.',
-    sproOrTcode: 'T-Codes: FPY1, FPE2 | SPRO: Clearing Control > Specifications for Clearing Types',
+    category: 'Subscription (SOM)',
+    question: 'How do discount agreements propagate from SOM master agreements to CC charging trees?',
+    sproOrTcode: 'SPRO: CRM > Master Data > Products > Define Subscription Settings for CC Cross-Catalog Mapping',
+    summary: 'Master agreements store discount percentages as parameters in provider contract items. These parameters are transferred during RFC replication to override price table lookups within SAP CC charging logic.',
   },
 ];
 
+const categories = ['All Scenarios', 'Billing & Invoicing', 'Charging & Rating', 'FI-CA Subledger', 'Architecture & Process', 'Subscription (SOM)'];
+
 export const QuestionPromptBank: React.FC = () => {
-  const [selectedPrompt, setSelectedPrompt] = useState<PromptItem>(samplePrompts[0]);
-  const [activeTab, setActiveTab] = useState<string>('All');
+  const [activeTab, setActiveTab] = useState<string>('All Scenarios');
+  const [selectedPrompt, setSelectedPrompt] = useState<SamplePrompt>(samplePrompts[0]);
   const [copied, setCopied] = useState<boolean>(false);
 
-  const categories = ['All', 'Configuration', 'Troubleshooting', 'Transactions', 'Processes'];
-
-  const filteredPrompts = activeTab === 'All'
+  const filteredPrompts = activeTab === 'All Scenarios'
     ? samplePrompts
     : samplePrompts.filter((p) => p.category === activeTab);
 
   const handleCopy = (text: string) => {
-    navigator.clipboard?.writeText(text);
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -74,8 +89,14 @@ export const QuestionPromptBank: React.FC = () => {
   return (
     <section className="prompt-bank-section">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
             <span>PRACTICAL CONSULTING PROMPTS</span>
@@ -89,32 +110,48 @@ export const QuestionPromptBank: React.FC = () => {
           <p className="section-subtitle-muted">
             Click any real-world SAP scenario below to preview how Clyptus.AI structures the grounded answer, transaction codes, and SPRO path.
           </p>
-        </div>
+        </motion.div>
 
         {/* Category Filter Pills */}
-        <div className="prompt-filter-tabs">
+        <motion.div
+          className="prompt-filter-tabs"
+          variants={staggerContainer(0.04, 0.02)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           {categories.map((cat) => (
-            <button
+            <motion.button
               key={cat}
               className={`filter-tab-btn ${activeTab === cat ? 'active' : ''}`}
               onClick={() => setActiveTab(cat)}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.97 }}
             >
               <span>{cat}</span>
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
         {/* 2-Column Layout: Prompt Chips Left, Grounded Inspector Right */}
         <div className="prompt-sandbox-grid">
-          {/* Left Column: Chips */}
-          <div className="prompt-chips-list">
+          {/* Left Column: Chips with Staggered Scroll-Triggered Reveal */}
+          <motion.div
+            className="prompt-chips-list"
+            variants={staggerContainer(0.07, 0.05)}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportCard}
+          >
             {filteredPrompts.map((p, index) => {
               const isSelected = selectedPrompt.id === p.id;
               return (
-                <div
+                <motion.div
                   key={p.id}
                   className={`prompt-chip-card ${isSelected ? 'selected-chip' : ''}`}
                   onClick={() => setSelectedPrompt(p)}
+                  variants={cardVariant}
+                  whileHover={{ x: 4, transition: transitions.micro }}
                 >
                   <div className="chip-meta-row">
                     <span className="chip-index">0{index + 1}</span>
@@ -122,13 +159,19 @@ export const QuestionPromptBank: React.FC = () => {
                   </div>
                   <p className="chip-question">{p.question}</p>
                   <span className="chip-arrow"><ArrowUpRight size={14} /></span>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
-          {/* Right Column: Live Inspector Card */}
-          <div className="prompt-inspector-card">
+          {/* Right Column: Live Inspector Card with AnimatePresence */}
+          <motion.div
+            className="prompt-inspector-card"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={transitions.smooth}
+          >
             <div className="inspector-header">
               <div className="inspector-badge">
                 <Sparkles size={13} />
@@ -143,26 +186,35 @@ export const QuestionPromptBank: React.FC = () => {
               </button>
             </div>
 
-            <div className="inspector-body">
-              <span className="inspector-label">QUERY</span>
-              <h4 className="inspector-question">{selectedPrompt.question}</h4>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedPrompt.id}
+                variants={tabPanelVariant}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="inspector-body"
+              >
+                <span className="inspector-label">QUERY</span>
+                <h4 className="inspector-question">{selectedPrompt.question}</h4>
 
-              <div className="inspector-divider" />
+                <div className="inspector-divider" />
 
-              <span className="inspector-label">CLYPTUS.AI GROUNDED SYNTHESIS</span>
-              <p className="inspector-summary">{selectedPrompt.summary}</p>
+                <span className="inspector-label">CLYPTUS.AI GROUNDED SYNTHESIS</span>
+                <p className="inspector-summary">{selectedPrompt.summary}</p>
 
-              <div className="inspector-spro-box">
-                <span className="spro-box-title">CONFIGURATION / T-CODE ANCHOR</span>
-                <code>{selectedPrompt.sproOrTcode}</code>
-              </div>
+                <div className="inspector-spro-box">
+                  <span className="spro-box-title">CONFIGURATION / T-CODE ANCHOR</span>
+                  <code>{selectedPrompt.sproOrTcode}</code>
+                </div>
 
-              <div className="inspector-footer">
-                <CheckCircle2 size={13} className="text-orange" />
-                <span>Mathematically verified against official SAP implementation documentation</span>
-              </div>
-            </div>
-          </div>
+                <div className="inspector-footer">
+                  <CheckCircle2 size={13} className="text-orange" />
+                  <span>Mathematically verified against official SAP implementation documentation</span>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </section>

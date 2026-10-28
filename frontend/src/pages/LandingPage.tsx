@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PublicNav } from '../components/navbar/PublicNav';
@@ -18,6 +18,36 @@ import { FinalCtaSection } from '../components/landing/FinalCtaSection';
 import iconOnly from '../assets/clyptusap-icon.png';
 
 export const LandingPage: React.FC = () => {
+  const heroRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Gentle Parallax Scroll Setup for Hero Ambient Layers
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const orbLeftY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [0, 0] : [0, 80]
+  );
+  const orbRightY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [0, 0] : [0, -60]
+  );
+  const showcaseY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [0, 0] : [0, 32]
+  );
+  const glowScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [1, 1] : [1, 1.1]
+  );
+
   return (
     <div className="clyptus-landing-wrap">
       <PageMeta
@@ -30,19 +60,31 @@ export const LandingPage: React.FC = () => {
         {/* =========================================================================
             Hero Section: Center-aligned, Warm Ivory Background with Peach Radial Aura
            ========================================================================= */}
-        <section className="hero-minimal-section">
-          {/* Subtle Ambient Background Gradient Orbs */}
-          <div className="hero-radial-glow" aria-hidden="true" />
-          <div className="hero-ambient-orb orb-left" aria-hidden="true" />
-          <div className="hero-ambient-orb orb-right" aria-hidden="true" />
+        <section ref={heroRef} className="hero-minimal-section">
+          {/* Subtle Ambient Background Gradient Orbs with Scroll Parallax */}
+          <motion.div
+            className="hero-radial-glow"
+            style={{ scale: glowScale }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="hero-ambient-orb orb-left"
+            style={{ y: orbLeftY }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="hero-ambient-orb orb-right"
+            style={{ y: orbRightY }}
+            aria-hidden="true"
+          />
 
           <div className="hero-content-container">
             {/* Kicker Pill */}
             <motion.div
               className="kicker-pill-subtle"
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
               <span className="kicker-icon-badge">
                 <img src={iconOnly} alt="Clyptus.AI" className="h-3.5 w-3.5 object-contain" />
@@ -52,15 +94,15 @@ export const LandingPage: React.FC = () => {
               <span className="pill-strong">SAP + BRIM ENTERPRISE ASSISTANT</span>
             </motion.div>
 
-            {/* Main Headline with Signature Italic Serif Highlight */}
+            {/* Main Headline */}
             <motion.h1
               className="hero-main-title"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.08 }}
+              transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
               Never Second-Guess Your<br />
-              <span className="hero-italic-serif">SAP &amp; BRIM Architecture Ever Again.</span>
+              <span className="hero-title-accent">SAP &amp; BRIM Architecture Ever Again.</span>
             </motion.h1>
 
             {/* Subtitle Description */}
@@ -68,7 +110,7 @@ export const LandingPage: React.FC = () => {
               className="hero-description"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.14 }}
+              transition={{ duration: 0.55, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
             >
               Ditch fragmented spreadsheets, guesswork, and rigid consulting notes. <strong>Clyptus.AI</strong> retrieves verified SAP configuration manuals, transaction codes, and SPRO customizing paths with <strong>mathematical grounding</strong> and <strong>zero hallucination</strong>.
             </motion.p>
@@ -78,7 +120,7 @@ export const LandingPage: React.FC = () => {
               className="hero-actions-row"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.55, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <Link to="/login" className="button-brand-pill">
                 <span>Get Started</span>
@@ -95,7 +137,7 @@ export const LandingPage: React.FC = () => {
               className="hero-trust-bar"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.26 }}
+              transition={{ duration: 0.65, delay: 0.26 }}
             >
               <div className="trust-item">
                 <span className="trust-dot" />
@@ -113,12 +155,13 @@ export const LandingPage: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Centerpiece Chatbot Preview Showcase Window */}
+            {/* Centerpiece Chatbot Preview Showcase Window with Parallax Shift */}
             <motion.div
               className="hero-showcase-container"
-              initial={{ opacity: 0, y: 28 }}
+              style={{ y: showcaseY }}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.3 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
               <HeroChatbotPreview />
             </motion.div>

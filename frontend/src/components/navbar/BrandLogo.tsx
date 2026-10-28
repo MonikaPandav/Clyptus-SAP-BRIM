@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import fullLogoWhite from '../../assets/clyptusap-logo.png';
 import fullLogoDark from '../../assets/clyptusap-logo-darktext.png';
+import fullLogoWhite from '../../assets/clyptusap-logo.png';
 import iconOnly from '../../assets/clyptusap-icon.png';
 
 interface BrandLogoProps {
@@ -17,34 +17,32 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   compact = false,
   light = false,
   size = 'md',
-  highlighted = false,
   className = '',
   imgClassName = '',
 }) => {
-  // Dimension presets for logo variants
+  // Dimension presets for logo variants with slightly enlarged, crisp presence
   const sizeMap = {
-    sm: { full: 'h-7', compact: 'h-7 w-7' },
-    md: { full: 'h-8', compact: 'h-8 w-8' },
-    lg: { full: 'h-10', compact: 'h-10 w-10' },
-    xl: { full: 'h-12 md:h-14', compact: 'h-12 w-12' },
-    '2xl': { full: 'h-14 md:h-16', compact: 'h-14 w-14' },
+    sm: { full: 'h-8', compact: 'h-8 w-8' },
+    md: { full: 'h-10', compact: 'h-10 w-10' },
+    lg: { full: 'h-12', compact: 'h-12 w-12' },
+    xl: { full: 'h-13 md:h-15 lg:h-[58px]', compact: 'h-13 w-13' },
+    '2xl': { full: 'h-15 md:h-17 lg:h-[64px]', compact: 'h-15 w-15' },
   };
 
   const selectedSize = sizeMap[size] || sizeMap.md;
+  const activeLogo = light ? fullLogoWhite : fullLogoDark;
 
   if (compact) {
     return (
       <Link
-        className={`brand inline-flex items-center ${highlighted ? 'brand-highlighted' : ''
-          } ${className}`}
+        className={`brand inline-flex items-center ${className}`}
         to="/"
-        aria-label="Clyptusap.ai home"
+        aria-label="Clyptus.AI home"
       >
         <img
-          className={`${selectedSize.compact} object-contain drop-shadow-sm ${highlighted ? 'brand-img-highlighted' : ''
-            } ${imgClassName}`}
+          className={`${selectedSize.compact} object-contain ${imgClassName}`}
           src={iconOnly}
-          alt="Clyptusap.ai"
+          alt="Clyptus.AI"
         />
       </Link>
     );
@@ -52,25 +50,16 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <Link
-      className={`brand inline-flex items-center gap-2.5 ${light ? 'brand-light' : ''} ${highlighted ? 'brand-highlighted' : ''
-        } ${className}`}
+      className={`brand inline-flex items-center ${className}`}
       to="/"
-      aria-label="Clyptusap.ai home"
+      aria-label="Clyptus.AI home"
     >
-      {/* On dark surfaces show white text version; on light surfaces show dark text version */}
+      {/* Single original full-color logo: absolutely no duplicate element in DOM */}
       <img
-        className={`${selectedSize.full} w-auto object-contain dark:hidden ${highlighted ? 'brand-img-highlighted' : ''
-          } ${imgClassName}`}
-        src={fullLogoDark}
-        alt="Clyptusap.ai"
-      />
-      <img
-        className={`${selectedSize.full} w-auto object-contain hidden dark:block ${highlighted ? 'brand-img-highlighted' : ''
-          } ${imgClassName}`}
-        src={fullLogoWhite}
-        alt="Clyptusap.ai"
+        className={`${selectedSize.full} w-auto object-contain ${imgClassName}`}
+        src={activeLogo}
+        alt="Clyptus.AI"
       />
     </Link>
   );
 };
-

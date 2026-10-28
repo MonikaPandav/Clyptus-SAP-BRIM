@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
-
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowRight,
+  CheckCircle2,
+} from 'lucide-react';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  tabPanelVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 interface BrimModule {
   id: string;
-  abbreviation: string;
   name: string;
+  abbreviation: string;
   tagline: string;
   overview: string;
   keyTcodes: string[];
@@ -15,73 +26,68 @@ interface BrimModule {
 
 const modules: BrimModule[] = [
   {
-    id: 'ci',
-    abbreviation: 'CI',
-    name: 'Convergent Invoicing',
-    tagline: 'High-Volume Aggregation, Rating Ingestion & Billing',
-    overview: 'Ingests billable items (BITs) from Convergent Charging or mediation, applies aggregation and billing rules, and creates billing and invoicing documents for FI-CA subledger posting.',
-    keyTcodes: ['FKKBIXCIT_CONF', 'FKKBIX_BIT_MON', 'FKKBIX_BILL_M', 'FKKBIX_INV_M'],
-    sproFocus: 'Financial Accounting > Contract Accounts A/R & A/P > Convergent Invoicing > Basic Data > Billable Item Classes & Billing Processes',
+    id: 'som',
+    name: 'Subscription Order Management',
+    abbreviation: 'SAP SOM',
+    tagline: 'Order Capture, Solution Bundles & Master Agreements',
+    overview: 'Centralizes the commercial definition of subscription products, cross-catalog bundles, and contract life-cycle events. Translates CRM orders into technical provider contracts in FI-CA and rating contracts in CC.',
+    keyTcodes: ['CRMD_ORDER', 'SOM_CONTRACT_MON', 'COMM_HIERARCHY'],
+    sproFocus: 'Customer Relationship Management > Master Data > Products > Define Subscription Settings',
     commonQuestions: [
-      'How to resolve BIT class generation errors in FKKBIXCIT_CONF?',
-      'How to configure billable item aggregation rules per contract account?',
-      'How does invoice document grouping prevent duplicate line item creation?',
+      'How to map partner functions on Provider Orders to FI-CA contract accounts?',
+      'Configuring distribution chains for complex subscription products and hardware combos.',
     ],
   },
   {
     id: 'cc',
-    abbreviation: 'CC',
     name: 'Convergent Charging',
-    tagline: 'Real-Time Dynamic Rating, Pricing & Subscriber Balances',
-    overview: 'Performs millisecond-speed rating and pricing for telecommunications, digital services, and utility events using price plans, charge plans, allowance logic, and refill mechanisms.',
-    keyTcodes: ['Core Tool', 'Admin+ / Setup+', 'BART+', 'CAT Tool'],
-    sproFocus: 'Integration via Web Services (JCo) with S/4HANA Convergent Invoicing and SOM Provider Agreements',
+    abbreviation: 'SAP CC',
+    tagline: 'High-Throughput Real-Time Rating & Charging Engine',
+    overview: 'High-throughput rating and charging engine processing billions of usage consumption events per second. Evaluates charged items, executes pricing logic trees, and manages prepaid/postpaid subscriber balances.',
+    keyTcodes: ['Core Tool (GUI)', 'Admin+ CLI', 'BART Server Monitor'],
+    sproFocus: 'Integration via RFC / Web Services with SAP CI; Charged Item (CIT) classes mapping.',
     commonQuestions: [
-      'How does allowance logic interact with recurring monthly charges?',
-      'How are charged items mapped and transmitted to S/4HANA billable item interfaces?',
-      'Best practices for configuring tier-based pricing in CC Core Tool?',
+      'How to design tiered volume charging plans with recurring reset periods in Core Tool?',
+      'Resolving CIT storage buffer overflow errors between CC and CI ingestion queues.',
+    ],
+  },
+  {
+    id: 'ci',
+    name: 'Convergent Invoicing',
+    abbreviation: 'SAP CI',
+    tagline: 'Billable Item Processing, Aggregation & Invoicing',
+    overview: 'Aggregates billable items (BITs) from multiple upstream mediation sources, applies billing rules, generates customer-facing invoices, and creates open posting items directly into FI-CA contract subledgers.',
+    keyTcodes: ['FKKBIXCIT_CONF', 'FKKBIX_BIT_MON', 'FKKBIX_BILLDOC_DISP', 'FKKINV_S'],
+    sproFocus: 'Financial Accounting > Contract Accounts > Convergent Invoicing > Basic Data > Billable Item Classes',
+    commonQuestions: [
+      'Step-by-step SPRO guide to activate new custom fields on /1BIX/ generated DDIC tables.',
+      'How to trigger selective invoicing reversing individual billing documents without cancelling BITs.',
     ],
   },
   {
     id: 'fica',
-    abbreviation: 'FI-CA',
-    name: 'Contract Accounts A/R & A/P',
-    tagline: 'Subledger for Millions of Customers & High-Volume Payments',
-    overview: 'High-performance subledger designed for mass data processing. Handles customer open item management, automatic clearing runs, dunning, dispute handling, and tax calculation.',
-    keyTcodes: ['FPY1', 'FPE2', 'FPL9', 'FPMA', 'FPDOC'],
-    sproFocus: 'Financial Accounting > Contract Accounts A/R & A/P > Basic Functions > Open Item Management & Clearing Control',
+    name: 'Contract Accounts Receivable and Payable',
+    abbreviation: 'SAP FI-CA',
+    tagline: 'High-Volume Enterprise Subledger Accounting',
+    overview: 'Subledger designed specifically for millions of B2C/B2B consumer accounts. Manages automatic payment runs, multi-stage dunning procedures, revenue recognition, dispute workflows, and mass clearing.',
+    keyTcodes: ['FP03D', 'FPY1', 'FPVA / FPVB', 'FPP3', 'FKK_SEC_MON'],
+    sproFocus: 'Financial Accounting > Contract Accounts Receivable and Payable > Basic Functions > Open Item Management',
     commonQuestions: [
-      'Why is an open item not cleared automatically during the FPY1 payment run?',
-      'How are clearing variants configured for installment plans?',
-      'How to configure posting area 0100 and document type assignments in SPRO?',
-    ],
-  },
-  {
-    id: 'som',
-    abbreviation: 'SOM',
-    name: 'Subscription Order Management',
-    tagline: 'Order Capture, Master Agreements & Lifecycle Management',
-    overview: 'Captures and manages recurring product bundles, subscription contracts, master agreements, and cross-catalog mapping, replicating contracts into S/4HANA and CC.',
-    keyTcodes: ['CRMD_ORDER', 'FKKORD1', 'ODI Monitor', 'CVI Cockpit'],
-    sproFocus: 'Customer Relationship Management > Master Data > Products & Order Distribution Infrastructure (ODI)',
-    commonQuestions: [
-      'How to trace contract replication failures in the ODI monitor?',
-      'How are change processes (upgrades, downgrades, cancellations) mapped to CC?',
-      'How to maintain technical resource IDs and sharing contracts in SOM?',
+      'How do clearing categories and clearing variants resolve installment plan priority?',
+      'Configuring multi-currency dunning procedures with automated collection agency handoff.',
     ],
   },
   {
     id: 'cm',
-    abbreviation: 'CM',
     name: 'Convergent Mediation',
-    tagline: 'Raw CDR Ingestion, Duplicate Filtering & Normalization',
-    overview: 'Collects unstructured usage records and event streams from network nodes, IoT devices, or cloud platforms, formats them, and dispatches them to Convergent Charging.',
-    keyTcodes: ['Mediation Zone Desktop', 'Workflow Engine', 'Node Config'],
-    sproFocus: 'Integration adapters: Diameter, RADIUS, REST, Kafka, and SAP CC Rating Engine',
+    abbreviation: 'SAP CM (DigitalRoute)',
+    tagline: 'Carrier-Grade Mediation & Usage Normalization',
+    overview: 'Collects raw usage logs, CDRs, and telemetry data from network switches, cloud APIs, and IoT devices. Normalizes, enriches, deduplicates, and formats clean transactions for downstream SAP CC rating.',
+    keyTcodes: ['Desktop Client', 'Execution Plans', 'Node Monitor'],
+    sproFocus: 'Integration endpoints to SAP CC Service Controller; APL scripting configuration.',
     commonQuestions: [
-      'How to configure deduplication filters for high-speed streaming events?',
-      'How are aggregated record structures mapped into CC chargeable item formats?',
-      'How to set up offline storage buffering during charging engine maintenance?',
+      'Configuring duplicate detection algorithms on massive streaming CDR telemetry batches.',
+      'How to route abnormal usage records into exception quarantine workflows for manual review.',
     ],
   },
 ];
@@ -92,8 +98,14 @@ export const BrimModuleExplorer: React.FC = () => {
   return (
     <section className="brim-explorer-section">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
             <span>FULL ARCHITECTURAL COVERAGE</span>
@@ -107,73 +119,97 @@ export const BrimModuleExplorer: React.FC = () => {
           <p className="section-subtitle-muted">
             End-to-end expertise across all 5 core pillars of the SAP Billing and Revenue Innovation Management ecosystem.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Tab Buttons for Modules */}
-        <div className="module-tabs-row">
+        {/* Tab Buttons for Modules with Staggered Reveal */}
+        <motion.div
+          className="module-tabs-row"
+          variants={staggerContainer(0.06, 0.04)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {modules.map((mod) => (
-            <button
+            <motion.button
               key={mod.id}
               className={`module-tab-btn ${selectedModule.id === mod.id ? 'active' : ''}`}
               onClick={() => setSelectedModule(mod)}
+              whileHover={{ y: -2, transition: transitions.micro }}
+              whileTap={{ scale: 0.98 }}
             >
               <span className="mod-tab-abbr">{mod.abbreviation}</span>
               <span className="mod-tab-name">{mod.name}</span>
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Active Module Card */}
-        <div className="module-display-card">
-          <div className="module-display-header">
-            <div>
-              <span className="display-abbr-badge">{selectedModule.abbreviation}</span>
-              <h3 className="display-title">{selectedModule.name}</h3>
-              <p className="display-tagline">{selectedModule.tagline}</p>
-            </div>
-            <div className="display-status-chip">
-              <CheckCircle2 size={14} className="text-orange" />
-              <span>100% Curated Manuals Indexed</span>
-            </div>
-          </div>
-
-          <p className="module-overview-text">{selectedModule.overview}</p>
-
-          <div className="module-details-grid">
-            {/* T-Codes Box */}
-            <div className="detail-box">
-              <span className="box-label">KEY SAP TRANSACTION CODES</span>
-              <div className="tcode-chips-wrap">
-                {selectedModule.keyTcodes.map((tc) => (
-                  <span key={tc} className="tcode-badge">
-                    <code>{tc}</code>
-                  </span>
-                ))}
+        {/* Active Module Card with Smooth Cross-Fade Transition */}
+        <motion.div
+          className="module-display-card"
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={transitions.smooth}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedModule.id}
+              variants={tabPanelVariant}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <div className="module-display-header">
+                <div>
+                  <span className="display-abbr-badge">{selectedModule.abbreviation}</span>
+                  <h3 className="display-title">{selectedModule.name}</h3>
+                  <p className="display-tagline">{selectedModule.tagline}</p>
+                </div>
+                <div className="display-status-chip">
+                  <CheckCircle2 size={14} className="text-orange" />
+                  <span>100% Curated Manuals Indexed</span>
+                </div>
               </div>
-            </div>
 
-            {/* SPRO Customizing Path */}
-            <div className="detail-box">
-              <span className="box-label">SPRO CUSTOMIZING ANCHOR</span>
-              <div className="spro-anchor-box">
-                <code>{selectedModule.sproFocus}</code>
+              <p className="module-overview-text">{selectedModule.overview}</p>
+
+              <div className="module-details-grid">
+                {/* T-Codes Box */}
+                <div className="detail-box">
+                  <span className="box-label">KEY SAP TRANSACTION CODES</span>
+                  <div className="tcode-chips-wrap">
+                    {selectedModule.keyTcodes.map((tc) => (
+                      <span key={tc} className="tcode-badge">
+                        <code>{tc}</code>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* SPRO Customizing Path */}
+                <div className="detail-box">
+                  <span className="box-label">SPRO CUSTOMIZING ANCHOR</span>
+                  <div className="spro-anchor-box">
+                    <code>{selectedModule.sproFocus}</code>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Common Consulting Doubts Solved */}
-          <div className="module-questions-box">
-            <span className="box-label">COMMON CONSULTING DOUBTS ANSWERED BY CLYPTUS.AI</span>
-            <ul className="questions-list">
-              {selectedModule.commonQuestions.map((q, i) => (
-                <li key={i}>
-                  <ArrowRight size={13} className="text-orange flex-none" />
-                  <span>{q}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+              {/* Common Consulting Doubts Solved */}
+              <div className="module-questions-box">
+                <span className="box-label">COMMON CONSULTING DOUBTS ANSWERED BY CLYPTUS.AI</span>
+                <ul className="questions-list">
+                  {selectedModule.commonQuestions.map((q, i) => (
+                    <li key={i}>
+                      <ArrowRight size={13} className="text-orange flex-none" />
+                      <span>{q}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,89 +1,74 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 interface FaqItem {
   id: string;
   category: string;
   question: string;
-  answer: React.ReactNode;
+  answer: string;
 }
 
 const faqs: FaqItem[] = [
   {
-    id: 'f1',
+    id: 'faq-1',
     category: 'Architecture & RAG',
-    question: 'What is Clyptus.AI and how is it different from ChatGPT?',
-    answer: (
-      <>
-        <strong>Clyptus.AI</strong> is an enterprise AI knowledge platform built specifically for <strong>SAP ERP, S/4HANA, and SAP BRIM</strong>. Unlike generalist models like ChatGPT that guess based on web scrapes, Clyptus.AI uses <strong>Developer-Managed Retrieval-Augmented Generation (RAG)</strong> to retrieve verified documentation first, generating answers strictly backed by cited manuals.
-      </>
-    ),
+    question: 'How does Clyptus.AI guarantee zero hallucination in SAP configuration?',
+    answer: 'Clyptus.AI implements a strict dual-stage retrieval and grounding verification pipeline. When a user asks an SAP question, our system searches indexed official SAP configuration guides, transaction code dictionaries, and implementation blueprints using both BM25 lexical search and pgvector dense vector embeddings. If the retrieved documentation lacks sufficient cosine and cross-encoder relevance to substantiate the answer, the system gracefully informs you rather than fabricating customizing paths.',
   },
   {
-    id: 'f2',
+    id: 'faq-2',
+    category: 'Security & Isolation',
+    question: 'Is enterprise SAP documentation and query data kept private and tenant-isolated?',
+    answer: 'Yes. Clyptus.AI runs on an enterprise-isolated PostgreSQL architecture with role-based JWT authentication. Your private implementation guides, project blueprints, and user conversations are separated by tenant schema isolation. Data is never used to train public foundation models or shared across client instances.',
+  },
+  {
+    id: 'faq-3',
     category: 'Architecture & RAG',
-    question: 'What does “Developer-Managed RAG” mean in practice?',
-    answer: (
-      <>
-        <strong>Developer-Managed RAG</strong> combines high-dimensional dense embeddings for semantic search with <strong>BM25 lexical search</strong> for exact SAP transaction codes, followed by <strong>cross-encoder neural reranking</strong>. This guarantees that only verified enterprise documentation enters the model prompt.
-      </>
-    ),
+    question: 'Which SAP and BRIM modules are currently indexed in the knowledge base?',
+    answer: 'The platform currently indexes end-to-end documentation across all 5 core BRIM pillars: Subscription Order Management (SOM), Convergent Charging (CC Core Tool & rating logic), Convergent Invoicing (CI billable item classes, billing and invoicing processes), Contract Accounts Receivable & Payable (FI-CA open item management, dunning, and clearing), and Convergent Mediation (CM / DigitalRoute usage pipelines).',
   },
   {
-    id: 'f3',
-    category: 'BRIM Coverage',
-    question: 'Which SAP BRIM modules are natively supported?',
-    answer: (
-      <>
-        Clyptus.AI covers all five core pillars: <strong>Convergent Invoicing (CI)</strong>, <strong>Convergent Charging (CC)</strong>, <strong>Contract Accounts Receivable & Payable (FI-CA)</strong>, <strong>Subscription Order Management (SOM)</strong>, and <strong>Convergent Mediation (CM)</strong>.
-      </>
-    ),
+    id: 'faq-4',
+    category: 'Integration & Workflows',
+    question: 'Can Clyptus.AI integrate with our existing Jira, Confluence, and ServiceNow systems?',
+    answer: 'Yes. Clyptus.AI is designed with modular API endpoints allowing integration into enterprise ticketing workflows. Functional leads can ingest custom internal runbooks and architecture blueprints into dedicated workspace collections alongside standard SAP manuals.',
   },
   {
-    id: 'f4',
-    category: 'Security & Privacy',
-    question: 'How are internal documents, schemas, and source manuals secured?',
-    answer: (
-      <>
-        Source documents and indexing pipelines are <strong>strictly restricted to authorized enterprise administrators</strong> via the secure Admin Dashboard. All user sessions are authenticated using encrypted JWT tokens with role-based access control and tenant workspace isolation.
-      </>
-    ),
-  },
-  {
-    id: 'f5',
-    category: 'Accuracy & Refusal',
-    question: 'What happens when retrieved knowledge cannot answer my SAP question?',
-    answer: (
-      <>
-        Clyptus.AI includes an <strong>automated mathematical grounding verification gate</strong>. If the retrieved documentation does not substantiate a confident technical answer, the assistant <strong>alerts the user and refuses to hallucinate</strong> fictitious SPRO customizing paths or T-Codes.
-      </>
-    ),
-  },
-  {
-    id: 'f6',
-    category: 'Domain Boundary',
-    question: 'Can Clyptus.AI be used for non-SAP general queries?',
-    answer: (
-      <>
-        No. Clyptus.AI enforces a <strong>strict domain boundary</strong> during query ingestion. General knowledge or non-enterprise queries (e.g., weather, generic programming) are rejected at pre-flight to preserve enterprise security and operational focus.
-      </>
-    ),
+    id: 'faq-5',
+    category: 'Consulting & Blueprinting',
+    question: 'How do citations and SPRO navigation breadcrumbs work in practice?',
+    answer: 'Every technical answer generated by Clyptus.AI appends a structured citation badge detailing the source manual title, section hierarchy, page numbers, and cosine similarity confidence score. SPRO paths are rendered as copyable breadcrumb trees so consultants can navigate directly to the correct IMG customizing activity in SAP GUI or Fiori.',
   },
 ];
 
 export const FaqSection: React.FC = () => {
-  const [openId, setOpenId] = useState<string | null>(faqs[0].id);
+  const [openId, setOpenId] = useState<string | null>('faq-1');
 
   const toggleFaq = (id: string) => {
-    setOpenId(openId === id ? null : id);
+    setOpenId((prev) => (prev === id ? null : id));
   };
 
   return (
     <section className="faq-section" id="faq">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
             <span>FREQUENTLY ASKED QUESTIONS</span>
@@ -97,16 +82,23 @@ export const FaqSection: React.FC = () => {
           <p className="section-subtitle-muted">
             Everything you need to know about our enterprise SAP retrieval architecture, grounding verification, and security guardrails.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Accordion List */}
-        <div className="faq-accordion-wrap">
+        {/* Accordion List with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="faq-accordion-wrap"
+          variants={staggerContainer(0.08, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {faqs.map((faq) => {
             const isOpen = openId === faq.id;
             return (
-              <div
+              <motion.div
                 key={faq.id}
                 className={`faq-accordion-item ${isOpen ? 'is-open' : ''}`}
+                variants={cardVariant}
               >
                 <button
                   className="faq-question-btn"
@@ -117,23 +109,43 @@ export const FaqSection: React.FC = () => {
                     <span className="faq-category-badge">{faq.category}</span>
                     <span className="faq-question-text">{faq.question}</span>
                   </div>
-                  <span className={`faq-chevron-icon ${isOpen ? 'rotated' : ''}`}>
+                  <motion.span
+                    className="faq-chevron-icon"
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={transitions.micro}
+                  >
                     <ChevronDown size={18} />
-                  </span>
+                  </motion.span>
                 </button>
 
-                {isOpen && (
-                  <div className="faq-answer-content">
-                    <p>{faq.answer}</p>
-                  </div>
-                )}
-              </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div className="faq-answer-content">
+                        <p>{faq.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* Bottom Support Callout */}
-        <div className="faq-bottom-callout">
+        {/* Bottom Support Callout with Scroll-Triggered Reveal */}
+        <motion.div
+          className="faq-bottom-callout"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={transitions.smooth}
+        >
           <div className="callout-inner">
             <div className="callout-icon-box">
               <MessageSquare size={18} />
@@ -146,7 +158,7 @@ export const FaqSection: React.FC = () => {
           <Link to="/login" className="callout-action-btn">
             Open Workspace →
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

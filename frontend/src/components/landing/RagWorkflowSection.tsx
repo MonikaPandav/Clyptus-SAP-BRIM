@@ -1,79 +1,89 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
+  BrainCircuit,
   CheckCircle,
-  Cpu,
-  FileCheck2,
-  MessageCircle,
+  Database,
+  Filter,
+  Layers,
   Search,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  tabPanelVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 interface Stage {
   num: string;
   title: string;
   subtitle: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
   description: string;
-  techSpec: string;
   metric: string;
+  icon: React.ElementType;
+  techSpec: string;
 }
 
 const stages: Stage[] = [
   {
     num: '01',
-    title: 'Question Ingestion',
-    subtitle: 'Technical SAP Context',
-    icon: MessageCircle,
-    description: 'Consultants submit questions using standard SAP business or technical terms, transaction codes, error codes, or SPRO paths.',
-    techSpec: 'Pre-flight query normalization and prompt boundary analysis ensuring only enterprise SAP queries enter the pipeline.',
-    metric: '< 15ms latency',
+    title: 'Query Ingestion',
+    subtitle: 'SAP Domain Intent Parser',
+    description: 'Deconstructs user input into T-Codes, SPRO customizing paths, billing concepts, and architectural sub-modules (SOM, CC, CI, FI-CA).',
+    metric: '< 45ms Intent Classification',
+    icon: BrainCircuit,
+    techSpec: 'Multi-head intent classification with specialized SAP vocabulary dictionary and entity extraction.',
   },
   {
     num: '02',
     title: 'Hybrid Retrieval',
-    subtitle: 'Dense Vectors + BM25',
-    icon: Search,
-    description: 'Simultaneous search using high-dimensional dense embeddings for semantic intent combined with BM25 lexical search for exact SAP transaction codes.',
-    techSpec: 'Dual-index search across admin-curated official SAP implementation guides, customizing dictionaries, and master data schemas.',
-    metric: 'Top-50 candidate recall',
+    subtitle: 'BM25 + Dense Vectors (pgvector)',
+    description: 'Executes parallel searches: pgvector HNSW cosine index for conceptual semantics, plus BM25 for precise SAP transaction codes.',
+    metric: 'Top-25 Balanced Candidates',
+    icon: Database,
+    techSpec: 'Dual-engine retrieval balancing semantic embedding similarity with exact technical keyword matching.',
   },
   {
     num: '03',
-    title: 'Cross-Encoder Rerank',
-    subtitle: 'Neural Relevance Scoring',
-    icon: Cpu,
-    description: 'Neural cross-encoder evaluates the exact semantic fit of every retrieved chunk against the query, filtering out out-of-date or irrelevant SAP release notes.',
-    techSpec: 'Re-scores text chunks jointly with query tokens to maximize contextual precision before model prompting.',
-    metric: '250ms reranking latency',
+    title: 'Reciprocal Rank Fusion',
+    subtitle: 'RRF Merging & De-duplication',
+    description: 'Merges lexical and semantic rank lists mathematically, promoting chunks that satisfy both exact T-code and contextual needs.',
+    metric: 'RRF Normalized Scoring',
+    icon: Layers,
+    techSpec: 'Reciprocal Rank Fusion k=60 parameter tuning to merge disparate search result spaces seamlessly.',
   },
   {
     num: '04',
-    title: 'Streaming Generation',
-    subtitle: 'Strict Contextual Guardrails',
-    icon: Sparkles,
-    description: 'LLM generates clear, step-by-step technical guidance with SPRO customizing paths, transaction codes, and prerequisite settings streamed in real-time.',
-    techSpec: 'System prompt enforces strict grounding within retrieved context, preventing extrapolations or fabricated SAP codes.',
-    metric: 'Token-by-token streaming',
+    title: 'Neural Cross-Encoder',
+    subtitle: 'Re-ranking & Context Trimming',
+    description: 'Scores (query, passage) pairs through a neural re-ranker, discarding irrelevant guides and selecting top 3-5 high-relevance chunks.',
+    metric: '0.94 Precision @ 5',
+    icon: Filter,
+    techSpec: 'Cross-attention deep transformer scoring full sequence interaction between user question and SAP manual.',
   },
   {
     num: '05',
-    title: 'Grounding Verification',
-    subtitle: 'Automated Hallucination Check',
+    title: 'Zero-Hallucination Gate',
+    subtitle: 'Grounding Verification Gate',
+    description: 'Validates that retrieved SAP documentation provides sufficient evidence. If insufficient, triggers honest refusal instead of guessing.',
+    metric: 'Strict Hallucination Gate',
     icon: ShieldCheck,
-    description: 'Post-generation mathematical checks ensure that every statement, table name, and configuration step is explicitly supported by retrieved manuals.',
-    techSpec: 'Zero-hallucination safeguard: if confidence falls below threshold, the assistant alerts the user rather than guessing.',
-    metric: '100% verified grounding',
+    techSpec: 'Deterministic grounding threshold check; queries lacking manual corroboration are gracefully declined.',
   },
   {
     num: '06',
-    title: 'Authoritative Response',
-    subtitle: 'Clickable Document Citations',
-    icon: FileCheck2,
-    description: 'The response is delivered alongside clickable citations displaying the exact document title, section heading, page number, and similarity score.',
-    techSpec: 'Traceable citations allow consultants to cross-reference official SAP guides immediately.',
-    metric: 'Full audit traceability',
+    title: 'Grounded Generation',
+    subtitle: 'Cited Streaming Response',
+    description: 'Streams the verified answer with exact SPRO navigation breadcrumbs, required transaction codes, and clickable documentation references.',
+    metric: '100% Traceable Citations',
+    icon: Search,
+    techSpec: 'Constraint-guided generation appending exact page, section, and document metadata citations to every response.',
   },
 ];
 
@@ -83,8 +93,14 @@ export const RagWorkflowSection: React.FC = () => {
   return (
     <section className="rag-workflow-section" id="how-it-works">
       <div className="section-container">
-        {/* Section Heading */}
-        <div className="section-header-center">
+        {/* Section Heading with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
             <span>THE RAG ARCHITECTURE</span>
@@ -98,18 +114,26 @@ export const RagWorkflowSection: React.FC = () => {
           <p className="section-subtitle-muted">
             Dense vector embeddings, BM25 lexical keyword search, and neural cross-encoder reranking eliminate guesswork and prevent hallucinations in complex SAP systems.
           </p>
-        </div>
+        </motion.div>
 
-        {/* 6-Stage Timeline Track */}
-        <div className="workflow-stages-grid">
+        {/* 6-Stage Timeline Track with Staggered Entrance */}
+        <motion.div
+          className="workflow-stages-grid"
+          variants={staggerContainer(0.09, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {stages.map((stage, idx) => {
             const Icon = stage.icon;
             const isSelected = activeStage === idx;
             return (
-              <div
+              <motion.div
                 key={stage.num}
                 className={`workflow-stage-card ${isSelected ? 'active-card' : ''}`}
                 onClick={() => setActiveStage(idx)}
+                variants={cardVariant}
+                whileHover={{ y: -4, transition: transitions.micro }}
               >
                 <div className="stage-card-top">
                   <span className="stage-num-badge">{stage.num}</span>
@@ -129,29 +153,46 @@ export const RagWorkflowSection: React.FC = () => {
                     <span className="stage-next-arrow"><ArrowRight size={13} /></span>
                   )}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* Detailed Stage Deep-Dive Bar */}
-        <div className="stage-deep-dive-card">
-          <div className="deep-dive-left">
-            <span className="deep-dive-badge">STAGE {stages[activeStage].num} ARCHITECTURAL SPEC</span>
-            <h4>{stages[activeStage].title} — {stages[activeStage].subtitle}</h4>
-            <p>{stages[activeStage].techSpec}</p>
-          </div>
-          <div className="deep-dive-right">
-            <div className="spec-metric-pill">
-              <span>Performance SLA:</span>
-              <strong>{stages[activeStage].metric}</strong>
-            </div>
-            <div className="spec-status-pill">
-              <CheckCircle size={14} className="text-orange" />
-              <span>Enterprise Guardrail Active</span>
-            </div>
-          </div>
-        </div>
+        {/* Detailed Stage Deep-Dive Bar with Smooth AnimatePresence Transition */}
+        <motion.div
+          className="stage-deep-dive-card"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={transitions.smooth}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeStage}
+              variants={tabPanelVariant}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+            >
+              <div className="deep-dive-left">
+                <span className="deep-dive-badge">STAGE {stages[activeStage].num} ARCHITECTURAL SPEC</span>
+                <h4>{stages[activeStage].title} — {stages[activeStage].subtitle}</h4>
+                <p>{stages[activeStage].techSpec}</p>
+              </div>
+              <div className="deep-dive-right">
+                <div className="spec-metric-pill">
+                  <span>Performance SLA:</span>
+                  <strong>{stages[activeStage].metric}</strong>
+                </div>
+                <div className="spec-status-pill">
+                  <CheckCircle size={14} className="text-orange" />
+                  <span>Enterprise Guardrail Active</span>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

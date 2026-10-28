@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   Boxes,
   Cpu,
@@ -9,6 +10,7 @@ import {
   Server,
   Zap,
 } from 'lucide-react';
+import { viewportOnce, transitions } from '../../utils/motionVariants';
 
 const partners = [
   { name: 'SAP S/4HANA Enterprise', icon: Server },
@@ -23,7 +25,13 @@ const partners = [
 
 export const EnterprisePartnerTicker: React.FC = () => {
   return (
-    <div className="partner-ticker-wrap">
+    <motion.div
+      className="partner-ticker-wrap"
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={viewportOnce}
+      transition={transitions.smooth}
+    >
       <div className="partner-ticker-inner">
         <div className="partner-ticker-track">
           {partners.concat(partners).map((item, idx) => {
@@ -37,6 +45,6 @@ export const EnterprisePartnerTicker: React.FC = () => {
           })}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

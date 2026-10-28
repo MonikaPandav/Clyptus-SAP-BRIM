@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
   ChevronRight,
@@ -16,6 +17,8 @@ import {
   Workflow,
 } from 'lucide-react';
 import iconOnly from '../../assets/clyptusap-icon.png';
+import { tabPanelVariant } from '../../utils/motionVariants';
+import { ChatThinkingIndicator } from '../chat/ChatThinkingIndicator';
 
 interface Scenario {
   id: string;
@@ -104,12 +107,29 @@ const scenarios: Scenario[] = [
 
 export const HeroChatbotPreview: React.FC = () => {
   const [activeScenario, setActiveScenario] = useState<Scenario>(scenarios[0]);
+  const [isThinking, setIsThinking] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleCopyPath = () => {
     navigator.clipboard?.writeText(activeScenario.sproPath);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSwitchScenario = (sc: Scenario) => {
+    if (sc.id === activeScenario.id && !isThinking) return;
+    setIsThinking(true);
+    setActiveScenario(sc);
+    setTimeout(() => {
+      setIsThinking(false);
+    }, 700);
+  };
+
+  const handleRunQuery = () => {
+    setIsThinking(true);
+    setTimeout(() => {
+      setIsThinking(false);
+    }, 700);
   };
 
   return (
@@ -195,7 +215,7 @@ export const HeroChatbotPreview: React.FC = () => {
                 <Search size={16} className="search-icon" />
                 <span className="search-text-value">{activeScenario.query}</span>
               </div>
-              <button className="search-send-btn" aria-label="Send Query">
+              <button className="search-send-btn" aria-label="Send Query" onClick={handleRunQuery}>
                 <Send size={14} />
               </button>
             </div>
@@ -206,56 +226,82 @@ export const HeroChatbotPreview: React.FC = () => {
               <span className="action-tag"><ShieldCheck size={12} /> Dual Rerank Guardrails</span>
             </div>
 
-            {/* Floating Overlaid Resolution Card (Interactive Response) */}
+            {/* Floating Overlaid Resolution Card (Interactive Response with Smooth Transition) */}
             <div className="floating-resolution-card">
-              <div className="resolution-top-bar">
-                <div className="resolution-badge">
-                  <CheckCircle2 size={13} />
-                  <span>GROUNDED SAP RESOLUTION</span>
-                </div>
-                <div className="resolution-score">
-                  <span>Confidence:</span>
-                  <strong>{activeScenario.similarity}</strong>
-                </div>
-              </div>
+              <AnimatePresence mode="wait">
+                {isThinking ? (
+                  <motion.div
+                    key="landing-thinking"
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex justify-center items-center py-10"
+                  >
+                    <ChatThinkingIndicator
+                      stage="Analyzing your question..."
+                      subtext={`Scanning SAP BRIM manuals for "${activeScenario.category}"`}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={activeScenario.id}
+                    variants={tabPanelVariant}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <div className="resolution-top-bar">
+                      <div className="resolution-badge">
+                        <CheckCircle2 size={13} />
+                        <span>GROUNDED SAP RESOLUTION</span>
+                      </div>
+                      <div className="resolution-score">
+                        <span>Confidence:</span>
+                        <strong>{activeScenario.similarity}</strong>
+                      </div>
+                    </div>
 
-              <div className="resolution-content">
-                <p className="resolution-summary">{activeScenario.summary}</p>
+                    <div className="resolution-content">
+                      <p className="resolution-summary">{activeScenario.summary}</p>
 
-                {/* SPRO Customizing Path Pill */}
-                <div className="resolution-spro-box">
-                  <div className="spro-box-header">
-                    <strong>SPRO CUSTOMIZING PATH</strong>
-                    <button className="copy-path-btn" onClick={handleCopyPath} title="Copy SPRO path">
-                      <Copy size={12} />
-                      <span>{copied ? 'Copied' : 'Copy'}</span>
-                    </button>
-                  </div>
-                  <code>{activeScenario.sproPath}</code>
-                </div>
+                      {/* SPRO Customizing Path Pill */}
+                      <div className="resolution-spro-box">
+                        <div className="spro-box-header">
+                          <strong>SPRO CUSTOMIZING PATH</strong>
+                          <button className="copy-path-btn" onClick={handleCopyPath} title="Copy SPRO path">
+                            <Copy size={12} />
+                            <span>{copied ? 'Copied' : 'Copy'}</span>
+                          </button>
+                        </div>
+                        <code>{activeScenario.sproPath}</code>
+                      </div>
 
-                {/* Key Technical Points */}
-                <ul className="resolution-key-points">
-                  {activeScenario.keyPoints.map((point, idx) => (
-                    <li key={idx}>
-                      <ChevronRight size={13} className="bullet-arrow" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
+                      {/* Key Technical Points */}
+                      <ul className="resolution-key-points">
+                        {activeScenario.keyPoints.map((point, idx) => (
+                          <li key={idx}>
+                            <ChevronRight size={13} className="bullet-arrow" />
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
 
-                {/* Citation Footer Pill */}
-                <div className="resolution-citation-row">
-                  <div className="citation-pill">
-                    <FileText size={12} />
-                    <span>{activeScenario.citationDoc} · p. {activeScenario.page}</span>
-                  </div>
-                  <div className="tcode-pill">
-                    <span>T-CODE:</span>
-                    <strong>{activeScenario.tcode}</strong>
-                  </div>
-                </div>
-              </div>
+                      {/* Citation Footer Pill */}
+                      <div className="resolution-citation-row">
+                        <div className="citation-pill">
+                          <FileText size={12} />
+                          <span>{activeScenario.citationDoc} · p. {activeScenario.page}</span>
+                        </div>
+                        <div className="tcode-pill">
+                          <span>T-CODE:</span>
+                          <strong>{activeScenario.tcode}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -265,13 +311,15 @@ export const HeroChatbotPreview: React.FC = () => {
           <span className="scenario-label">CLICK SCENARIO TO PREVIEW:</span>
           <div className="scenario-tabs">
             {scenarios.map((sc) => (
-              <button
+              <motion.button
                 key={sc.id}
                 className={`scenario-btn ${activeScenario.id === sc.id ? 'active' : ''}`}
-                onClick={() => setActiveScenario(sc)}
+                onClick={() => handleSwitchScenario(sc)}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
               >
                 <span>{sc.tabLabel}</span>
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>

@@ -44,6 +44,121 @@
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Header Standalone Logo — Pure, Frame-Free & Visually Prominent */
+.public-nav .nav-brand-clean,
+.public-nav .brand {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  flex-shrink: 0 !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+}
+
+.public-nav .nav-brand-clean:hover,
+.public-nav .brand:hover {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateY(-1px) scale(1.02) !important;
+  opacity: 0.95 !important;
+}
+
+.public-nav .nav-logo-clean,
+.public-nav .brand img {
+  height: 48px !important;
+  max-height: 52px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+@media (min-width: 768px) {
+
+  .public-nav .nav-logo-clean,
+  .public-nav .brand img {
+    height: 58px !important;
+    max-height: 62px !important;
+  }
+}
+
+/* Nav links alignment & refined typography */
+.public-nav .nav-links {
+  display: flex !important;
+  align-items: center !important;
+  gap: 32px !important;
+}
+
+.public-nav .nav-links>a {
+  font-size: 14.5px !important;
+  font-weight: 550 !important;
+  color: var(--ivory-ink-secondary) !important;
+  letter-spacing: -0.01em !important;
+  padding: 6px 4px !important;
+  transition: color 0.18s ease, transform 0.18s ease !important;
+  text-decoration: none !important;
+}
+
+.public-nav .nav-links>a:hover {
+  color: var(--orange-brand) !important;
+  transform: translateY(-1px) !important;
+}
+
+.public-nav .nav-links>a.active {
+  color: var(--orange-brand) !important;
+  font-weight: 650 !important;
+}
+
+/* Nav Actions & Sign-in Ghost Button */
+.public-nav .nav-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.public-nav .nav-signin {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--ivory-ink-secondary) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.public-nav .nav-signin:hover {
+  color: var(--orange-brand) !important;
+  background: var(--orange-peach-bg) !important;
+  border-color: var(--orange-peach-border) !important;
+  box-shadow: 0 2px 8px rgba(255, 98, 0, 0.08) !important;
+  transform: translateY(-1px) !important;
+}
+
 /* Signature Editorial Italic Serif Highlight */
 .hero-italic-serif {
   font-family: 'Newsreader', 'Playfair Display', Georgia, serif;
@@ -51,6 +166,12 @@
   font-weight: 500;
   color: var(--orange-brand);
   letter-spacing: -0.015em;
+}
+
+/* Hero Title Accent - Non-Italic Brand Highlight */
+.hero-title-accent {
+  color: var(--orange-brand);
+  font-style: normal;
 }
 
 /* Reusable Kicker Pill */
@@ -2888,5 +3009,168 @@
   .auth-logo-pure {
     max-width: 210px;
     max-height: 56px;
+  }
+}
+
+/* =========================================================================
+   Premium Scroll Animations & Subtle UI Interactions (Design System Polish)
+   ========================================================================= */
+
+/* Hardware acceleration & smooth rendering for animated surfaces */
+.hero-content-container,
+.hero-showcase-container,
+.possibilities-grid,
+.workflow-stages-grid,
+.comparison-cards-grid,
+.prompt-sandbox-grid,
+.about-story-grid,
+.pillars-grid,
+.stats-cards-row,
+.final-cta-card {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Elevated Hover States for Cards across Landing Page */
+.possibility-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.possibility-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 20px 42px -12px rgba(255, 98, 0, 0.1),
+    0 0 0 1px var(--orange-peach-border);
+}
+
+.workflow-stage-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.workflow-stage-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 16px 36px -10px rgba(255, 98, 0, 0.12);
+}
+
+.workflow-stage-card.active-card {
+  border-color: var(--orange-brand);
+  box-shadow: 0 16px 36px -10px rgba(255, 98, 0, 0.14),
+    0 0 0 1px rgba(255, 98, 0, 0.3);
+}
+
+.prompt-chip-card {
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prompt-chip-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 10px 24px -6px rgba(255, 98, 0, 0.08);
+}
+
+.prompt-chip-card.selected-chip {
+  border-color: var(--orange-brand);
+  background: var(--orange-peach-bg);
+  box-shadow: 0 8px 24px -6px rgba(255, 98, 0, 0.12);
+}
+
+.story-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.story-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 16px 36px -10px rgba(255, 98, 0, 0.09);
+}
+
+.pillar-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pillar-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 12px 30px -8px rgba(255, 98, 0, 0.1);
+}
+
+.stat-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card:hover {
+  border-color: var(--orange-peach-border);
+  box-shadow: 0 14px 32px -8px rgba(255, 98, 0, 0.1);
+}
+
+/* Subtle continuous ambient breathing for orbital rings */
+.orbital-ring {
+  transition: border-color 0.4s ease;
+}
+
+.card-orbital-tools:hover .orbital-ring.ring-1 {
+  border-color: rgba(255, 98, 0, 0.22);
+}
+
+.card-orbital-tools:hover .orbital-ring.ring-2 {
+  border-color: rgba(255, 98, 0, 0.18);
+}
+
+.card-orbital-tools:hover .orbital-ring.ring-3 {
+  border-color: rgba(255, 98, 0, 0.14);
+}
+
+/* Pause partner ticker on hover */
+.partner-ticker-inner:hover .partner-ticker-track {
+  animation-play-state: paused;
+}
+
+.partner-item {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.partner-item:hover {
+  background: var(--orange-peach-bg);
+  border-color: var(--orange-peach-border);
+  color: var(--orange-brand);
+  transform: translateY(-2px);
+}
+
+/* =========================================================================
+   Reduced Motion Accessibility Preference
+   Respects user's operating system settings to prevent motion sickness.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .partner-ticker-track {
+    animation: none !important;
+    overflow-x: auto;
+  }
+
+  .hero-radial-glow,
+  .hero-ambient-orb,
+  .final-cta-radial-glow {
+    transform: none !important;
   }
 }

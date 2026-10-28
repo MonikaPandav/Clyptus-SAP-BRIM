@@ -462,11 +462,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               <div className="mt-3.5 pt-2 flex items-center gap-2">
                 <button
                   onClick={() => setShowSourcesModal(true)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl transition text-xs font-medium shadow-xs group cursor-pointer ${
-                    hasSources
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl transition text-xs font-medium shadow-xs group cursor-pointer ${hasSources
                       ? 'bg-orange-50/90 dark:bg-[#12121e] hover:bg-orange-100 dark:hover:bg-[#1a1a2c] text-orange-950 dark:text-orange-200 border border-orange-200 dark:border-orange-500/35 hover:border-orange-400 dark:hover:border-orange-500/60'
                       : 'bg-slate-100 dark:bg-slate-900/70 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-                  }`}
+                    }`}
                   title="Admin Only: View internal sources & citations"
                 >
                   <Eye className="w-3.5 h-3.5 text-orange-500 group-hover:scale-110 transition-transform" />

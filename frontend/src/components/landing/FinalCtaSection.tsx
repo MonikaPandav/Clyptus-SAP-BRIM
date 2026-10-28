@@ -1,31 +1,70 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Lock, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  viewportOnce,
+  transitions,
+} from '../../utils/motionVariants';
 
 export const FinalCtaSection: React.FC = () => {
   return (
     <section className="final-cta-section">
       <div className="section-container">
-        <div className="final-cta-card">
-          {/* Subtle Ambient Radial Aura */}
-          <div className="final-cta-radial-glow" />
+        <motion.div
+          className="final-cta-card"
+          initial={{ opacity: 0, scale: 0.97, y: 28 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={viewportOnce}
+          transition={transitions.gentle}
+        >
+          {/* Subtle Ambient Radial Aura with gentle breathing pulse */}
+          <motion.div
+            className="final-cta-radial-glow"
+            animate={{ scale: [1, 1.1, 1], opacity: [0.65, 0.95, 0.65] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          />
 
           <div className="final-cta-content">
-            <div className="kicker-pill-subtle">
+            <motion.div
+              className="kicker-pill-subtle"
+              initial={{ opacity: 0, y: -10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ delay: 0.1, duration: 0.4 }}
+            >
               <span className="pill-dot" />
               <span>READY TO EXPLORE SAP + BRIM?</span>
-            </div>
+            </motion.div>
 
-            <h2 className="cta-headline">
+            <motion.h2
+              className="cta-headline"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ delay: 0.15, duration: 0.5 }}
+            >
               Never Guess An SAP Setting Again.<br />
               <span className="hero-italic-serif">Ask Clyptus.AI.</span>
-            </h2>
+            </motion.h2>
 
-            <p className="cta-description">
+            <motion.p
+              className="cta-description"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               Access grounded answers across Convergent Invoicing, Charging, FI-CA, and SOM. Backed by verified enterprise documentation and zero-hallucination guardrails.
-            </p>
+            </motion.p>
 
-            <div className="cta-buttons-row">
+            <motion.div
+              className="cta-buttons-row"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportOnce}
+              transition={{ delay: 0.25, duration: 0.5 }}
+            >
               <Link to="/login" className="button-brand-pill">
                 <span>Open Enterprise Workspace</span>
                 <ArrowRight size={16} />
@@ -34,9 +73,15 @@ export const FinalCtaSection: React.FC = () => {
                 <span>See How It Works</span>
                 <ArrowUpRight size={15} />
               </Link>
-            </div>
+            </motion.div>
 
-            <div className="cta-trust-indicators">
+            <motion.div
+              className="cta-trust-indicators"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={viewportOnce}
+              transition={{ delay: 0.35, duration: 0.6 }}
+            >
               <div className="trust-indicator-item">
                 <ShieldCheck size={14} className="text-orange" />
                 <span>100% Grounded in Official Manuals</span>
@@ -51,9 +96,9 @@ export const FinalCtaSection: React.FC = () => {
                 <Sparkles size={14} className="text-orange" />
                 <span>Real-Time Streaming Generation</span>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

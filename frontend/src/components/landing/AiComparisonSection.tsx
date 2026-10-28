@@ -1,55 +1,51 @@
-import { Check, ShieldAlert, ShieldCheck, X } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import {
+  Check,
+  ShieldAlert,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 interface ComparisonRow {
   dimension: string;
   genericAi: string;
-  genericStatus: 'bad' | 'warn';
   clyptusAi: string;
-  clyptusStatus: 'good';
 }
 
 const comparisons: ComparisonRow[] = [
   {
-    dimension: 'SPRO Customizing Paths',
-    genericAi: 'Frequently hallucinates non-existent SPRO nodes, mixing ECC and S/4HANA paths.',
-    genericStatus: 'bad',
-    clyptusAi: 'Exact SPRO hierarchy retrieved directly from indexed SAP official customizing guides.',
-    clyptusStatus: 'good',
+    dimension: 'SPRO Navigation Breadcrumbs',
+    genericAi: 'Guesses generic ERP paths, often combining ECC 6.0 with S/4HANA obsolete trees.',
+    clyptusAi: 'Outputs exact, verified IMG navigation paths down to the leaf node customizing activity.',
   },
   {
-    dimension: 'SAP Transaction Codes',
-    genericAi: 'Invents outdated or fictitious T-Codes (e.g., mixing SD billing with FI-CA).',
-    genericStatus: 'bad',
-    clyptusAi: 'Verified, executable S/4HANA and BRIM T-Codes (e.g. FKKBIXCIT_CONF, FPY1).',
-    clyptusStatus: 'good',
+    dimension: 'Transaction Codes (T-Codes)',
+    genericAi: 'Frequently hallucinates deprecated transactions or non-existent prefix codes.',
+    clyptusAi: 'Verified SAP BRIM transaction codes with explicit version compatibility flags.',
   },
   {
-    dimension: 'Hallucination Safeguard',
-    genericAi: 'Generates plausible-sounding but completely incorrect technical configurations.',
-    genericStatus: 'bad',
-    clyptusAi: 'Mathematical grounding verification. Refuses to answer if evidence is insufficient.',
-    clyptusStatus: 'good',
+    dimension: 'Zero Hallucination Guarantee',
+    genericAi: 'Speaks with false confidence when context is missing, fabricating configuration tables.',
+    clyptusAi: 'Mathematically refuses to answer if enterprise documentation cannot corroborate the claim.',
   },
   {
-    dimension: 'Citations & Audit Trail',
-    genericAi: 'No source citations. Impossible to verify or defend in architectural reviews.',
-    genericStatus: 'bad',
-    clyptusAi: 'Page-level and document-level citations with similarity scores and verified notes.',
-    clyptusStatus: 'good',
+    dimension: 'Clickable Documentation Citations',
+    genericAi: 'No source attribution or generic references to public forums.',
+    clyptusAi: 'Page-accurate citations linked to indexed SAP Solution Architecture & Config Guides.',
   },
   {
-    dimension: 'BRIM Domain Specialization',
-    genericAi: 'Generalist training with shallow, outdated web scrapes on billing concepts.',
-    genericStatus: 'warn',
-    clyptusAi: 'Strictly dedicated to SAP ERP, S/4HANA, BRIM (CI, CC, FI-CA, SOM, CM).',
-    clyptusStatus: 'good',
-  },
-  {
-    dimension: 'Enterprise Data Privacy',
-    genericAi: 'Public multi-tenant endpoints with risk of confidential prompt leakage.',
-    genericStatus: 'warn',
-    clyptusAi: 'Tenant isolation, encrypted JWT authentication, admin-managed document boundaries.',
-    clyptusStatus: 'good',
+    dimension: 'Enterprise Data Isolation',
+    genericAi: 'Public multi-tenant models that may absorb prompts into training corpora.',
+    clyptusAi: 'Tenant-isolated PostgreSQL pgvector storage with role-based JWT access controls.',
   },
 ];
 
@@ -57,13 +53,14 @@ export const AiComparisonSection: React.FC = () => {
   return (
     <section className="ai-comparison-section">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
-          <div className="kicker-pill-subtle">
-            <span className="pill-dot" />
-            <span>ARCHITECTURAL INTEGRITY</span>
-          </div>
-
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <h2 className="section-title-large">
             Why Generic AI Fails in SAP.<br />
             <span className="hero-italic-serif">And Why Clyptus.AI Doesn't.</span>
@@ -72,12 +69,22 @@ export const AiComparisonSection: React.FC = () => {
           <p className="section-subtitle-muted">
             In mission-critical billing and revenue accounting, a single hallucinated customizing path can derail enterprise implementations. Grounding makes all the difference.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Side-by-side Table / Cards */}
-        <div className="comparison-cards-grid">
+        {/* Side-by-side Cards with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="comparison-cards-grid"
+          variants={staggerContainer(0.14, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {/* Column 1: Generic LLMs */}
-          <div className="comparison-col generic-col">
+          <motion.div
+            className="comparison-col generic-col"
+            variants={cardVariant}
+            whileHover={{ y: -3, transition: transitions.micro }}
+          >
             <div className="col-header">
               <div className="col-badge badge-danger">
                 <ShieldAlert size={14} />
@@ -100,10 +107,14 @@ export const AiComparisonSection: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Column 2: Clyptus.AI */}
-          <div className="comparison-col clyptus-col">
+          <motion.div
+            className="comparison-col clyptus-col"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <div className="col-header">
               <div className="col-badge badge-brand">
                 <ShieldCheck size={14} />
@@ -126,8 +137,8 @@ export const AiComparisonSection: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

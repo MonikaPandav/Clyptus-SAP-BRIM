@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   CheckCircle2,
   FileCode,
@@ -15,32 +16,51 @@ import {
   Workflow,
   Zap,
 } from 'lucide-react';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 export const InfinitePossibilitiesGrid: React.FC = () => {
   return (
     <section className="infinite-possibilities-section" id="features">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
-          <div className="kicker-pill-subtle">
-            <span className="pill-dot" />
-            <span>One For All</span>
-          </div>
-
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <h2 className="section-title-large">
             One Knowledge Platform.<br />
-            <span className="hero-italic-serif">Infinite SAP Possibilities.</span>
+            <span className="hero-title-accent">Infinite SAP Possibilities.</span>
           </h2>
 
           <p className="section-subtitle-muted">
             Connect enterprise SAP documentation, configuration dictionaries, and consulting teams into one authoritative, hallucination-free AI workspace.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Feature Cards Grid */}
-        <div className="possibilities-grid">
+        {/* Feature Cards Grid with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="possibilities-grid"
+          variants={staggerContainer(0.12, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {/* Card 1: Secure Multi-User SAP Access */}
-          <div className="possibility-card card-multi-user">
+          <motion.div
+            className="possibility-card card-multi-user"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <div className="card-top-content">
               <span className="card-category-tag">ACCESS CONTROL</span>
               <h3 className="card-headline">Secure Multi-User SAP Access</h3>
@@ -84,10 +104,14 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Card 2: Connect with Your Favorite Tools (Orbital Arcs) */}
-          <div className="possibility-card card-orbital-tools">
+          <motion.div
+            className="possibility-card card-orbital-tools"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <div className="card-top-content">
               <span className="card-category-tag">ECOSYSTEM INTEGRATION</span>
               <h3 className="card-headline">Connect with Your Enterprise Tools</h3>
@@ -100,10 +124,14 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
             <div className="card-orbital-visual">
               <div className="orbital-arcs-container">
                 {/* Center Core Badge */}
-                <div className="orbital-core-badge">
+                <motion.div
+                  className="orbital-core-badge"
+                  animate={{ scale: [1, 1.04, 1] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
                   <Sparkles size={18} />
                   <span>Clyptus</span>
-                </div>
+                </motion.div>
 
                 {/* Orbit 1 */}
                 <div className="orbital-ring ring-1" />
@@ -112,37 +140,66 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
                 {/* Orbit 3 */}
                 <div className="orbital-ring ring-3" />
 
-                {/* Floating Tool Badges along the concentric arcs */}
-                <div className="orbital-tool-node node-sap" title="SAP S/4HANA">
+                {/* Floating Tool Badges along the concentric arcs with subtle float animation */}
+                <motion.div
+                  className="orbital-tool-node node-sap"
+                  title="SAP S/4HANA"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
                   <Server size={14} />
                   <span>S/4HANA</span>
-                </div>
+                </motion.div>
 
-                <div className="orbital-tool-node node-confluence" title="SAP Fiori / GUI">
+                <motion.div
+                  className="orbital-tool-node node-confluence"
+                  title="SAP Fiori / GUI"
+                  animate={{ y: [0, 4, 0] }}
+                  transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                >
                   <Layers size={14} />
                   <span>Fiori</span>
-                </div>
+                </motion.div>
 
-                <div className="orbital-tool-node node-jira" title="Jira Implementation Issues">
+                <motion.div
+                  className="orbital-tool-node node-jira"
+                  title="Jira Implementation Issues"
+                  animate={{ y: [0, -3, 0] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                >
                   <FileText size={14} />
                   <span>Jira</span>
-                </div>
+                </motion.div>
 
-                <div className="orbital-tool-node node-github" title="Confluence Runbooks">
+                <motion.div
+                  className="orbital-tool-node node-github"
+                  title="Confluence Runbooks"
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+                >
                   <GitBranch size={14} />
                   <span>Git/Docs</span>
-                </div>
+                </motion.div>
 
-                <div className="orbital-tool-node node-slack" title="Enterprise Messaging">
+                <motion.div
+                  className="orbital-tool-node node-slack"
+                  title="Enterprise Messaging"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+                >
                   <Network size={14} />
                   <span>ServiceNow</span>
-                </div>
+                </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Card 3: Encrypted Workflow Infrastructure (Wide Timeline Card) */}
-          <div className="possibility-card card-infrastructure-timeline">
+          <motion.div
+            className="possibility-card card-infrastructure-timeline"
+            variants={cardVariant}
+            whileHover={{ y: -3, transition: transitions.micro }}
+          >
             <div className="card-top-content">
               <span className="card-category-tag">DATA CONFIDENCE</span>
               <h3 className="card-headline">Encrypted Workflow Infrastructure</h3>
@@ -193,10 +250,14 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Card 4: Smart Workflows */}
-          <div className="possibility-card card-compact">
+          <motion.div
+            className="possibility-card card-compact"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <div className="compact-icon-box bg-orange">
               <Workflow size={20} className="text-white" />
             </div>
@@ -208,10 +269,14 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
               <span><CheckCircle2 size={13} /> SPRO navigation breadcrumbs</span>
               <span><CheckCircle2 size={13} /> S/4HANA Transaction codes</span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Card 5: Secure AI */}
-          <div className="possibility-card card-compact">
+          <motion.div
+            className="possibility-card card-compact"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <div className="compact-icon-box bg-amber">
               <Shield size={20} className="text-white" />
             </div>
@@ -223,8 +288,8 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
               <span><CheckCircle2 size={13} /> Mathematical refusal trigger</span>
               <span><CheckCircle2 size={13} /> Admin-controlled knowledge base</span>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

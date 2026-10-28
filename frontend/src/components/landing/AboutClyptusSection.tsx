@@ -1,4 +1,13 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import {
+  sectionHeaderVariant,
+  staggerContainer,
+  cardVariant,
+  viewportOnce,
+  viewportCard,
+  transitions,
+} from '../../utils/motionVariants';
 
 const pillars = [
   {
@@ -34,8 +43,14 @@ export const AboutClyptusSection: React.FC = () => {
   return (
     <section className="about-clyptus-section" id="about">
       <div className="section-container">
-        {/* Section Header */}
-        <div className="section-header-center">
+        {/* Section Header with Scroll-Triggered Reveal */}
+        <motion.div
+          className="section-header-center"
+          variants={sectionHeaderVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <div className="kicker-pill-subtle">
             <span className="pill-dot" />
             <span>ABOUT CLYPTUS &amp; CLYPTUS.AI</span>
@@ -49,48 +64,84 @@ export const AboutClyptusSection: React.FC = () => {
           <p className="section-subtitle-muted">
             Clyptus Technologies builds domain-specialized artificial intelligence systems designed strictly for complex ERP environments. Clyptus.AI bridges the gap between massive, distributed SAP technical documentation and immediate, grounded decision-making for enterprise architects, billing consultants, and engineering teams.
           </p>
-        </div>
+        </motion.div>
 
-        {/* 2 Story Cards */}
-        <div className="about-story-grid">
-          <div className="story-card">
+        {/* 2 Story Cards with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="about-story-grid"
+          variants={staggerContainer(0.12, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
+          <motion.div
+            className="story-card"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <span className="story-tag tag-challenge">THE ENTERPRISE CHALLENGE</span>
             <h3>Why Generic AI Fails in SAP</h3>
             <p>
               Standard large language models hallucinate non-existent transaction codes, invent fictitious SPRO customizing paths, and confuse SAP Convergent Charging rating logic with Convergent Invoicing billing plans. In high-throughput telecommunications, utilities, and subscription businesses, a single billing configuration error can delay millions in revenue recognition.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="story-card">
+          <motion.div
+            className="story-card"
+            variants={cardVariant}
+            whileHover={{ y: -4, transition: transitions.micro }}
+          >
             <span className="story-tag tag-approach">THE CLYPTUS APPROACH</span>
             <h3>Grounding Before Generation</h3>
             <p>
               Clyptus.AI never relies on raw parametric memory for configuration paths or technical syntax. Every query triggers dense embedding retrieval combined with BM25 exact keyword matching, cross-encoder neural reranking, and mathematical grounding verification. If verified enterprise documentation doesn't back the answer, the system refuses rather than guessing.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* 4 Pillars Grid */}
-        <div className="pillars-grid">
+        {/* 4 Pillars Grid with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="pillars-grid"
+          variants={staggerContainer(0.08, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {pillars.map((pillar) => (
-            <div key={pillar.num} className="pillar-card">
+            <motion.div
+              key={pillar.num}
+              className="pillar-card"
+              variants={cardVariant}
+              whileHover={{ y: -3, transition: transitions.micro }}
+            >
               <span className="pillar-number">{pillar.num}</span>
               <h4 className="pillar-title">{pillar.title}</h4>
               <p className="pillar-desc">{pillar.desc}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* 4 Stats Cards */}
-        <div className="stats-cards-row">
+        {/* 4 Stats Cards with Staggered Scroll-Triggered Reveal */}
+        <motion.div
+          className="stats-cards-row"
+          variants={staggerContainer(0.08, 0.05)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportCard}
+        >
           {stats.map((s) => (
-            <div key={s.label} className="stat-card">
+            <motion.div
+              key={s.label}
+              className="stat-card"
+              variants={cardVariant}
+              whileHover={{ y: -3, transition: transitions.micro }}
+            >
               <strong className="stat-value">{s.value}</strong>
               <span className="stat-label">{s.label}</span>
               <span className="stat-sub">{s.sub}</span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
