@@ -1246,9 +1246,8 @@ p {
 }
 
 .faq-section {
-  display: grid;
-  grid-template-columns: .7fr 1.3fr;
-  gap: 70px
+  display: block;
+  width: 100%;
 }
 
 .faq-section .section-heading h2 {

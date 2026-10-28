@@ -75,8 +75,8 @@ export const FaqSection: React.FC = () => {
           </div>
 
           <h2 className="section-title-large">
-            Curious About Clyptus.AI?<br />
-            <span className="hero-italic-serif">Clear Answers to Common Questions.</span>
+            <span className="faq-heading-main">Curious About Clyptus.AI?</span>
+            <span className="hero-italic-serif faq-heading-sub">Clear Answers to Common Questions</span>
           </h2>
 
           <p className="section-subtitle-muted">

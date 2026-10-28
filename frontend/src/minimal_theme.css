@@ -2187,8 +2187,52 @@
    ========================================================================= */
 
 .faq-section {
+  display: block !important;
+  width: 100%;
   padding: 96px 20px;
   background: var(--ivory-white);
+}
+
+.faq-section .section-container {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.faq-section .section-header-center {
+  text-align: center !important;
+  max-width: 780px;
+  margin: 0 auto 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.faq-section .kicker-pill-subtle {
+  margin: 0 auto 20px;
+}
+
+.faq-section .section-title-large {
+  text-align: center !important;
+  margin: 14px auto 16px;
+  width: 100%;
+}
+
+.faq-heading-main {
+  display: block;
+  text-align: center !important;
+  margin: 0 auto;
+}
+
+.faq-heading-sub {
+  display: block;
+  text-align: center !important;
+  margin: 8px auto 0;
+}
+
+.faq-section .section-subtitle-muted {
+  text-align: center !important;
+  margin: 0 auto;
+  max-width: 640px;
 }
 
 .faq-accordion-wrap {
