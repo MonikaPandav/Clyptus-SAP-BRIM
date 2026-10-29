@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useEffectEvent, useRef } from 'react';
 import { ChevronDown, Lock } from 'lucide-react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import type { Message, DocumentAttachment } from '../types';
@@ -8,6 +8,7 @@ import { ChatInput } from '../components/chat/ChatInput';
 import { WelcomeScreen } from '../components/chat/WelcomeScreen';
 import { AuthLimitModal } from '../components/chat/AuthLimitModal';
 import { useAuth } from '../context/AuthContext';
+import { readChatPromptState } from '../utils/chatNavigation';
 
 import {
   apiCreateChat,
@@ -30,6 +31,8 @@ export const ChatPage: React.FC = () => {
   const { user } = useAuth();
   // A prompt opened from a share link pre-fills the input; the user decides whether to send it.
   const [prefillPrompt] = useState<string>(() => (location.state as { prefillPrompt?: string } | null)?.prefillPrompt ?? '');
+  const [submitPrompt] = useState(() => readChatPromptState(location.state)?.submitPrompt);
+  const submittedPromptRef = useRef(false);
 
   useEffect(() => {
     // Drop the router state so a page refresh doesn't pre-fill again.
@@ -477,6 +480,22 @@ export const ChatPage: React.FC = () => {
       if (!controller.signal.aborted) callbacks.onError?.(err);
     }
   };
+
+  const sendLaunchPrompt = useEffectEvent((prompt: string) => {
+    void handleSendMessage(prompt);
+  });
+
+  useEffect(() => {
+    if (!submitPrompt || submittedPromptRef.current) return;
+    // Run after chat initialization; cleanup prevents a duplicate send in StrictMode.
+    const timer = window.setTimeout(() => {
+      if (submittedPromptRef.current) return;
+      submittedPromptRef.current = true;
+      navigate(location.pathname, { replace: true, state: null });
+      sendLaunchPrompt(submitPrompt);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [submitPrompt, navigate, location.pathname]);
 
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-[#ffffff] dark:bg-[#000000] relative text-slate-800 dark:text-slate-100 font-sans transition-colors overflow-hidden">

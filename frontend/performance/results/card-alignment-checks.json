@@ -1,0 +1,513 @@
+{
+  "passed": 56,
+  "checks": [
+    "Hub loads",
+    "Team details follow description with a 16px gap at 1440px",
+    "Access card has no forced empty height at 1440px",
+    "No page overflow or overlapping nodes at 1440px",
+    "Four stages retain unclipped text and aligned labels at 1440px",
+    "Stage boxes use equal intrinsic row heights at 1440px",
+    "Connectors align with icons and fill the 20px row gap at 1440px",
+    "Desktop cards align at the top with equal column widths at 1440px",
+    "Hub loads",
+    "Team details follow description with a 16px gap at 1280px",
+    "Access card has no forced empty height at 1280px",
+    "No page overflow or overlapping nodes at 1280px",
+    "Four stages retain unclipped text and aligned labels at 1280px",
+    "Stage boxes use equal intrinsic row heights at 1280px",
+    "Connectors align with icons and fill the 20px row gap at 1280px",
+    "Desktop cards align at the top with equal column widths at 1280px",
+    "Hub loads",
+    "Team details follow description with a 16px gap at 1024px",
+    "Access card has no forced empty height at 1024px",
+    "No page overflow or overlapping nodes at 1024px",
+    "Four stages retain unclipped text and aligned labels at 1024px",
+    "Stage boxes use equal intrinsic row heights at 1024px",
+    "Connectors align with icons and fill the 20px row gap at 1024px",
+    "Hub loads",
+    "Team details follow description with a 16px gap at 768px",
+    "Access card has no forced empty height at 768px",
+    "No page overflow or overlapping nodes at 768px",
+    "Four stages retain unclipped text and aligned labels at 768px",
+    "Stage boxes use equal intrinsic row heights at 768px",
+    "Connectors align with icons and fill the 20px row gap at 768px",
+    "Hub loads",
+    "Team details follow description with a 16px gap at 390px",
+    "Access card has no forced empty height at 390px",
+    "No page overflow or overlapping nodes at 390px",
+    "Four stages retain unclipped text and aligned labels at 390px",
+    "Stage boxes use equal intrinsic row heights at 390px",
+    "Connectors align with icons and fill the 20px row gap at 390px",
+    "Hub loads",
+    "Team details follow description with a 16px gap at 320px",
+    "Access card has no forced empty height at 320px",
+    "No page overflow or overlapping nodes at 320px",
+    "Four stages retain unclipped text and aligned labels at 320px",
+    "Stage boxes use equal intrinsic row heights at 320px",
+    "Connectors align with icons and fill the 20px row gap at 320px",
+    "Hub loads",
+    "som focus previews correct question",
+    "som click preserves existing chatbot prompt handoff",
+    "Hub loads",
+    "cc focus previews correct question",
+    "cc click preserves existing chatbot prompt handoff",
+    "Hub loads",
+    "ci focus previews correct question",
+    "ci click preserves existing chatbot prompt handoff",
+    "Hub loads",
+    "fica focus previews correct question",
+    "fica click preserves existing chatbot prompt handoff"
+  ],
+  "measurements": [
+    {
+      "width": 1440,
+      "left": {
+        "x": 117.00003051757812,
+        "y": 107.50010681152344,
+        "width": 588,
+        "height": 418.53118896484375,
+        "right": 705.0000305175781,
+        "bottom": 526.0312957763672
+      },
+      "right": {
+        "x": 729.0005493164062,
+        "y": 107.50335693359375,
+        "width": 587.9989624023438,
+        "height": 718.5611572265625,
+        "right": 1316.99951171875,
+        "bottom": 826.0645141601562
+      },
+      "gap": 16,
+      "leftBottomGap": 24.999984741210938,
+      "leftPadding": 24,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 72,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 794.0004272460938,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 72,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 794.0004272460938,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 72,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 794.0004272460938,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 72,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 794.0004272460938,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 19.99993896484375,
+          "iconX": 794.0004272460938
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 794.0004272460938
+        },
+        {
+          "gap": 0,
+          "height": 19.99993896484375,
+          "iconX": 794.0004272460938
+        }
+      ],
+      "nodeOverlap": false
+    },
+    {
+      "width": 1280,
+      "left": {
+        "x": 44,
+        "y": 137.5,
+        "width": 581,
+        "height": 418.53125,
+        "right": 625,
+        "bottom": 556.03125
+      },
+      "right": {
+        "x": 649,
+        "y": 137.5,
+        "width": 581,
+        "height": 718.5625,
+        "right": 1230,
+        "bottom": 856.0625
+      },
+      "gap": 16,
+      "leftBottomGap": 25,
+      "leftPadding": 24,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 72,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 714,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 72,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 714,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 72,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 714,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 72,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 714,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 714
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 714
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 714
+        }
+      ],
+      "nodeOverlap": false
+    },
+    {
+      "width": 1024,
+      "left": {
+        "x": 44,
+        "y": -263.71875,
+        "width": 930,
+        "height": 395.4375,
+        "right": 974,
+        "bottom": 131.71875
+      },
+      "right": {
+        "x": 44,
+        "y": 155.71875,
+        "width": 930,
+        "height": 678.21875,
+        "right": 974,
+        "bottom": 833.9375
+      },
+      "gap": 16,
+      "leftBottomGap": 25,
+      "leftPadding": 24,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 72,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 72,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 72,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 72,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        }
+      ],
+      "nodeOverlap": false
+    },
+    {
+      "width": 768,
+      "left": {
+        "x": 44,
+        "y": -295.625,
+        "width": 674,
+        "height": 418.53125,
+        "right": 718,
+        "bottom": 122.90625
+      },
+      "right": {
+        "x": 44,
+        "y": 146.90625,
+        "width": 674,
+        "height": 695.46875,
+        "right": 718,
+        "bottom": 842.375
+      },
+      "gap": 16,
+      "leftBottomGap": 25,
+      "leftPadding": 24,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 72,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 72,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 72,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 72,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 109,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 109
+        }
+      ],
+      "nodeOverlap": false
+    },
+    {
+      "width": 390,
+      "left": {
+        "x": 44,
+        "y": -649.25,
+        "width": 302,
+        "height": 639.3125,
+        "right": 346,
+        "bottom": -9.9375
+      },
+      "right": {
+        "x": 44,
+        "y": 14.0625,
+        "width": 302,
+        "height": 961.53125,
+        "right": 346,
+        "bottom": 975.59375
+      },
+      "gap": 16,
+      "leftBottomGap": 21,
+      "leftPadding": 20,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 110,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 110,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 110,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 110,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        }
+      ],
+      "nodeOverlap": false
+    },
+    {
+      "width": 320,
+      "left": {
+        "x": 44,
+        "y": -924.171875,
+        "width": 232,
+        "height": 778.34375,
+        "right": 276,
+        "bottom": -145.828125
+      },
+      "right": {
+        "x": 44,
+        "y": -121.828125,
+        "width": 232,
+        "height": 1234.25,
+        "right": 276,
+        "bottom": 1112.421875
+      },
+      "gap": 16,
+      "leftBottomGap": 21,
+      "leftPadding": 20,
+      "overflow": false,
+      "stages": [
+        {
+          "id": "som",
+          "height": 152,
+          "question": "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "cc",
+          "height": 152,
+          "question": "How are usage events rated with charge plans in SAP Convergent Charging, and how are the resulting billable items sent to Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "ci",
+          "height": 152,
+          "question": "How are billable items grouped and processed through billing and invoicing in SAP Convergent Invoicing?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        },
+        {
+          "id": "fica",
+          "height": 152,
+          "question": "How do payment lots and clearing control allocate incoming payments to open items in SAP FI-CA?",
+          "overflow": false,
+          "iconX": 97,
+          "codeOverlaps": false
+        }
+      ],
+      "connectors": [
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        },
+        {
+          "gap": 0,
+          "height": 20,
+          "iconX": 97
+        }
+      ],
+      "nodeOverlap": false
+    }
+  ]
+}

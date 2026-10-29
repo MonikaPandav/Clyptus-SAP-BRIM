@@ -1,3 +1,4 @@
+import '../../auth.css';
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ShieldCheck, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';

@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(getStoredToken());
+  const [token, setToken] = useState<string | null>(getStoredToken);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {

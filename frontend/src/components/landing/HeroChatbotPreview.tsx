@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   ChevronRight,
@@ -16,11 +15,10 @@ import {
   Sparkles,
   Workflow,
 } from 'lucide-react';
-import iconOnly from '../../assets/clyptusap-icon.png';
-import { tabPanelVariant } from '../../utils/motionVariants';
-import { ChatThinkingIndicator } from '../chat/ChatThinkingIndicator';
+import iconOnly from '../../assets/clyptusap-icon-small.webp';
+const PreviewResourcePanels = lazy(() => import('./PreviewResourcePanels').then(m => ({ default: m.PreviewResourcePanels })));
 
-interface Scenario {
+export interface Scenario {
   id: string;
   tabLabel: string;
   category: string;
@@ -105,10 +103,21 @@ const scenarios: Scenario[] = [
   },
 ];
 
+const previewPanels = [
+  { id: 'chat', label: 'Chat', Icon: MessageSquare },
+  { id: 'documents', label: 'Documents', Icon: FileText },
+  { id: 'workflows', label: 'Workflows', Icon: Workflow },
+  { id: 'database', label: 'Database', Icon: Database },
+] as const;
+
 export const HeroChatbotPreview: React.FC = () => {
+  const [activePanel, setActivePanel] = useState<typeof previewPanels[number]['id']>('chat');
+  const [panelsLoaded, setPanelsLoaded] = useState(false);
   const [activeScenario, setActiveScenario] = useState<Scenario>(scenarios[0]);
-  const [isThinking, setIsThinking] = useState(false);
   const [copied, setCopied] = useState(false);
+  const responseRef = useRef<HTMLDivElement>(null);
+  const responseAnimation = useRef<Animation | null>(null);
+  useEffect(() => () => responseAnimation.current?.cancel(), []);
 
   const handleCopyPath = () => {
     navigator.clipboard?.writeText(activeScenario.sproPath);
@@ -117,19 +126,20 @@ export const HeroChatbotPreview: React.FC = () => {
   };
 
   const handleSwitchScenario = (sc: Scenario) => {
-    if (sc.id === activeScenario.id && !isThinking) return;
-    setIsThinking(true);
+    if (sc.id === activeScenario.id) return;
     setActiveScenario(sc);
-    setTimeout(() => {
-      setIsThinking(false);
-    }, 700);
+    setCopied(false);
+    handleRunQuery();
   };
 
   const handleRunQuery = () => {
-    setIsThinking(true);
-    setTimeout(() => {
-      setIsThinking(false);
-    }, 700);
+    // Preview answers are already available; keep the panel visible and mounted.
+    responseAnimation.current?.cancel();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    responseAnimation.current = responseRef.current?.animate(
+      [{ opacity: 0.85 }, { opacity: 1 }],
+      { duration: 200, easing: 'ease-out' },
+    ) ?? null;
   };
 
   return (
@@ -151,8 +161,6 @@ export const HeroChatbotPreview: React.FC = () => {
 
           <div className="showcase-window-tabs">
             <span className="active-tab">Enterprise RAG</span>
-            <span>Customizing Explorer</span>
-            <span>Audit Trail</span>
           </div>
 
           <div className="showcase-window-status">
@@ -166,30 +174,44 @@ export const HeroChatbotPreview: React.FC = () => {
           {/* Left Mini Sidebar */}
           <aside className="showcase-sidebar">
             <div className="sidebar-dock-icons">
-              <button className="dock-btn active" title="Active Chat"><MessageSquare size={16} /></button>
-              <button className="dock-btn" title="Indexed Manuals"><FileText size={16} /></button>
-              <button className="dock-btn" title="SPRO Tree"><Workflow size={16} /></button>
-              <button className="dock-btn" title="Tenant Storage"><Database size={16} /></button>
+              {previewPanels.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`dock-btn ${activePanel === id ? 'active' : ''}`}
+                  title={label}
+                  aria-label={label}
+                  aria-pressed={activePanel === id}
+                  onClick={() => {
+                    setActivePanel(id);
+                    if (id !== 'chat') setPanelsLoaded(true);
+                  }}
+                >
+                  <Icon size={16} aria-hidden="true" />
+                </button>
+              ))}
             </div>
 
             <div className="sidebar-module-list">
-              <span className="sidebar-module-title">BRIM DOMAINS</span>
-              <div className="module-pill active">
-                <Layers size={13} />
-                <span>Convergent Invoicing</span>
-              </div>
-              <div className="module-pill">
-                <Workflow size={13} />
-                <span>Convergent Charging</span>
-              </div>
-              <div className="module-pill">
-                <FileCheck size={13} />
-                <span>FI-CA Contract Accounts</span>
-              </div>
-              <div className="module-pill">
-                <ShieldCheck size={13} />
-                <span>Subscription Order Mgmt</span>
-              </div>
+              <span className="sidebar-module-title">CLICK SCENARIO TO PREVIEW</span>
+              {scenarios.map((sc, index) => {
+                const Icon = [Layers, Workflow, ShieldCheck, FileCheck][index];
+                return (
+                  <button
+                    key={sc.id}
+                    className={`scenario-btn ${activeScenario.id === sc.id ? 'active' : ''}`}
+                    type="button"
+                    aria-pressed={activeScenario.id === sc.id}
+                    onClick={() => {
+                      handleSwitchScenario(sc);
+                      setActivePanel('chat');
+                    }}
+                  >
+                    <Icon size={13} aria-hidden="true" />
+                    <span>{sc.tabLabel}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="sidebar-security-badge">
@@ -200,6 +222,7 @@ export const HeroChatbotPreview: React.FC = () => {
 
           {/* Center / Right Main Canvas */}
           <div className="showcase-main-workspace">
+            <div className="showcase-chat-panel" role="region" aria-label="Chat preview" hidden={activePanel !== 'chat'}>
             {/* Welcome Center Pill */}
             <div className="showcase-welcome-header">
               <div className="welcome-icon-wrap">
@@ -228,28 +251,9 @@ export const HeroChatbotPreview: React.FC = () => {
 
             {/* Floating Overlaid Resolution Card (Interactive Response with Smooth Transition) */}
             <div className="floating-resolution-card">
-              <AnimatePresence mode="wait">
-                {isThinking ? (
-                  <motion.div
-                    key="landing-thinking"
-                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex justify-center items-center py-10"
-                  >
-                    <ChatThinkingIndicator
-                      stage="Analyzing your question..."
-                      subtext={`Scanning SAP BRIM manuals for "${activeScenario.category}"`}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key={activeScenario.id}
-                    variants={tabPanelVariant}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
+                  <div
+                    ref={responseRef}
+                    aria-live="polite"
                   >
                     <div className="resolution-top-bar">
                       <div className="resolution-badge">
@@ -299,30 +303,23 @@ export const HeroChatbotPreview: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  </div>
             </div>
+            </div>
+            {panelsLoaded && <Suspense fallback={<div className="resource-panel-loading" role="status">Loading panel...</div>}>
+            <PreviewResourcePanels
+              activePanel={activePanel}
+              scenarios={scenarios}
+              activeScenario={activeScenario}
+              onSelectScenario={handleSwitchScenario}
+              onOpenChat={() => setActivePanel('chat')}
+              onCopyPath={handleCopyPath}
+              copied={copied}
+            />
+            </Suspense>}
           </div>
         </div>
 
-        {/* Bottom Interactive Scenario Switcher */}
-        <div className="showcase-bottom-scenarios">
-          <span className="scenario-label">CLICK SCENARIO TO PREVIEW:</span>
-          <div className="scenario-tabs">
-            {scenarios.map((sc) => (
-              <motion.button
-                key={sc.id}
-                className={`scenario-btn ${activeScenario.id === sc.id ? 'active' : ''}`}
-                onClick={() => handleSwitchScenario(sc)}
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <span>{sc.tabLabel}</span>
-              </motion.button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

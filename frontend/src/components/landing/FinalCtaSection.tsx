@@ -26,17 +26,6 @@ export const FinalCtaSection: React.FC = () => {
           />
 
           <div className="final-cta-content">
-            <motion.div
-              className="kicker-pill-subtle"
-              initial={{ opacity: 0, y: -10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={viewportOnce}
-              transition={{ delay: 0.1, duration: 0.4 }}
-            >
-              <span className="pill-dot" />
-              <span>READY TO EXPLORE SAP + BRIM?</span>
-            </motion.div>
-
             <motion.h2
               className="cta-headline"
               initial={{ opacity: 0, y: 16 }}

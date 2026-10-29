@@ -1,0 +1,148 @@
+{
+  "before": {
+    "label": "load-before",
+    "url": "http://127.0.0.1:4173/",
+    "browser": "Chrome/156.0.8078.73",
+    "viewport": "1440x900 @1",
+    "cache": "disabled and cleared each run",
+    "throttling": "none (CPU and network)",
+    "observation": "2 seconds after load",
+    "loadMedian": 179.19999999925494,
+    "fcpMedian": 364,
+    "lcpMedian": 364,
+    "loadRange": [
+      309,
+      165.40000000037253,
+      199.09999999962747,
+      171.5,
+      179.19999999925494
+    ],
+    "fcpRange": [
+      556,
+      364,
+      356,
+      344,
+      364
+    ],
+    "initialJsDecodedBytes": 422942,
+    "initialJsGzipBytes": 135339,
+    "initialLocalCssDecodedBytes": 235251,
+    "totalBlockingStylesheetBytes": 277507,
+    "scriptDurationMedianMs": 75.515,
+    "layoutDurationMedianMs": 141.76,
+    "recalcStyleCountMedian": 62,
+    "mainThreadTimeMedianMs": 392.065,
+    "longTasksMedianMs": 97,
+    "lighthousedesktop": {
+      "version": "13.6.0",
+      "timestamp": "2026-10-29T17:35:01.676Z",
+      "score": 100,
+      "fcp": 480.48955,
+      "lcp": 480.48955,
+      "tbt": 0,
+      "cls": 0.0009779853874173784,
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "throttlingMethod": "simulate",
+      "warnings": []
+    },
+    "lighthousemobile": {
+      "version": "13.6.0",
+      "timestamp": "2026-10-29T17:35:36.560Z",
+      "score": 93,
+      "fcp": 2173.4386999999997,
+      "lcp": 2173.4386999999997,
+      "tbt": 221.50000000000023,
+      "cls": 0.02182568350967156,
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "throttlingMethod": "simulate",
+      "warnings": []
+    }
+  },
+  "after": {
+    "label": "load-after",
+    "url": "http://127.0.0.1:4173/",
+    "browser": "Chrome/156.0.8078.73",
+    "viewport": "1440x900 @1",
+    "cache": "disabled and cleared each run",
+    "throttling": "none (CPU and network)",
+    "observation": "2 seconds after load",
+    "loadMedian": 51,
+    "fcpMedian": 240,
+    "lcpMedian": 240,
+    "loadRange": [
+      206.5,
+      51.19999999925494,
+      49.100000001490116,
+      51,
+      48.400000002235174
+    ],
+    "fcpRange": [
+      240,
+      208,
+      244,
+      244,
+      232
+    ],
+    "initialJsDecodedBytes": 292541,
+    "initialJsGzipBytes": 93248,
+    "initialLocalCssDecodedBytes": 266255,
+    "totalBlockingStylesheetBytes": 266255,
+    "scriptDurationMedianMs": 30.637,
+    "layoutDurationMedianMs": 104.64099999999999,
+    "recalcStyleCountMedian": 38,
+    "mainThreadTimeMedianMs": 216.115,
+    "longTasksMedianMs": 104,
+    "lighthousedesktop": {
+      "version": "13.6.0",
+      "timestamp": "2026-10-29T17:46:17.298Z",
+      "score": 100,
+      "fcp": 246.45819999999998,
+      "lcp": 246.45819999999998,
+      "tbt": 0,
+      "cls": 0,
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "throttlingMethod": "simulate",
+      "warnings": []
+    },
+    "lighthousemobile": {
+      "version": "13.6.0",
+      "timestamp": "2026-10-29T17:46:55.903Z",
+      "score": 98,
+      "fcp": 916.1596,
+      "lcp": 916.1596,
+      "tbt": 180.42020000000002,
+      "cls": 0,
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "throttlingMethod": "simulate",
+      "warnings": []
+    }
+  }
+}

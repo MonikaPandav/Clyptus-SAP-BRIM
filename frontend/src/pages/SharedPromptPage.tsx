@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../components/chat/chatMarkdown.css';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

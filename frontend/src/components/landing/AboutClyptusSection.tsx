@@ -51,11 +51,6 @@ export const AboutClyptusSection: React.FC = () => {
           whileInView="visible"
           viewport={viewportOnce}
         >
-          <div className="kicker-pill-subtle">
-            <span className="pill-dot" />
-            <span>ABOUT CLYPTUS &amp; CLYPTUS.AI</span>
-          </div>
-
           <h2 className="section-title-large">
             Engineered For Enterprise Precision.<br />
             <span className="hero-italic-serif">Zero Guesswork in Mission-Critical SAP.</span>

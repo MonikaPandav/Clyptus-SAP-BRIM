@@ -1,18 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BrimConversationCard } from './BrimConversationCard';
 import {
   CheckCircle2,
   FileCode,
-  FileText,
-  GitBranch,
-  Layers,
   Lock,
-  Network,
   Search,
-  Server,
   Shield,
   ShieldCheck,
-  Sparkles,
   Workflow,
   Zap,
 } from 'lucide-react';
@@ -106,93 +101,7 @@ export const InfinitePossibilitiesGrid: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Card 2: Connect with Your Favorite Tools (Orbital Arcs) */}
-          <motion.div
-            className="possibility-card card-orbital-tools"
-            variants={cardVariant}
-            whileHover={{ y: -4, transition: transitions.micro }}
-          >
-            <div className="card-top-content">
-              <span className="card-category-tag">ECOSYSTEM INTEGRATION</span>
-              <h3 className="card-headline">Connect with Your Enterprise Tools</h3>
-              <p className="card-description">
-                Integrate seamlessly with documentation repositories, ticket systems, and enterprise knowledge stores. Ground your AI in your actual implementation blueprints.
-              </p>
-            </div>
-
-            {/* Concentric Dotted Orbital Arc Visualization */}
-            <div className="card-orbital-visual">
-              <div className="orbital-arcs-container">
-                {/* Center Core Badge */}
-                <motion.div
-                  className="orbital-core-badge"
-                  animate={{ scale: [1, 1.04, 1] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <Sparkles size={18} />
-                  <span>Clyptus</span>
-                </motion.div>
-
-                {/* Orbit 1 */}
-                <div className="orbital-ring ring-1" />
-                {/* Orbit 2 */}
-                <div className="orbital-ring ring-2" />
-                {/* Orbit 3 */}
-                <div className="orbital-ring ring-3" />
-
-                {/* Floating Tool Badges along the concentric arcs with subtle float animation */}
-                <motion.div
-                  className="orbital-tool-node node-sap"
-                  title="SAP S/4HANA"
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <Server size={14} />
-                  <span>S/4HANA</span>
-                </motion.div>
-
-                <motion.div
-                  className="orbital-tool-node node-confluence"
-                  title="SAP Fiori / GUI"
-                  animate={{ y: [0, 4, 0] }}
-                  transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                >
-                  <Layers size={14} />
-                  <span>Fiori</span>
-                </motion.div>
-
-                <motion.div
-                  className="orbital-tool-node node-jira"
-                  title="Jira Implementation Issues"
-                  animate={{ y: [0, -3, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                >
-                  <FileText size={14} />
-                  <span>Jira</span>
-                </motion.div>
-
-                <motion.div
-                  className="orbital-tool-node node-github"
-                  title="Confluence Runbooks"
-                  animate={{ y: [0, 3, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-                >
-                  <GitBranch size={14} />
-                  <span>Git/Docs</span>
-                </motion.div>
-
-                <motion.div
-                  className="orbital-tool-node node-slack"
-                  title="Enterprise Messaging"
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-                >
-                  <Network size={14} />
-                  <span>ServiceNow</span>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
+          <BrimConversationCard />
 
           {/* Card 3: Encrypted Workflow Infrastructure (Wide Timeline Card) */}
           <motion.div

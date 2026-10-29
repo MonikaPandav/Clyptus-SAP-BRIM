@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import fullLogoDark from '../../assets/clyptusap-logo-darktext.png';
-import fullLogoWhite from '../../assets/clyptusap-logo.png';
-import iconOnly from '../../assets/clyptusap-icon.png';
+import fullLogoDark from '../../assets/clyptusap-logo-darktext-small.webp';
+import fullLogoWhite from '../../assets/clyptusap-logo-small.webp';
+import iconOnly from '../../assets/clyptusap-icon-small.webp';
 
 interface BrandLogoProps {
   compact?: boolean;
@@ -42,6 +42,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         <img
           className={`${selectedSize.compact} object-contain ${imgClassName}`}
           src={iconOnly}
+          width={128}
+          height={128}
+          decoding="async"
           alt="Clyptus.AI"
         />
       </Link>
@@ -58,6 +61,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       <img
         className={`${selectedSize.full} w-auto object-contain ${imgClassName}`}
         src={activeLogo}
+        width={256}
+        height={162}
+        decoding="async"
         alt="Clyptus.AI"
       />
     </Link>

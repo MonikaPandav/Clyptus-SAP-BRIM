@@ -1,9 +1,12 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, BookOpen, Boxes, MessageCircle, Search, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Footer } from '../components/footer/Footer';
 import { PublicNav } from '../components/navbar/PublicNav';
 import { PageMeta } from '../components/ui/PageMeta';
+import { cardVariant, staggerContainer, transitions, viewportCard, viewportOnce } from '../utils/motionVariants';
+import './productInfo.css';
 
 const items = [
   [Sparkles, 'SAP answers with context', 'Ask in everyday technical language and get responses shaped strictly by indexed enterprise SAP knowledge.'],
@@ -15,58 +18,63 @@ const items = [
 ] as const;
 
 export const FeaturesPage: React.FC = () => {
+  const reduceMotion = useReducedMotion();
   return (
-    <>
+    <div className="clyptus-landing-wrap product-info-page">
       <PageMeta
         title="Features"
         description="Explore SAP-focused answers, retrieval and BRIM knowledge with Clyptusap.ai."
       />
       <PublicNav />
-      <main className="inner-page">
-        <section className="inner-hero section-wrap">
-          <span className="eyebrow">SAP + BRIM AI KNOWLEDGE ASSISTANT</span>
-          <h1>
+      <main>
+        <section className="inner-hero info-hero section-container">
+          <div className="section-header-center info-hero-copy">
+          <span className="kicker-pill-subtle">SAP + BRIM AI KNOWLEDGE ASSISTANT</span>
+          <h1 className="section-title-large">
             Good questions<br />
-            <span>deserve verified SAP context.</span>
+            <span className="hero-italic-serif">deserve verified SAP context.</span>
           </h1>
-          <p>
+          <p className="section-subtitle-muted">
             Clyptusap.ai retrieves relevant information from indexed SAP knowledge before generating an answer, backed by streaming citations and cross-encoder reranking.
           </p>
-          <Link className="text-link" to="/how-it-works">
+          <Link className="button-outline-pill info-hero-action" to="/how-it-works">
             See how it works <ArrowRight size={16} />
           </Link>
-          <div className="inner-hero-art">
-            <div className="art-stack">
+          </div>
+          <motion.div className="story-card info-hero-visual" initial={reduceMotion ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={viewportOnce} transition={transitions.smooth}>
+            <div className="info-art-stack">
               <span><Workflow size={17} /> SAP Technical Question</span>
               <span><Search size={17} /> Hybrid Retrieved Context</span>
               <span><Sparkles size={17} /> Grounded Streaming Answer</span>
             </div>
-          </div>
+          </motion.div>
         </section>
 
-        <section className="section section-wrap inner-feature-list">
-          <span className="eyebrow">BUILT FOR SAP · DEEPLY FOCUSED ON BRIM</span>
-          <div className="inner-feature-grid">
+        <section className="section-container info-content-section" aria-label="Features">
+          <div className="info-section-label"><span className="story-tag tag-approach">BUILT FOR SAP · DEEPLY FOCUSED ON BRIM</span></div>
+          <motion.div className="info-feature-grid" variants={reduceMotion ? undefined : staggerContainer(0.08, 0.04)} initial={reduceMotion ? false : 'hidden'} whileInView="visible" viewport={viewportCard}>
             {items.map(([Icon, title, text], index) => (
-              <article className="inner-feature" key={title}>
-                <span className="section-index">0{index + 1}</span>
-                <span className="feature-icon"><Icon size={19} /></span>
+              <motion.article className="story-card info-feature-card" key={title} variants={reduceMotion ? undefined : cardVariant} whileHover={reduceMotion ? undefined : { y: -4 }} transition={transitions.micro}>
+                <div className="info-feature-meta">
+                <span className="info-card-icon"><Icon size={19} /></span>
+                <span className="pillar-number">0{index + 1}</span>
+                </div>
                 <h2>{title}</h2>
                 <p>{text}</p>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
         </section>
 
-        <section className="inner-bottom-cta">
-          <span className="eyebrow">SAP KNOWLEDGE, IN CONTEXT</span>
+        <motion.section className="section-container info-bottom-cta" initial={reduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={viewportOnce} transition={transitions.smooth}>
+          <span className="story-tag tag-approach">SAP KNOWLEDGE, IN CONTEXT</span>
           <h2>Have an SAP question?</h2>
-          <Link className="button button-dark" to="/login">
+          <Link className="button-brand-pill" to="/login">
             Ask Clyptusap.ai <ArrowRight size={16} />
           </Link>
-        </section>
+        </motion.section>
       </main>
       <Footer />
-    </>
+    </div>
   );
 };

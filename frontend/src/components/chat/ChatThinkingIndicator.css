@@ -1,0 +1,91 @@
+.clyptus-thinking-indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  max-width: 100%;
+  color: var(--ivory-ink-secondary, #57534E);
+  pointer-events: none;
+}
+
+.clyptus-thinking-indicator .thinking-centerpiece {
+  position: relative;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.clyptus-thinking-indicator .thinking-ambient-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 98, 0, 0.18), rgba(255, 209, 176, 0.14) 55%, transparent 75%);
+  animation: clyptus-thinking-glow 3.2s ease-in-out infinite;
+}
+
+.clyptus-thinking-indicator .thinking-sweep-ring {
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid var(--orange-peach-border, rgba(255, 98, 0, 0.24));
+  border-top-color: var(--orange-brand, #FF6200);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: clyptus-thinking-orbit 2.8s linear infinite;
+}
+
+.clyptus-thinking-indicator .thinking-logo-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--orange-peach-border, rgba(255, 98, 0, 0.24));
+  border-radius: 10px;
+  background: var(--orange-peach-bg, #FFF1E7);
+}
+
+.clyptus-thinking-indicator .thinking-logo-badge img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.clyptus-thinking-indicator .thinking-details {
+  min-width: 0;
+}
+
+.clyptus-thinking-indicator .thinking-title {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.clyptus-thinking-indicator .thinking-subtext {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ivory-ink-muted, #78716C);
+  overflow-wrap: anywhere;
+}
+
+.dark .clyptus-thinking-indicator { color: #E2E8F0; }
+.dark .clyptus-thinking-indicator .thinking-subtext { color: #94A3B8; }
+.dark .clyptus-thinking-indicator .thinking-logo-badge { background: #241B15; }
+
+@keyframes clyptus-thinking-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes clyptus-thinking-glow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clyptus-thinking-indicator .thinking-sweep-ring,
+  .clyptus-thinking-indicator .thinking-ambient-glow {
+    animation: none;
+  }
+}

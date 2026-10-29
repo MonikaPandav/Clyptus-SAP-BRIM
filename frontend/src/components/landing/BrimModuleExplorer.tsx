@@ -106,11 +106,6 @@ export const BrimModuleExplorer: React.FC = () => {
           whileInView="visible"
           viewport={viewportOnce}
         >
-          <div className="kicker-pill-subtle">
-            <span className="pill-dot" />
-            <span>FULL ARCHITECTURAL COVERAGE</span>
-          </div>
-
           <h2 className="section-title-large">
             Built For SAP.<br />
             <span className="hero-italic-serif">Deeply Focused on BRIM.</span>

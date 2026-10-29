@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import './chatMarkdown.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -8,6 +9,7 @@ import {
 import type { Message, MessageFeedback } from '../../types';
 import { GroundingScoreBadge } from './GroundingScoreBadge';
 import { SourceTypeBadge } from './SourceTypeBadge';
+import { ChatThinkingIndicator } from './ChatThinkingIndicator';
 import { CitationModal } from './CitationModal';
 import { SharePromptModal } from './SharePromptModal';
 import { isStoredMessage, toSpeechText } from './messageUtils';
@@ -169,6 +171,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const isInterrupted = message.source_type === 'interrupted' || message.source_type === 'error';
 
+  if (!isUser && isStreaming && !message.content) {
+    return (
+      <div className="py-6 px-4 md:px-8 transition-colors bg-[#ffffff] dark:bg-[#000000] border-b border-[#ecece8] dark:border-[#101016]">
+        <div className="max-w-4xl mx-auto">
+          <ChatThinkingIndicator stage={isAdmin ? streamingStage : undefined} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className={`py-6 px-4 md:px-8 transition-colors ${isUser ? 'bg-[#fbfbf9] dark:bg-[#07070b] border-b border-[#e8e8e3] dark:border-[#14141e]' : 'bg-[#ffffff] dark:bg-[#000000] border-b border-[#ecece8] dark:border-[#101016]'}`}>
@@ -265,27 +277,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     Send
                   </button>
                 </div>
-              </div>
-            ) : isStreaming && !message.content ? (
-              /* Pipeline Status Indicator with Company Logo Orange Accents */
-              <div className="flex items-center gap-2.5 py-1.5 text-slate-600 dark:text-slate-300 text-sm select-none">
-                <span className="font-medium text-orange-500 dark:text-orange-400 animate-pulse">
-                  {isAdmin ? (streamingStage || 'Thinking...') : 'Thinking...'}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce"
-                    style={{ animationDuration: '0.9s', animationDelay: '0ms' }}
-                  />
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce"
-                    style={{ animationDuration: '0.9s', animationDelay: '180ms' }}
-                  />
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce"
-                    style={{ animationDuration: '0.9s', animationDelay: '360ms' }}
-                  />
-                </span>
               </div>
             ) : (
               <div className={`prose-sap text-sm text-slate-800 dark:text-slate-200 leading-relaxed break-words ${isUser ? 'max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 bg-orange-50/80 dark:bg-[#13131d] border border-orange-200/70 dark:border-orange-500/20' : ''}`}>

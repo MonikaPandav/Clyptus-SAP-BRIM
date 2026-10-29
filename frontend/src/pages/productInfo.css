@@ -1,0 +1,301 @@
+/* Scoped to Features and How It Works. About's shared tokens and classes stay intact. */
+.product-info-page .info-hero {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 85px 0 52px;
+  background: radial-gradient(ellipse at 50% 0%, var(--orange-peach-bg), transparent 70%);
+}
+
+.product-info-page .info-hero-copy {
+  margin-bottom: 36px;
+}
+
+.product-info-page .info-hero h1 {
+  margin: 20px 0 16px;
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-size: clamp(32px, 4.2vw, 48px);
+  font-weight: 750;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+  color: var(--ivory-ink-primary);
+}
+
+.product-info-page .info-hero h1 span {
+  color: var(--orange-brand);
+}
+
+.product-info-page .info-hero-action {
+  margin-top: 28px;
+}
+
+.product-info-page .info-hero-visual {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.product-info-page .info-art-stack,
+.product-info-page .info-hero-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.product-info-page .info-art-stack > span,
+.product-info-page .info-hero-flow > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--ivory-ink-primary);
+  font-size: 13.5px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+.product-info-page .info-art-stack svg,
+.product-info-page .info-hero-flow svg {
+  flex-shrink: 0;
+  color: var(--orange-brand);
+}
+
+.product-info-page .info-art-stack > span + span {
+  border-left: 1px solid var(--ivory-border);
+  padding-left: 20px;
+}
+
+.product-info-page .info-content-section {
+  padding: 0 0 85px;
+}
+
+.product-info-page .info-section-label {
+  text-align: center;
+  margin: 0 0 28px;
+}
+
+.product-info-page .info-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+.product-info-page .info-feature-card,
+.product-info-page .info-workflow-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.product-info-page .info-feature-card::before,
+.product-info-page .info-workflow-card::before {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(145deg, var(--orange-peach-bg), var(--ivory-white) 80%);
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+.product-info-page .info-feature-card:hover::before,
+.product-info-page .info-workflow-card:hover::before {
+  opacity: 1;
+}
+
+.product-info-page .info-feature-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.product-info-page .info-feature-meta .pillar-number {
+  margin: 0;
+}
+
+.product-info-page .info-card-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--orange-peach-border);
+  border-radius: 12px;
+  background: var(--orange-peach-bg);
+  color: var(--orange-brand);
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.product-info-page .story-card:hover .info-card-icon {
+  border-color: var(--orange-brand);
+  box-shadow: 0 4px 14px rgba(255, 98, 0, 0.12);
+}
+
+.product-info-page .info-feature-card h2,
+.product-info-page .info-workflow-card h2 {
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.4;
+  color: var(--ivory-ink-primary);
+  margin: 0 0 10px;
+}
+
+.product-info-page .info-process {
+  scroll-margin-top: 100px;
+}
+
+.product-info-page .info-process-list {
+  max-width: 920px;
+  padding: 0;
+  margin: 0 auto;
+  list-style: none;
+}
+
+.product-info-page .info-process-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+}
+
+.product-info-page .info-process-step + .info-process-step {
+  margin-top: 24px;
+}
+
+.product-info-page .info-step-indicator {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-top: 24px;
+  border: 1px solid var(--orange-peach-border);
+  border-radius: 50%;
+  background: var(--ivory-white);
+  color: var(--orange-brand);
+  font-size: 13px;
+  font-weight: 750;
+  transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.product-info-page .info-process-step[data-revealed='true'] .info-step-indicator {
+  background: var(--orange-brand);
+  color: var(--ivory-white);
+  box-shadow: 0 6px 20px rgba(255, 98, 0, 0.2);
+}
+
+.product-info-page .info-step-connector {
+  position: absolute;
+  left: 27px;
+  top: 80px;
+  bottom: -48px;
+  width: 2px;
+  overflow: hidden;
+  background: var(--ivory-border);
+}
+
+.product-info-page .info-step-connector > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: top;
+  background: linear-gradient(var(--orange-brand), var(--orange-peach-border));
+}
+
+.product-info-page .info-workflow-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.product-info-page .info-step-note {
+  margin: 16px 0 0;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+.product-info-page .info-bottom-cta {
+  padding: 60px 28px;
+  margin-bottom: 85px;
+  max-width: 1060px;
+  border: 1px solid var(--ivory-border);
+  border-radius: 16px;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 0%, var(--orange-peach-bg), transparent 80%), var(--ivory-white);
+}
+
+.product-info-page .info-bottom-cta h2 {
+  margin: 12px 0 24px;
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  color: var(--ivory-ink-primary);
+}
+
+.product-info-page .info-hero-action svg,
+.product-info-page .info-bottom-cta a svg {
+  transition: transform 0.22s ease;
+}
+
+.product-info-page .info-hero-action:hover svg,
+.product-info-page .info-bottom-cta a:hover svg {
+  transform: translateX(3px);
+}
+
+.product-info-page main a:focus-visible {
+  outline: 2px solid var(--orange-brand);
+  outline-offset: 5px;
+}
+
+@media (max-width: 1024px) {
+  .product-info-page .info-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .product-info-page .info-hero { padding-top: 52px; }
+  .product-info-page .info-hero .kicker-pill-subtle { font-size: 9px; padding: 6px 10px; }
+  .product-info-page .info-hero-visual { padding: 22px; }
+  .product-info-page .info-art-stack,
+  .product-info-page .info-hero-flow { flex-direction: column; gap: 18px; }
+  .product-info-page .info-art-stack > span + span { border: 0; padding: 0; }
+  .product-info-page .info-hero-flow > svg { transform: rotate(45deg); }
+  .product-info-page .info-feature-grid { grid-template-columns: minmax(0, 1fr); }
+  .product-info-page .info-process-step { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; }
+  .product-info-page .info-step-indicator { width: 36px; height: 36px; font-size: 11px; margin-top: 22px; }
+  .product-info-page .info-step-connector { left: 17px; top: 58px; bottom: -46px; }
+  .product-info-page .info-workflow-card { display: block; padding: 22px; }
+  .product-info-page .info-workflow-card .info-card-icon { margin-bottom: 18px; }
+  .product-info-page .info-content-section { padding-bottom: 52px; }
+  .product-info-page .info-bottom-cta { padding: 40px 22px; margin-bottom: 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-info-page main *,
+  .product-info-page main *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  .product-info-page .info-feature-grid,
+  .product-info-page .info-feature-card,
+  .product-info-page .info-workflow-card,
+  .product-info-page .info-hero-visual,
+  .product-info-page .info-bottom-cta {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .product-info-page .info-step-connector > span,
+  .product-info-page main a:hover,
+  .product-info-page main a:hover svg {
+    transform: none !important;
+  }
+}

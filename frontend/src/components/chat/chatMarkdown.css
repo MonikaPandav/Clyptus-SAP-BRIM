@@ -1,0 +1,179 @@
+/* Markdown typography in chat - Dual Theme Aware */
+.prose-sap {
+  color: #1e293b;
+}
+
+.dark .prose-sap {
+  color: #e2e8f0;
+}
+
+.prose-sap h1,
+.prose-sap h2,
+.prose-sap h3,
+.prose-sap h4 {
+  color: #0f172a;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.35;
+}
+
+/* Modest scale so section headings stand out from body text without dominating short answers */
+.prose-sap h1 {
+  font-size: 1.125rem;
+}
+
+.prose-sap h2 {
+  font-size: 1.0625rem;
+}
+
+.prose-sap h3 {
+  font-size: 1rem;
+}
+
+.prose-sap h4 {
+  font-size: 0.9375rem;
+}
+
+.prose-sap> :first-child {
+  margin-top: 0;
+}
+
+.dark .prose-sap h1,
+.dark .prose-sap h2,
+.dark .prose-sap h3,
+.dark .prose-sap h4 {
+  color: #f8fafc;
+}
+
+/* Multi-line cells read top-down instead of floating mid-row */
+.prose-sap th,
+.prose-sap td {
+  vertical-align: top;
+}
+
+.prose-sap li>ul,
+.prose-sap li>ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.prose-sap p {
+  margin-bottom: 0.75rem;
+  line-height: 1.65;
+}
+
+.prose-sap ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-sap ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-sap li {
+  margin-bottom: 0.25rem;
+}
+
+.prose-sap code {
+  background-color: #f1f5f9;
+  color: #c2410c;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+  border: 1px solid #fed7aa;
+}
+
+.dark .prose-sap code {
+  background-color: rgba(30, 41, 59, 0.8);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.25);
+}
+
+.prose-sap pre {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  margin-bottom: 0.85rem;
+}
+
+.dark .prose-sap pre {
+  background-color: #0b1120;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+.prose-sap pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  color: #1e293b;
+}
+
+.dark .prose-sap pre code {
+  color: #e2e8f0;
+}
+
+.prose-sap strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.dark .prose-sap strong {
+  color: #f1f5f9;
+}
+
+.prose-sap blockquote {
+  border-left: 3px solid #ff6200;
+  padding-left: 0.85rem;
+  color: #64748b;
+  font-style: italic;
+  margin: 0.75rem 0;
+}
+
+.dark .prose-sap blockquote {
+  color: #94a3b8;
+}
+
+.prose-sap table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.prose-sap th {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.dark .prose-sap th {
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  color: #f1f5f9;
+}
+
+.prose-sap td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  color: #334155;
+}
+
+.dark .prose-sap td {
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  color: #cbd5e1;
+}
+
+

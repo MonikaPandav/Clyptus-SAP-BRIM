@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../auth.css';
 import {
   ArrowLeft,
   ArrowRight,
@@ -6,21 +7,25 @@ import {
   Mail,
   Lock,
   User,
-  Sparkles,
   AlertCircle,
   Eye,
   EyeOff,
   Info,
   X,
 } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageMeta } from '../components/ui/PageMeta';
 import { useAuth } from '../context/AuthContext';
+import { readChatPromptState } from '../utils/chatNavigation';
 import fullLogoDark from '../assets/clyptusap-logo-darktext.png';
 
 export const LoginPage: React.FC = () => {
-  const { user, login, register, guestLogin } = useAuth();
+  const { user, login, register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [chatPromptState] = useState(() => readChatPromptState(
+    (location.state as { chatPromptState?: unknown } | null)?.chatPromptState,
+  ));
   const [searchParams] = useSearchParams();
 
   const [mode, setMode] = useState<'login' | 'register'>(() => {
@@ -45,9 +50,9 @@ export const LoginPage: React.FC = () => {
   // If already logged in with a real registered account, redirect to workspace
   useEffect(() => {
     if (user && !user.isGuest && user.email !== 'consultant@clyptusap.ai') {
-      navigate('/app', { replace: true });
+      navigate('/app', { replace: true, state: chatPromptState });
     }
-  }, [user, navigate]);
+  }, [user, navigate, chatPromptState]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,21 +66,9 @@ export const LoginPage: React.FC = () => {
         if (!name.trim()) throw new Error('Please enter your full name');
         await register(name.trim(), email.trim(), password);
       }
-      navigate('/app', { replace: true });
+      navigate('/app', { replace: true, state: chatPromptState });
     } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please verify credentials or try Demo Access.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoAccess = async () => {
-    setLoading(true);
-    try {
-      await guestLogin();
-      navigate('/app', { replace: true });
-    } catch {
-      navigate('/app', { replace: true });
+      setError(err.message || 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }
@@ -287,24 +280,6 @@ export const LoginPage: React.FC = () => {
               <ArrowRight size={15} />
             </button>
           </form>
-
-          {/* Quick Access Divider */}
-          <div className="auth-divider-line">
-            <span>or instant exploration</span>
-          </div>
-
-          {/* 1-Click Guest Test Drive */}
-          <button
-            type="button"
-            onClick={handleDemoAccess}
-            disabled={loading}
-            className="auth-demo-btn"
-            title="Explore Clyptus.AI instantly without registration"
-          >
-            <Sparkles size={14} className="text-orange" />
-            <span>Instant Test Drive (1-Click Guest)</span>
-            <ArrowRight size={13} />
-          </button>
 
           {/* Enterprise Security Footer */}
           <div className="auth-security-footer">

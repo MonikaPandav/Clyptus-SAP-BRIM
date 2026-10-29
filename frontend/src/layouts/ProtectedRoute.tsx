@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { readChatPromptState } from '../utils/chatNavigation';
 
 export function ProtectedRoute({
   children,
@@ -19,7 +20,7 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: location.pathname, chatPromptState: readChatPromptState(location.state) }} />;
   }
 
   return children;

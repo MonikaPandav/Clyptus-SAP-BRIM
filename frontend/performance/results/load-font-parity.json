@@ -1,0 +1,86 @@
+[
+  {
+    "family": "Manrope",
+    "weight": 400,
+    "width": 640.6664428710938,
+    "baselineWidth": 640.6664428710938,
+    "changed": 0
+  },
+  {
+    "family": "Manrope",
+    "weight": 550,
+    "width": 663.1331787109375,
+    "baselineWidth": 663.1331787109375,
+    "changed": 0
+  },
+  {
+    "family": "Manrope",
+    "weight": 650,
+    "width": 674.2064208984375,
+    "baselineWidth": 674.2064208984375,
+    "changed": 0
+  },
+  {
+    "family": "Manrope",
+    "weight": 750,
+    "width": 685.4398193359375,
+    "baselineWidth": 685.4398193359375,
+    "changed": 0
+  },
+  {
+    "family": "DM Sans",
+    "weight": 400,
+    "width": 581.1998291015625,
+    "baselineWidth": 581.1998291015625,
+    "changed": 0
+  },
+  {
+    "family": "DM Sans",
+    "weight": 550,
+    "width": 605.9024658203125,
+    "baselineWidth": 605.9024658203125,
+    "changed": 0
+  },
+  {
+    "family": "DM Sans",
+    "weight": 650,
+    "width": 622.7198486328125,
+    "baselineWidth": 622.7198486328125,
+    "changed": 0
+  },
+  {
+    "family": "DM Sans",
+    "weight": 750,
+    "width": 631.9468383789062,
+    "baselineWidth": 631.9468383789062,
+    "changed": 0
+  },
+  {
+    "family": "JetBrains Mono",
+    "weight": 400,
+    "width": 816,
+    "baselineWidth": 816,
+    "changed": 0
+  },
+  {
+    "family": "JetBrains Mono",
+    "weight": 550,
+    "width": 816,
+    "baselineWidth": 816,
+    "changed": 0
+  },
+  {
+    "family": "JetBrains Mono",
+    "weight": 650,
+    "width": 816,
+    "baselineWidth": 816,
+    "changed": 0
+  },
+  {
+    "family": "JetBrains Mono",
+    "weight": 750,
+    "width": 816,
+    "baselineWidth": 816,
+    "changed": 0
+  }
+]

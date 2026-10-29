@@ -1,0 +1,14 @@
+{
+  "passed": 9,
+  "checks": [
+    "Initial viewport excludes third-party fonts, Motion, API, session and deferred-section resources",
+    "Existing heading and body fonts are available",
+    "All hero entrance animations finish visibly",
+    "Ambient layers and preview retain their scroll parallax",
+    "Reduced motion disables parallax and entrance movement",
+    "Native response animation finishes with the answer visible",
+    "Mobile navigation remains closed initially",
+    "Mobile menu exposes only the existing Sign In action",
+    "Mobile Sign In still opens the login route"
+  ]
+}

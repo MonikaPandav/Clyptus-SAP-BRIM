@@ -1,0 +1,19 @@
+{
+  "mode": "development StrictMode smoke",
+  "api": "CDP test fixtures; no live backend calls",
+  "passed": 8,
+  "checks": [
+    "Landing renders",
+    "Four BRIM question cards load",
+    "New section replaces integration heading and diagram",
+    "Exact selected question submitted once to existing chat stream endpoint",
+    "Chat displays selected question and streamed response",
+    "Chat reloads",
+    "Refresh does not resubmit consumed prompt intent",
+    "No browser runtime exceptions"
+  ],
+  "submitted": [
+    "How does a subscription order in SAP SOM become a subscription contract and get distributed to FI-CA and SAP Convergent Charging?"
+  ],
+  "errors": []
+}

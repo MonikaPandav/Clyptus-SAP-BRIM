@@ -1,0 +1,60 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "beforeHeight": 898.1875,
+      "afterHeight": 704.9218139648438,
+      "reductionPercent": 22,
+      "equalDesktopCards": true,
+      "noOverflow": true,
+      "contentUnchanged": true,
+      "iconSize": 32,
+      "connectorHeight": 18
+    },
+    {
+      "width": 1280,
+      "beforeHeight": 898.1873779296875,
+      "afterHeight": 704.921875,
+      "reductionPercent": 22,
+      "equalDesktopCards": true,
+      "noOverflow": true,
+      "contentUnchanged": true,
+      "iconSize": 32,
+      "connectorHeight": 18
+    },
+    {
+      "width": 1024,
+      "beforeHeight": 875.0936279296875,
+      "afterHeight": 658.7186279296875,
+      "reductionPercent": 25,
+      "equalDesktopCards": false,
+      "noOverflow": true,
+      "contentUnchanged": true,
+      "iconSize": 32,
+      "connectorHeight": 18
+    },
+    {
+      "width": 390,
+      "beforeHeight": 1185.468505859375,
+      "afterHeight": 843.9998779296875,
+      "reductionPercent": 29,
+      "equalDesktopCards": false,
+      "noOverflow": true,
+      "contentUnchanged": true,
+      "iconSize": 28,
+      "connectorHeight": 18
+    },
+    {
+      "width": 320,
+      "beforeHeight": 1577.2498779296875,
+      "afterHeight": 1130.406005859375,
+      "reductionPercent": 28,
+      "equalDesktopCards": false,
+      "noOverflow": true,
+      "contentUnchanged": true,
+      "iconSize": 28,
+      "connectorHeight": 18
+    }
+  ],
+  "errors": []
+}
