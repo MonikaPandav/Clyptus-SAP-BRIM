@@ -1,3 +1,4 @@
+import '../components/landing/landingSections.css';
 import React, { useRef } from 'react';
 import { motion, useInView, useReducedMotion, type Variants } from 'framer-motion';
 import { ArrowDown, ArrowUpRight, Boxes, MessageCircle, Search, ShieldCheck, Sparkles } from 'lucide-react';

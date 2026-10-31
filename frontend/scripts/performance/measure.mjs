@@ -3,7 +3,7 @@ import { connect, delay } from './cdp.mjs';
 
 const label = process.argv[2] ?? 'baseline';
 const runs = Number(process.argv[3] ?? 5);
-const url = 'http://127.0.0.1:4173/';
+const url = process.argv[4] ?? 'http://127.0.0.1:4173/';
 const results = [];
 const browser = await fetch('http://127.0.0.1:9222/json/version').then(r => r.json());
 await mkdir('performance/results', { recursive: true });

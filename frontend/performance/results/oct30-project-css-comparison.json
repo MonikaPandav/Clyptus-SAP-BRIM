@@ -1,0 +1,48 @@
+{
+  "comparisons": [
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    }
+  ],
+  "differences": [],
+  "expectedChanges": []
+}

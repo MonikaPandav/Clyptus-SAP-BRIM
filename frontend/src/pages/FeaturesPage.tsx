@@ -1,3 +1,4 @@
+import '../components/landing/landingSections.css';
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, BookOpen, Boxes, MessageCircle, Search, ShieldCheck, Sparkles, Workflow } from 'lucide-react';

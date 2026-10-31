@@ -1,0 +1,355 @@
+import re
+import math
+import threading
+import numpy as np
+from typing import List, Dict, Any, Optional, Set, Tuple
+from collections import defaultdict
+from sqlalchemy.orm import Session
+
+from backend.app.config import settings
+from backend.app.models.chunk import DocumentChunk
+from backend.app.services.embedding_service import embedding_service
+
+STOP_WORDS = {
+    "what", "is", "the", "a", "an", "how", "to", "in", "of", "and", "for", "with",
+    "does", "do", "explain", "describe", "can", "you", "tell", "me", "about", "which",
+    "are", "why", "where", "when", "by", "from", "on", "at", "as", "into", "onto",
+    "should", "would", "could", "been", "being", "have", "has", "had"
+}
+
+# High-precision SAP technical identifier patterns
+TECH_ID_PATTERN = re.compile(
+    r"\b(/[a-z0-9_]{2,}/[a-z0-9_]+|fkkbix_[a-z0-9_]+|dfkk[a-z0-9_]+|fkk[a-z0-9_]+|erdk|erch|but000|but020|"
+    r"mara|marc|vbak|vbap|ekko|ekpo|bseg|bkpf|v_fkk[a-z0-9_]+|vkont|gpart|fpe[0-9]|fp[0-9]{2}|"
+    r"vk[0-9]{2}|va[0-9]{2}|vf[0-9]{2}|me[0-9]{2}[a-z]?|se[0-9]{2}[a-z]?|sm[0-9]{2}|spro|swo1|sicf)\b",
+    re.IGNORECASE
+)
+
+
+class RetrievalService:
+    @staticmethod
+    def preprocess_query(query: str) -> str:
+        """Normalizes whitespace and standardizes common punctuation."""
+        return re.sub(r"[ \t]+", " ", query).strip()
+
+    @staticmethod
+    def extract_query_tokens(query: str) -> List[str]:
+        raw = re.findall(r"\b[a-z0-9\/\-_]+\b", query.lower())
+        return [t for t in raw if t not in STOP_WORDS and len(t) > 1]
+
+    @staticmethod
+    def extract_technical_identifiers(text: str) -> List[str]:
+        found = set()
+        for m in TECH_ID_PATTERN.finditer(text):
+            tok = m.group(0).lower()
+            if tok not in STOP_WORDS:
+                found.add(tok)
+        return list(found)
+
+    def __init__(self):
+        self._cache_chunks: Optional[List[Dict[str, Any]]] = None
+        self._cache_matrix: Optional[np.ndarray] = None
+        self._cache_token_index: Optional[Dict[str, List[int]]] = None
+        self._cache_tech_id_index: Optional[Dict[str, List[int]]] = None
+        self._cache_doc_lengths: Optional[np.ndarray] = None
+        self._avg_doc_len: float = 100.0
+        self._cache_idf: Optional[Dict[str, float]] = None
+        self._cache_count: int = -1
+        self._query_result_cache: Dict[Tuple[str, int, Optional[str]], List[Dict[str, Any]]] = {}
+        self._cache_lock = threading.Lock()
+
+    def invalidate_cache(self):
+        with self._cache_lock:
+            self._cache_chunks = None
+            self._cache_matrix = None
+            self._cache_token_index = None
+            self._cache_tech_id_index = None
+            self._cache_doc_lengths = None
+            self._cache_idf = None
+            self._cache_count = -1
+            self._query_result_cache.clear()
+
+    def _get_cache(self, db: Session):
+        with self._cache_lock:
+            current_count = db.query(DocumentChunk).count()
+            if self._cache_chunks is not None and self._cache_count == current_count:
+                return (
+                    self._cache_chunks,
+                    self._cache_matrix,
+                    self._cache_token_index,
+                    self._cache_tech_id_index,
+                    self._cache_doc_lengths,
+                    self._avg_doc_len,
+                    self._cache_idf
+                )
+
+            # Explicit, stable order: tie-breaking in the ranking channels depends on position.
+            all_chunks = db.query(DocumentChunk).order_by(DocumentChunk.insertion_order).all()
+            chunks_meta = []
+            vecs = []
+            dim = settings.EMBEDDING_DIM
+
+            token_to_indices = defaultdict(list)
+            tech_to_indices = defaultdict(list)
+            doc_lengths = []
+
+            for idx, c in enumerate(all_chunks):
+                emb = c.embedding
+                if emb and len(emb) == dim:
+                    v = np.array(emb, dtype=np.float32)
+                    norm = float(np.linalg.norm(v))
+                    v = v / norm if norm > 0 else np.zeros(dim, dtype=np.float32)
+                else:
+                    v = np.zeros(dim, dtype=np.float32)
+                vecs.append(v)
+
+                chunk_text = c.chunk_text or ""
+                raw_tokens = re.findall(r"\b[a-z0-9\/\-_]+\b", chunk_text.lower())
+                tokens = [t for t in raw_tokens if t not in STOP_WORDS and len(t) > 1]
+                doc_lengths.append(len(tokens))
+
+                unique_tokens = set(tokens)
+                for tok in unique_tokens:
+                    token_to_indices[tok].append(idx)
+
+                tech_ids = self.extract_technical_identifiers(chunk_text)
+                for tid in tech_ids:
+                    tech_to_indices[tid].append(idx)
+
+                chunks_meta.append({
+                    "chunk_id": c.id,
+                    "document_id": c.document_id,
+                    "document_name": c.document_name,
+                    "page_number": c.page_number,
+                    "section": c.section or f"Page {c.page_number}",
+                    "chunk_text": chunk_text,
+                    "tech_ids": tech_ids,
+                })
+
+            N = len(chunks_meta)
+            doc_lengths_arr = np.array(doc_lengths, dtype=np.float32)
+            avg_len = float(np.mean(doc_lengths_arr)) if N > 0 else 100.0
+
+            idf_dict = {}
+            for tok, doc_list in token_to_indices.items():
+                df = len(doc_list)
+                idf_dict[tok] = max(0.1, math.log(1.0 + (N - df + 0.5) / (df + 0.5)))
+
+            self._cache_chunks = chunks_meta
+            self._cache_matrix = np.array(vecs, dtype=np.float32) if vecs else np.zeros((0, dim), dtype=np.float32)
+            self._cache_token_index = dict(token_to_indices)
+            self._cache_tech_id_index = dict(tech_to_indices)
+            self._cache_doc_lengths = doc_lengths_arr
+            self._avg_doc_len = avg_len
+            self._cache_idf = idf_dict
+            self._cache_count = current_count
+
+            return (
+                self._cache_chunks,
+                self._cache_matrix,
+                self._cache_token_index,
+                self._cache_tech_id_index,
+                self._cache_doc_lengths,
+                self._avg_doc_len,
+                self._cache_idf
+            )
+
+    def hybrid_search(
+        self,
+        db: Session,
+        query: str,
+        top_k: Optional[int] = None,
+        document_filter: Optional[str] = None,
+        **kwargs
+    ) -> List[Dict[str, Any]]:
+        """
+        Independent Multi-Channel Enterprise Retrieval Pipeline:
+        1. Channel A: Dense Semantic Vector Retrieval
+        2. Channel B: Independent Full-Corpus Lexical BM25 Retrieval
+        3. Channel C: Exact SAP Technical Identifier Retrieval
+        4. Multi-Channel Reciprocal Rank Fusion (RRF) with identifier boosting
+        5. Near-duplicate chunk suppression
+        """
+        k = top_k or settings.TOP_K
+        processed_query = self.preprocess_query(query)
+
+        cache_key = (processed_query, k, document_filter)
+        with self._cache_lock:
+            if cache_key in self._query_result_cache:
+                return list(self._query_result_cache[cache_key])
+
+        query_tokens = self.extract_query_tokens(processed_query)
+        query_tech_ids = self.extract_technical_identifiers(processed_query)
+
+        query_vector_list = embedding_service.embed_text(processed_query)
+        query_vector = np.array(query_vector_list, dtype=np.float32)
+        q_norm = float(np.linalg.norm(query_vector))
+        if q_norm > 0:
+            query_vector = query_vector / q_norm
+
+        (
+            cached_meta,
+            cached_matrix,
+            token_index,
+            tech_index,
+            doc_lengths,
+            avg_doc_len,
+            idf_dict
+        ) = self._get_cache(db)
+
+        if not cached_meta or cached_matrix.shape[0] == 0:
+            return []
+
+        CANDIDATES_PER_CHANNEL = max(60, k * 4)
+
+        # CHANNEL 1: INDEPENDENT DENSE VECTOR RETRIEVAL
+        sims = cached_matrix @ query_vector
+        # Cosine similarity already has a meaningful zero point. Mapping it to
+        # (cosine + 1) / 2 gives unrelated vectors a misleading 0.50 baseline.
+        normalized_sims = np.clip(sims, 0.0, 1.0)
+        top_vec_indices = np.argsort(-normalized_sims)[:CANDIDATES_PER_CHANNEL]
+
+        vec_rank_map: Dict[int, int] = {}
+        for rank, idx in enumerate(top_vec_indices, start=1):
+            if document_filter and cached_meta[idx]["document_name"] != document_filter:
+                continue
+            vec_rank_map[idx] = rank
+
+        # CHANNEL 2: INDEPENDENT LEXICAL BM25 RETRIEVAL (FULL CORPUS)
+        bm25_scores = defaultdict(float)
+        k1 = 1.5
+        b = 0.75
+
+        for tok in query_tokens:
+            if tok in token_index:
+                tok_idf = idf_dict.get(tok, 0.5)
+                doc_list = token_index[tok]
+                for d_idx in doc_list:
+                    if document_filter and cached_meta[d_idx]["document_name"] != document_filter:
+                        continue
+                    c_text = cached_meta[d_idx]["chunk_text"].lower()
+                    tf = c_text.count(tok)
+                    d_len = doc_lengths[d_idx]
+                    denom = tf + k1 * (1.0 - b + b * (d_len / avg_doc_len))
+                    score = tok_idf * ((tf * (k1 + 1.0)) / max(0.001, denom))
+                    if len(tok) in (2, 3, 4) and (tok in {"som", "cc", "ci", "fica", "bit", "cit", "rar", "mm", "sd", "fi", "co"}):
+                        score *= 1.4
+                    bm25_scores[d_idx] += score
+
+        sorted_bm25 = sorted(bm25_scores.items(), key=lambda x: x[1], reverse=True)[:CANDIDATES_PER_CHANNEL]
+        lex_rank_map: Dict[int, int] = {}
+        for rank, (idx, _) in enumerate(sorted_bm25, start=1):
+            lex_rank_map[idx] = rank
+
+        # CHANNEL 3: EXACT TECHNICAL IDENTIFIER RETRIEVAL
+        tech_hits = defaultdict(int)
+        for tid in query_tech_ids:
+            if tid in tech_index:
+                for d_idx in tech_index[tid]:
+                    if document_filter and cached_meta[d_idx]["document_name"] != document_filter:
+                        continue
+                    tech_hits[d_idx] += 1
+
+        sorted_tech = sorted(tech_hits.items(), key=lambda x: x[1], reverse=True)[:30]
+        tech_rank_map: Dict[int, int] = {}
+        for rank, (idx, _) in enumerate(sorted_tech, start=1):
+            tech_rank_map[idx] = rank
+
+        # CHANNEL 4: RECIPROCAL RANK FUSION (RRF)
+        RRF_K = 60
+        all_candidate_indices = set(vec_rank_map.keys()) | set(lex_rank_map.keys()) | set(tech_rank_map.keys())
+        rrf_fused_scores: Dict[int, float] = {}
+
+        w_vec = 1.0
+        w_lex = 0.85
+        w_tech = 1.30
+
+        for idx in all_candidate_indices:
+            score = 0.0
+            if idx in vec_rank_map:
+                score += w_vec / (RRF_K + vec_rank_map[idx])
+            if idx in lex_rank_map:
+                score += w_lex / (RRF_K + lex_rank_map[idx])
+            if idx in tech_rank_map:
+                score += w_tech / (RRF_K + tech_rank_map[idx])
+            rrf_fused_scores[idx] = score
+
+        sorted_candidates = sorted(rrf_fused_scores.items(), key=lambda x: x[1], reverse=True)
+
+        # NEAR-DUPLICATE SUPPRESSION & CALIBRATED SCORES
+        results: List[Dict[str, Any]] = []
+        seen_passages: List[Set[str]] = []
+
+        for idx, fused_score in sorted_candidates:
+            meta = cached_meta[idx]
+            
+            # Phase 1: Exclude off-domain documents when flag is enabled (default False)
+            if getattr(settings, "EXCLUDE_OFF_DOMAIN_DOCS", False):
+                try:
+                    from backend.app.corpus.tier_definitions import DOCUMENT_TIER_MAPPING
+                    if DOCUMENT_TIER_MAPPING.get(meta["document_name"], {}).get("is_off_domain", False):
+                        continue
+                except Exception:
+                    pass
+
+            v_score = float(normalized_sims[idx])
+            b_score = float(bm25_scores.get(idx, 0.0))
+            
+            c_text = meta["chunk_text"]
+            c_words = set(re.findall(r"\b[a-z]{3,}\b", c_text.lower()))
+
+            is_duplicate = False
+            for prev_words in seen_passages:
+                intersection = len(c_words & prev_words)
+                union = len(c_words | prev_words)
+                if union > 0 and (intersection / union) > 0.82:
+                    is_duplicate = True
+                    break
+
+            if is_duplicate:
+                continue
+
+            seen_passages.append(c_words)
+
+            token_coverage = (
+                sum(1 for token in query_tokens if token in c_text.lower()) / len(query_tokens)
+                if query_tokens else 0.5
+            )
+            identifier_match = 1.0 if query_tech_ids and idx in tech_rank_map else 0.0
+            phrase_match = 1.0 if len(query_tokens) > 1 and " ".join(query_tokens[:3]) in c_text.lower() else 0.0
+            calibrated_score = round(min(0.99, max(0.0, (
+                0.60 * v_score + 0.25 * token_coverage +
+                0.10 * identifier_match + 0.05 * phrase_match
+            ))), 4)
+
+            results.append({
+                "chunk_id": meta["chunk_id"],
+                "document_id": meta["document_id"],
+                "document_name": meta["document_name"],
+                "source_type": "knowledge_base",
+                "page_number": meta["page_number"],
+                "section": meta["section"],
+                "chunk_text": c_text,
+                "snippet": c_text[:350],
+                "vector_score": round(v_score, 4),
+                "bm25_score": round(b_score, 4),
+                "rrf_score": round(fused_score, 6),
+                "has_tech_id_match": bool(idx in tech_rank_map),
+                "score": calibrated_score,
+            })
+
+            if len(results) >= k:
+                break
+
+        with self._cache_lock:
+            if len(self._query_result_cache) >= 512:
+                self._query_result_cache.pop(next(iter(self._query_result_cache)))
+            self._query_result_cache[cache_key] = results
+        return results
+
+    def retrieve(self, db: Session, query: str, top_k: int = 15) -> List[Dict[str, Any]]:
+        """Standard retrieval interface delegating to hybrid search."""
+        return self.hybrid_search(db, query, top_k=top_k)
+
+
+retrieval_service = RetrievalService()

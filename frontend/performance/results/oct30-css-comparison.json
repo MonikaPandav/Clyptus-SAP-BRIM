@@ -1,0 +1,1034 @@
+{
+  "comparisons": [
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/app",
+      "comparedNodes": 118,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/app",
+      "comparedNodes": 118,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/app",
+      "comparedNodes": 119,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/app",
+      "comparedNodes": 119,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app",
+      "comparedNodes": 119,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": [
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "65.3125px",
+          "after": "70.0625px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "75.0156px",
+          "after": "80.8906px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "width",
+          "before": "81.4688px",
+          "after": "87.9219px"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "comparedNodes": 483,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/features",
+      "comparedNodes": 95,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/how-it-works",
+      "comparedNodes": 107,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/login",
+      "comparedNodes": 41,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app",
+      "comparedNodes": 119,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app/settings",
+      "comparedNodes": 91,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app/profile",
+      "comparedNodes": 78,
+      "changes": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": [
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "65.3125px",
+          "after": "70.0625px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "75.0156px",
+          "after": "80.8906px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "width",
+          "before": "81.4688px",
+          "after": "87.9219px"
+        }
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": [
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "65.3125px",
+          "after": "70.0625px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "75.0156px",
+          "after": "80.8906px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "width",
+          "before": "81.4688px",
+          "after": "87.9219px"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/app/projects/proj_brim_core",
+      "comparedNodes": 77,
+      "changes": [
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 64,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "65.3125px",
+          "after": "70.0625px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 65,
+          "classes": "button button-outline button-small",
+          "property": "width",
+          "before": "75.0156px",
+          "after": "80.8906px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "font-size",
+          "before": "9px",
+          "after": "10px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "line-height",
+          "before": "13.5px",
+          "after": "15px"
+        },
+        {
+          "node": 66,
+          "classes": "button button-dark button-small",
+          "property": "width",
+          "before": "81.4688px",
+          "after": "87.9219px"
+        }
+      ]
+    }
+  ],
+  "expectedChanges": [
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "7596.98px",
+      "after": "7593.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "7232.98px",
+      "after": "7229.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "5890.73px",
+      "after": "5887.73px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "717.484px",
+      "after": "714.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "537.484px",
+      "after": "534.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "537.484px",
+      "after": "534.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "387.484px",
+      "after": "384.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "7596.98px",
+      "after": "7593.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "7232.98px",
+      "after": "7229.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "5890.73px",
+      "after": "5887.73px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "717.484px",
+      "after": "714.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "537.484px",
+      "after": "534.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "537.484px",
+      "after": "534.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "387.484px",
+      "after": "384.484px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "8988.11px",
+      "after": "8985.11px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "8624.11px",
+      "after": "8621.11px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "7050.98px",
+      "after": "7047.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "647.219px",
+      "after": "644.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "467.219px",
+      "after": "464.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "467.219px",
+      "after": "464.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "317.219px",
+      "after": "314.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "8988.11px",
+      "after": "8985.11px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "8624.11px",
+      "after": "8621.11px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "7050.98px",
+      "after": "7047.98px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "647.219px",
+      "after": "644.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "467.219px",
+      "after": "464.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "467.219px",
+      "after": "464.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "317.219px",
+      "after": "314.219px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "13091.1px",
+      "after": "13085.1px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "12643.3px",
+      "after": "12637.3px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "10668px",
+      "after": "10662px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "897.719px",
+      "after": "891.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "717.719px",
+      "after": "711.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "717.719px",
+      "after": "711.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "567.719px",
+      "after": "561.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 0,
+      "property": "height",
+      "before": "13091.1px",
+      "after": "13085.1px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 17,
+      "property": "height",
+      "before": "12643.3px",
+      "after": "12637.3px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 125,
+      "property": "height",
+      "before": "10668px",
+      "after": "10662px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 449,
+      "property": "height",
+      "before": "897.719px",
+      "after": "891.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 450,
+      "property": "height",
+      "before": "717.719px",
+      "after": "711.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 451,
+      "property": "height",
+      "before": "717.719px",
+      "after": "711.719px",
+      "reason": "Requested CTA label spacing and line height"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "path": "/#features",
+      "node": 453,
+      "property": "height",
+      "before": "567.719px",
+      "after": "561.719px",
+      "reason": "Requested CTA label spacing and line height"
+    }
+  ]
+}

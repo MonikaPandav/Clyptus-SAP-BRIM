@@ -1,0 +1,816 @@
+{
+  "before": {
+    "label": "oct30-final-before",
+    "url": "http://127.0.0.1:4174/",
+    "browser": "Chrome/156.0.8078.79",
+    "viewport": "1440x900 @1",
+    "cache": "disabled and cleared each run",
+    "throttling": "none (CPU and network)",
+    "observation": "2 seconds after load",
+    "loadMedian": 65.70000000298023,
+    "fcpMedian": 296,
+    "lcpMedian": 296,
+    "js": {
+      "decodedBytes": 292541,
+      "gzipBytes": 93248
+    },
+    "css": {
+      "decodedBytes": 266255,
+      "gzipBytes": 40985
+    },
+    "initialCode": {
+      "decodedBytes": 558796,
+      "gzipBytes": 134233
+    },
+    "allEmittedJsBytes": 845175,
+    "loadRange": [
+      97.40000000596046,
+      88.29999999701977,
+      83,
+      65.70000000298023,
+      61.70000000298023,
+      65.09999999403954,
+      64.29999999701977
+    ],
+    "fcpRange": [
+      436,
+      400,
+      324,
+      272,
+      296,
+      288,
+      284
+    ],
+    "lcpRange": [
+      436,
+      400,
+      324,
+      272,
+      296,
+      288,
+      284
+    ],
+    "scriptMs": 32.052,
+    "layoutMs": 118.524,
+    "taskMs": 245.07899999999998,
+    "apiRequests": [],
+    "desktop": {
+      "medians": {
+        "score": 99,
+        "fcp": 275.3276,
+        "lcp": 275.3276,
+        "tbt": 97.83620000000002,
+        "cls": 0
+      },
+      "runs": [
+        {
+          "score": 97,
+          "fcp": 270.6349,
+          "lcp": 270.6349,
+          "tbt": 151,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:07:56.702Z"
+        },
+        {
+          "score": 100,
+          "fcp": 358.24070000000006,
+          "lcp": 358.24070000000006,
+          "tbt": 16.37964999999997,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:09:08.768Z"
+        },
+        {
+          "score": 99,
+          "fcp": 275.3276,
+          "lcp": 275.3276,
+          "tbt": 97.83620000000002,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:09:50.388Z"
+        }
+      ],
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "method": "simulate"
+    },
+    "mobile": {
+      "medians": {
+        "score": 81,
+        "fcp": 1241.0518499999998,
+        "lcp": 1241.0518499999998,
+        "tbt": 767,
+        "cls": 0
+      },
+      "runs": [
+        {
+          "score": 81,
+          "fcp": 1251.5651,
+          "lcp": 1251.5651,
+          "tbt": 767,
+          "cls": 0,
+          "warnings": [
+            "The tested device appears to have a slower CPU than  Lighthouse expects. This can negatively affect your performance score. Learn more about [calibrating an appropriate CPU slowdown multiplier](https://github.com/GoogleChrome/lighthouse/blob/main/docs/throttling.md#cpu-throttling)."
+          ],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:08:24.807Z"
+        },
+        {
+          "score": 93,
+          "fcp": 910.6847,
+          "lcp": 910.6847,
+          "tbt": 320.1576499999999,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:09:36.795Z"
+        },
+        {
+          "score": 80,
+          "fcp": 1241.0518499999998,
+          "lcp": 1241.0518499999998,
+          "tbt": 841,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:10:20.642Z"
+        }
+      ],
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "method": "simulate"
+    }
+  },
+  "after": {
+    "label": "oct30-final-after",
+    "url": "http://127.0.0.1:4173/",
+    "browser": "Chrome/156.0.8078.79",
+    "viewport": "1440x900 @1",
+    "cache": "disabled and cleared each run",
+    "throttling": "none (CPU and network)",
+    "observation": "2 seconds after load",
+    "loadMedian": 62.400000005960464,
+    "fcpMedian": 284,
+    "lcpMedian": 284,
+    "js": {
+      "decodedBytes": 292654,
+      "gzipBytes": 93278
+    },
+    "css": {
+      "decodedBytes": 222234,
+      "gzipBytes": 33398
+    },
+    "initialCode": {
+      "decodedBytes": 514888,
+      "gzipBytes": 126676
+    },
+    "allEmittedJsBytes": 845176,
+    "loadRange": [
+      60.099999994039536,
+      61.400000005960464,
+      66.3999999910593,
+      62.400000005960464,
+      61.5,
+      71.6000000089407,
+      64.90000000596046
+    ],
+    "fcpRange": [
+      252,
+      304,
+      280,
+      284,
+      288,
+      296,
+      284
+    ],
+    "lcpRange": [
+      252,
+      304,
+      280,
+      284,
+      288,
+      296,
+      284
+    ],
+    "scriptMs": 31.894,
+    "layoutMs": 108.32799999999999,
+    "taskMs": 236.64499999999998,
+    "apiRequests": [],
+    "desktop": {
+      "medians": {
+        "score": 100,
+        "fcp": 274.9715,
+        "lcp": 274.9715,
+        "tbt": 72.48204999999996,
+        "cls": 0
+      },
+      "runs": [
+        {
+          "score": 100,
+          "fcp": 252.03590000000003,
+          "lcp": 252.03590000000003,
+          "tbt": 72.48204999999996,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:08:10.966Z"
+        },
+        {
+          "score": 97,
+          "fcp": 274.9715,
+          "lcp": 274.9715,
+          "tbt": 150.51425,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:08:52.741Z"
+        },
+        {
+          "score": 100,
+          "fcp": 392.0548,
+          "lcp": 392.0548,
+          "tbt": 39.00000000000006,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:10:06.647Z"
+        }
+      ],
+      "throttling": {
+        "rttMs": 40,
+        "throughputKbps": 10240,
+        "requestLatencyMs": 0,
+        "downloadThroughputKbps": 0,
+        "uploadThroughputKbps": 0,
+        "cpuSlowdownMultiplier": 1
+      },
+      "method": "simulate"
+    },
+    "mobile": {
+      "medians": {
+        "score": 85,
+        "fcp": 925.3324,
+        "lcp": 925.3324,
+        "tbt": 577.5648499999998,
+        "cls": 0
+      },
+      "runs": [
+        {
+          "score": 85,
+          "fcp": 913.8703,
+          "lcp": 913.8703,
+          "tbt": 577.5648499999998,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:08:39.077Z"
+        },
+        {
+          "score": 78,
+          "fcp": 925.3324,
+          "lcp": 925.3324,
+          "tbt": 1065.5,
+          "cls": 0,
+          "warnings": [
+            "The tested device appears to have a slower CPU than  Lighthouse expects. This can negatively affect your performance score. Learn more about [calibrating an appropriate CPU slowdown multiplier](https://github.com/GoogleChrome/lighthouse/blob/main/docs/throttling.md#cpu-throttling)."
+          ],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:09:22.517Z"
+        },
+        {
+          "score": 96,
+          "fcp": 1553.8654,
+          "lcp": 1553.8654,
+          "tbt": 202.5,
+          "cls": 0,
+          "warnings": [],
+          "version": "13.6.0",
+          "timestamp": "2026-10-30T13:10:34.453Z"
+        }
+      ],
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "method": "simulate"
+    }
+  },
+  "validation": {
+    "cssCases": 48,
+    "unexpectedCssDifferences": [],
+    "expectedCtaHeightChanges": [
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "7596.98px",
+        "after": "7593.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "7232.98px",
+        "after": "7229.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "5890.73px",
+        "after": "5887.73px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "717.484px",
+        "after": "714.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "537.484px",
+        "after": "534.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "537.484px",
+        "after": "534.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "light",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "387.484px",
+        "after": "384.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "7596.98px",
+        "after": "7593.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "7232.98px",
+        "after": "7229.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "5890.73px",
+        "after": "5887.73px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "717.484px",
+        "after": "714.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "537.484px",
+        "after": "534.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "537.484px",
+        "after": "534.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 1440,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "387.484px",
+        "after": "384.484px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "8988.11px",
+        "after": "8985.11px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "8624.11px",
+        "after": "8621.11px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "7050.98px",
+        "after": "7047.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "647.219px",
+        "after": "644.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "467.219px",
+        "after": "464.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "467.219px",
+        "after": "464.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "light",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "317.219px",
+        "after": "314.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "8988.11px",
+        "after": "8985.11px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "8624.11px",
+        "after": "8621.11px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "7050.98px",
+        "after": "7047.98px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "647.219px",
+        "after": "644.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "467.219px",
+        "after": "464.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "467.219px",
+        "after": "464.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 768,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "317.219px",
+        "after": "314.219px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "13091.1px",
+        "after": "13085.1px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "12643.3px",
+        "after": "12637.3px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "10668px",
+        "after": "10662px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "897.719px",
+        "after": "891.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "717.719px",
+        "after": "711.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "717.719px",
+        "after": "711.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "light",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "567.719px",
+        "after": "561.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 0,
+        "property": "height",
+        "before": "13091.1px",
+        "after": "13085.1px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 17,
+        "property": "height",
+        "before": "12643.3px",
+        "after": "12637.3px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 125,
+        "property": "height",
+        "before": "10668px",
+        "after": "10662px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 449,
+        "property": "height",
+        "before": "897.719px",
+        "after": "891.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 450,
+        "property": "height",
+        "before": "717.719px",
+        "after": "711.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 451,
+        "property": "height",
+        "before": "717.719px",
+        "after": "711.719px",
+        "reason": "Requested CTA label spacing and line height"
+      },
+      {
+        "width": 390,
+        "theme": "dark",
+        "path": "/#features",
+        "node": 453,
+        "property": "height",
+        "before": "567.719px",
+        "after": "561.719px",
+        "reason": "Requested CTA label spacing and line height"
+      }
+    ],
+    "functional": {
+      "passed": 52,
+      "checks": [
+        "Landing page renders",
+        "No API, authenticated routes, Markdown, lower sections or secondary panels loaded initially",
+        "Documents opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Four document references available",
+        "Document search filters references",
+        "Selected document excerpt changes",
+        "Chat opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Document selection updates chat scenario",
+        "Documents opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Document search preserved when switching panels",
+        "Workflows opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Workflow matches selected scenario",
+        "Workflow copy action confirms",
+        "Clipboard contains actual SPRO path",
+        "Database opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Four database records available",
+        "Database record selection updates details",
+        "Open in Chat restores selected record",
+        "Scenario 1 displays correct chat answer",
+        "Scenario 2 displays correct chat answer",
+        "Scenario 3 displays correct chat answer",
+        "Scenario 4 displays correct chat answer",
+        "Send Query keeps answer mounted",
+        "FAQ navigation loads deferred sections",
+        "FAQ anchor scrolls to correct section",
+        "FAQ accordion remains interactive",
+        "Direct About hash loads section",
+        "Direct About view starts at page top",
+        "Features route loads lazily",
+        "How it works route loads lazily",
+        "Login and lazy auth stylesheet load",
+        "Login styling preserved",
+        "Protected chat redirects unauthenticated users",
+        "Admin login loads",
+        "Mobile landing renders",
+        "Mobile viewport has no horizontal overflow",
+        "All sidebar icons accessible on mobile",
+        "Documents opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Workflows opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Database opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Chat opens and is selected",
+        "Exactly one sidebar icon selected",
+        "Landing with saved token renders",
+        "Landing with saved token does not access API/database/RAG"
+      ],
+      "exceptions": []
+    },
+    "animations": {
+      "passed": 9,
+      "checks": [
+        "Initial viewport excludes third-party fonts, Motion, API, session and deferred-section resources",
+        "Existing heading and body fonts are available",
+        "All hero entrance animations finish visibly",
+        "Ambient layers and preview retain their scroll parallax",
+        "Reduced motion disables parallax and entrance movement",
+        "Native response animation finishes with the answer visible",
+        "Mobile navigation remains closed initially",
+        "Mobile menu exposes only the existing Sign In action",
+        "Mobile Sign In still opens the login route"
+      ]
+    }
+  }
+}

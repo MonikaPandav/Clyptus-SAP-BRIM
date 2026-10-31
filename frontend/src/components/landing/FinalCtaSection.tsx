@@ -75,12 +75,10 @@ export const FinalCtaSection: React.FC = () => {
                 <ShieldCheck size={14} className="text-orange" />
                 <span>100% Grounded in Official Manuals</span>
               </div>
-              <span className="trust-sep">·</span>
               <div className="trust-indicator-item">
                 <Lock size={14} className="text-orange" />
                 <span>Tenant-Isolated Workspaces</span>
               </div>
-              <span className="trust-sep">·</span>
               <div className="trust-indicator-item">
                 <Sparkles size={14} className="text-orange" />
                 <span>Real-Time Streaming Generation</span>

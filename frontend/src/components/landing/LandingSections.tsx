@@ -1,3 +1,4 @@
+import './landingSections.css';
 import { useEffect } from 'react';
 import { EnterprisePartnerTicker } from './EnterprisePartnerTicker';
 import { InfinitePossibilitiesGrid } from './InfinitePossibilitiesGrid';
